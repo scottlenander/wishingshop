@@ -1,0 +1,198 @@
+/* Product list (products/index) and product detail (products/show). */
+
+/* ---------- Product list ---------- */
+
+/* A responsive grid of cards: as many ~220px columns as fit. */
+#products {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+}
+
+#products > div {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+
+#products > div:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+/*
+ * Image area. The list view does not render product images yet, so
+ * this draws a placeholder. If an <img> is added to the card later,
+ * it fills the same space and the placeholder is hidden.
+ */
+#products > div::before {
+  content: "";
+  display: block;
+  aspect-ratio: 4 / 3;
+  background:
+    radial-gradient(circle at 30% 30%, rgb(255 176 32 / 0.35), transparent 55%),
+    linear-gradient(135deg, #e6ebf2, #cfd8e6);
+}
+
+#products > div:has(img)::before {
+  display: none;
+}
+
+#products > div img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  background: var(--color-surface);
+}
+
+#products > div a {
+  padding: var(--space-4);
+  color: var(--color-text);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* Make the whole card clickable, not just the name. */
+#products > div a::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+#products > div:hover a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+/* ---------- Product detail ---------- */
+
+/* Image on the left, details on the right; stacks on small screens. */
+section.product {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+section.product > img {
+  width: 100%;
+  max-height: 600px;
+  object-fit: contain;
+  padding: var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+/* Details card ("buy box"). */
+.product-info {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-4));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-6);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* With no image, the details take the full width. */
+section.product:not(:has(> img)) {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+section.product:not(:has(> img)) .product-info {
+  position: static;
+}
+
+.product-info h1 {
+  margin-bottom: 0;
+}
+
+.product-info .trix-content {
+  width: 100%;
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+}
+
+/* Inventory status ("3 in stock" / "Out of stock"). */
+.product-info > p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.product-info > p:has(+ p) {
+  color: var(--color-danger);
+}
+
+.product-info > p + p {
+  font-weight: 400;
+  color: var(--color-text-muted);
+}
+
+/* "Email me when available" form. */
+.product-info form:not(.button_to) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.product-info form:not(.button_to) input[type="email"] {
+  flex: 1 1 200px;
+  width: auto;
+}
+
+/* Admin actions: Edit (link) and Delete (button_to). */
+.product-info > a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: var(--space-2) var(--space-5);
+  margin-top: var(--space-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.product-info > a:hover {
+  background: var(--color-bg);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.product-info .button_to button {
+  background: var(--color-surface);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+}
+
+.product-info .button_to button:hover {
+  background: var(--color-danger-bg);
+}
+
+@media (max-width: 768px) {
+  section.product {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .product-info {
+    position: static;
+    padding: var(--space-5);
+  }
+}

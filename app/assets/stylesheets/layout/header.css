@@ -1,0 +1,68 @@
+/*
+ * Site header: the <nav> in the layout becomes a full-width navy bar
+ * that sticks to the top of the screen. The first link ("Home") is
+ * styled as the store's brand and pushed to the left.
+ */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  min-height: var(--header-height);
+  /* Full-width background, content lined up with <main>. */
+  padding: var(--space-2) max(var(--gutter), (100% - var(--content-width)) / 2);
+  background: var(--color-brand);
+  color: var(--color-on-brand);
+  box-shadow: var(--shadow-md);
+}
+
+nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  color: var(--color-on-brand);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+nav a:hover {
+  background: var(--color-brand-light);
+  color: var(--color-on-brand);
+  text-decoration: none;
+}
+
+/* Brand link */
+nav > a:first-child {
+  margin-right: auto;
+  padding-left: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+nav > a:first-child:hover {
+  background: none;
+  color: var(--color-accent);
+}
+
+/* "Log out" (a button_to form) */
+nav button {
+  min-height: 2.25rem;
+  padding: var(--space-1) var(--space-4);
+  background: transparent;
+  border-color: rgb(255 255 255 / 0.4);
+  color: var(--color-on-brand);
+  font-size: var(--font-size-sm);
+}
+
+nav button:hover {
+  background: var(--color-brand-light);
+  border-color: var(--color-on-brand);
+  color: var(--color-on-brand);
+}

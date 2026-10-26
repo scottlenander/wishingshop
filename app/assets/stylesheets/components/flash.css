@@ -1,0 +1,55 @@
+/*
+ * Flash messages (.notice and .alert from the layout).
+ * They show as a toast in the top-right corner, below the header.
+ * The layout always renders both divs, so hide them when empty.
+ */
+
+.notice,
+.alert {
+  position: fixed;
+  top: calc(var(--header-height) + var(--space-3));
+  right: var(--gutter);
+  z-index: 100;
+  max-width: min(420px, calc(100vw - 2 * var(--gutter)));
+  padding: var(--space-3) var(--space-4);
+  border-left: 4px solid currentColor;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  font-weight: 600;
+  animation: flash-in 250ms ease-out;
+}
+
+.notice {
+  background: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+.alert {
+  background: var(--color-danger-bg);
+  color: var(--color-danger);
+}
+
+.notice:empty,
+.alert:empty {
+  display: none;
+}
+
+/* If both are shown at once, stack the alert under the notice. */
+.notice:not(:empty) + .alert:not(:empty) {
+  top: calc(var(--header-height) + 4.5rem);
+}
+
+@keyframes flash-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (max-width: 600px) {
+  .notice,
+  .alert {
+    left: var(--gutter);
+    max-width: none;
+  }
+}

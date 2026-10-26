@@ -1,0 +1,17 @@
+/* The centered page container that holds each view. */
+
+main {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: var(--space-6) var(--gutter) var(--space-8);
+}
+
+/* Plain links that sit directly in a page (e.g. "New product", "Back", "Cancel"). */
+main > a,
+main > p > a {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-weight: 600;
+}

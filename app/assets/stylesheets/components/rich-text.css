@@ -1,0 +1,49 @@
+/*
+ * Adjusts the Action Text (Trix) defaults from actiontext.css
+ * to match the rest of the forms.
+ */
+
+trix-toolbar .trix-button-group {
+  border-color: var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+trix-toolbar .trix-button-row {
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+trix-toolbar .trix-button-group:not(:first-child) {
+  margin-left: 0;
+}
+
+trix-toolbar .trix-button {
+  background: var(--color-surface);
+  border-bottom: none;
+}
+
+trix-editor {
+  min-height: 10rem;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+
+trix-editor:focus {
+  border-color: var(--color-link);
+  box-shadow: 0 0 0 3px rgb(10 102 194 / 0.2);
+}
+
+.trix-content {
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.trix-content > div + div,
+.trix-content ul,
+.trix-content ol {
+  margin-top: var(--space-2);
+}
