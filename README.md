@@ -1,24 +1,35 @@
-# README
+# WishingShop
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+A fake shopping website built for development and testing practice. Based on the [Ruby on Rails tutorial](https://guides.rubyonrails.org/getting_started.html).
 
-Things you may want to cover:
+## Features
 
-* Ruby version
+- **Feature 1** — Short description of the first key feature
+- **Feature 2** — Short description of the second key feature
+- **Feature 3** — Short description of the third key feature
+- **Feature 4** — Short description of the fourth key feature
 
-* System dependencies
+## Quick Start
 
-* Configuration
+### Prerequisites
 
-* Database creation
+- Ruby >= 3.2
+- Rails >= 8.1
 
-* Database initialization
+### Installation
 
-* How to run the test suite
+Create DB first time:
 
-* Services (job queues, cache servers, search engines, etc.)
+```bash
+bin/rails db:create
+```
 
-* Deployment instructions
+### Basic Usage
 
-* ...
+```bash
+bin/rails server
+```
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
