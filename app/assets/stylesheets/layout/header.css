@@ -1,10 +1,9 @@
 /*
- * Site header: the <nav> in the layout becomes a full-width navy bar
- * that sticks to the top of the screen. The first link ("Home") is
- * styled as the store's brand and pushed to the left.
+ * Site header (layouts/application): a full-width navy bar that
+ * sticks to the top of the screen, with the brand link on the left.
  */
 
-nav {
+.layouts-application__nav {
   position: sticky;
   top: 0;
   z-index: 50;
@@ -13,46 +12,28 @@ nav {
   align-items: center;
   gap: var(--space-2) var(--space-4);
   min-height: var(--header-height);
-  /* Full-width background, content lined up with <main>. */
+  /* Full-width background, content lined up with the main container. */
   padding: var(--space-2) max(var(--gutter), (100% - var(--content-width)) / 2);
   background: var(--color-brand);
   color: var(--color-on-brand);
   box-shadow: var(--shadow-md);
 }
 
-nav a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.5rem;
-  padding: var(--space-1) var(--space-3);
-  border-radius: var(--radius-sm);
-  color: var(--color-on-brand);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-}
-
-nav a:hover {
-  background: var(--color-brand-light);
-  color: var(--color-on-brand);
-  text-decoration: none;
-}
-
-/* Brand link */
-nav > a:first-child {
+.layouts-application__brand {
   margin-right: auto;
-  padding-left: 0;
+  color: var(--color-on-brand);
   font-size: var(--font-size-xl);
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
-nav > a:first-child:hover {
-  background: none;
+.layouts-application__brand:hover {
   color: var(--color-accent);
+  text-decoration: none;
 }
 
-/* "Log out" (a button_to form) */
-nav button {
+/* "Log out" button: outlined so it sits quietly on the navy bar. */
+.layouts-application__logout {
   min-height: 2.25rem;
   padding: var(--space-1) var(--space-4);
   background: transparent;
@@ -61,7 +42,7 @@ nav button {
   font-size: var(--font-size-sm);
 }
 
-nav button:hover {
+.layouts-application__logout:hover {
   background: var(--color-brand-light);
   border-color: var(--color-on-brand);
   color: var(--color-on-brand);

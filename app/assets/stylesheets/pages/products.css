@@ -1,16 +1,26 @@
-/* Product list (products/index) and product detail (products/show). */
+/*
+ * Product views: products/index, products/show, products/_inventory,
+ * products/_form, products/new and products/edit.
+ */
 
-/* ---------- Product list ---------- */
+/* ---------- products/index ---------- */
+
+.products-index__action,
+.products-show__back,
+.products-new__cancel,
+.products-edit__cancel {
+  font-weight: 600;
+}
 
 /* A responsive grid of cards: as many ~220px columns as fit. */
-#products {
+.products-index__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: var(--space-5);
   margin-top: var(--space-5);
 }
 
-#products > div {
+.products-index__card {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -22,37 +32,30 @@
   transition: box-shadow var(--transition), transform var(--transition);
 }
 
-#products > div:hover {
+.products-index__card:hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-3px);
 }
 
-/*
- * Image area. The list view does not render product images yet, so
- * this draws a placeholder. If an <img> is added to the card later,
- * it fills the same space and the placeholder is hidden.
- */
-#products > div::before {
-  content: "";
-  display: block;
+/* Product image, centered on white so photos of any shape line up. */
+.products-index__card-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: contain;
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Shown instead of the image when a product has none. */
+.products-index__card-placeholder {
   aspect-ratio: 4 / 3;
   background:
     radial-gradient(circle at 30% 30%, rgb(255 176 32 / 0.35), transparent 55%),
     linear-gradient(135deg, #e6ebf2, #cfd8e6);
 }
 
-#products > div:has(img)::before {
-  display: none;
-}
-
-#products > div img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: contain;
-  background: var(--color-surface);
-}
-
-#products > div a {
+.products-index__card-link {
   padding: var(--space-4);
   color: var(--color-text);
   font-weight: 600;
@@ -60,28 +63,32 @@
 }
 
 /* Make the whole card clickable, not just the name. */
-#products > div a::after {
+.products-index__card-link::after {
   content: "";
   position: absolute;
   inset: 0;
 }
 
-#products > div:hover a {
+.products-index__card:hover .products-index__card-link {
   color: var(--color-link);
   text-decoration: none;
 }
 
-/* ---------- Product detail ---------- */
+/* ---------- products/show ---------- */
 
 /* Image on the left, details on the right; stacks on small screens. */
-section.product {
+.products-show__product {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
   gap: var(--space-6);
   align-items: start;
 }
 
-section.product > img {
+.products-show__product--no-image {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.products-show__image {
   width: 100%;
   max-height: 600px;
   object-fit: contain;
@@ -91,8 +98,8 @@ section.product > img {
   border-radius: var(--radius-lg);
 }
 
-/* Details card ("buy box"). */
-.product-info {
+/* Details card ("buy box"). Stays in view while scrolling next to the image. */
+.products-show__info {
   position: sticky;
   top: calc(var(--header-height) + var(--space-4));
   display: flex;
@@ -106,93 +113,76 @@ section.product > img {
   box-shadow: var(--shadow-sm);
 }
 
-/* With no image, the details take the full width. */
-section.product:not(:has(> img)) {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-section.product:not(:has(> img)) .product-info {
+.products-show__product--no-image .products-show__info {
   position: static;
 }
 
-.product-info h1 {
+.products-show__title {
   margin-bottom: 0;
 }
 
-.product-info .trix-content {
+.products-show__description {
   width: 100%;
   padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-muted);
 }
 
-/* Inventory status ("3 in stock" / "Out of stock"). */
-.product-info > p {
+.products-show__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 768px) {
+  .products-show__product {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+
+  .products-show__info {
+    position: static;
+    padding: var(--space-5);
+  }
+}
+
+/* ---------- products/_inventory ---------- */
+
+.products-inventory__status {
   margin: 0;
   font-weight: 600;
+}
+
+.products-inventory__status--in-stock {
   color: var(--color-success);
 }
 
-.product-info > p:has(+ p) {
+.products-inventory__status--out-of-stock {
   color: var(--color-danger);
 }
 
-.product-info > p + p {
-  font-weight: 400;
+.products-inventory__note {
+  margin: 0;
   color: var(--color-text-muted);
 }
 
-/* "Email me when available" form. */
-.product-info form:not(.button_to) {
+/* "Email me when available" form: email field and button on one line. */
+.products-inventory__form {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
   width: 100%;
 }
 
-.product-info form:not(.button_to) input[type="email"] {
+.products-inventory__email {
   flex: 1 1 200px;
-  width: auto;
 }
 
-/* Admin actions: Edit (link) and Delete (button_to). */
-.product-info > a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  padding: var(--space-2) var(--space-5);
-  margin-top: var(--space-2);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill);
-  color: var(--color-text);
-  font-weight: 600;
-}
+/* ---------- products/_form ---------- */
 
-.product-info > a:hover {
-  background: var(--color-bg);
-  color: var(--color-text);
-  text-decoration: none;
-}
-
-.product-info .button_to button {
-  background: var(--color-surface);
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-}
-
-.product-info .button_to button:hover {
-  background: var(--color-danger-bg);
-}
-
-@media (max-width: 768px) {
-  section.product {
-    grid-template-columns: minmax(0, 1fr);
-    gap: var(--space-4);
-  }
-
-  .product-info {
-    position: static;
-    padding: var(--space-5);
-  }
+.products-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }

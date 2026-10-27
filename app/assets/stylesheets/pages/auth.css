@@ -1,19 +1,24 @@
 /*
- * Sign in and password reset pages.
- * These views have no wrapper class, so they are matched by their
- * fields (email_address or new-password) and centered as a narrow column.
+ * Sign in and password reset views: sessions/new, passwords/new
+ * and passwords/edit. Shown as a narrow, centered column.
  */
 
-main:has(> form :is([name="email_address"], [autocomplete="new-password"])) {
+.sessions-new__form,
+.passwords-new__form,
+.passwords-edit__form {
+  max-width: 420px;
+  margin-inline: auto;
+}
+
+.passwords-new__title,
+.passwords-edit__title,
+.sessions-new__links {
   text-align: center;
 }
 
-main > form:has(:is([name="email_address"], [autocomplete="new-password"])) {
-  max-width: 420px;
-  margin-inline: auto;
-  text-align: left;
-}
-
-main > form:has(:is([name="email_address"], [autocomplete="new-password"])) input[type="submit"] {
+/* Full-width submit button (overrides .form-card's left-aligned one). */
+.form-card input.sessions-new__submit,
+.form-card input.passwords-new__submit,
+.form-card input.passwords-edit__submit {
   align-self: stretch;
 }

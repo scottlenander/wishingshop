@@ -1,7 +1,6 @@
 /*
  * Flash messages (.notice and .alert from the layout).
  * They show as a toast in the top-right corner, below the header.
- * The layout always renders both divs, so hide them when empty.
  */
 
 .notice,
@@ -29,13 +28,8 @@
   color: var(--color-danger);
 }
 
-.notice:empty,
-.alert:empty {
-  display: none;
-}
-
 /* If both are shown at once, stack the alert under the notice. */
-.notice:not(:empty) + .alert:not(:empty) {
+.notice + .alert {
   top: calc(var(--header-height) + 4.5rem);
 }
 

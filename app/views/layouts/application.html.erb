@@ -24,15 +24,15 @@
   </head>
 
   <body>
-    <div class="notice"><%= flash[:notice] %></div>
-    <div class="alert"><%= flash[:alert] %></div>
+    <%= tag.div(flash[:notice], class: "notice") if flash[:notice] %>
+    <%= tag.div(flash[:alert], class: "alert") if flash[:alert] %>
 
-    <nav>
-      <%= link_to "Home", root_path %>
-      <%= button_to "Log out", session_path, method: :delete if authenticated? %>
+    <nav class="layouts-application__nav">
+      <%= link_to "Home", root_path, class: "layouts-application__brand" %>
+      <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" if authenticated? %>
     </nav>
 
-    <main>
+    <main class="layouts-application__main">
       <%= yield %>
     </main>
   </body>
