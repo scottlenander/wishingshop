@@ -1,29 +1,29 @@
-<%= form_with model: product do |form| %>
+<%= form_with model: product, class: "form-card products-form" do |form| %>
   <% if form.object.errors.any? %>
     <p class="error"><%= form.object.errors.full_messages.first %></p>
   <% end %>
 
-  <div>
+  <div class="products-form__field">
     <%= form.label :name %>
     <%= form.text_field :name %>
   </div>
 
-  <div>
-    <%= form.label :description, style: "display: block" %>
+  <div class="products-form__field">
+    <%= form.label :description %>
     <%= form.rich_textarea :description %>
   </div>
-  
-  <div>
-    <%= form.label :featured_image, style: "display: block" %>
+
+  <div class="products-form__field">
+    <%= form.label :featured_image %>
     <%= form.file_field :featured_image, accept: "image/*" %>
   </div>
 
-  <div>
-    <%= form.label :inventory_count, style: "display:block" %>
+  <div class="products-form__field">
+    <%= form.label :inventory_count %>
     <%= form.number_field :inventory_count %>
   </div>
 
-  <div>
+  <div class="products-form__actions">
     <%= form.submit %>
   </div>
 <% end %>

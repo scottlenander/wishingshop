@@ -1,11 +1,11 @@
 <% if product.inventory_count.positive? %>
-  <p><%= product.inventory_count %> in stock</p>
+  <p class="products-inventory__status products-inventory__status--in-stock"><%= product.inventory_count %> in stock</p>
 <% else %>
-  <p>Out of stock</p>
-  <p>Email me when available.</p>
+  <p class="products-inventory__status products-inventory__status--out-of-stock">Out of stock</p>
+  <p class="products-inventory__note">Email me when available.</p>
 
-  <%= form_with model: [product, Subscriber.new] do |form| %>
-    <%= form.email_field :email, placeholder: "you@example.com", required: true %>
+  <%= form_with model: [product, Subscriber.new], class: "products-inventory__form" do |form| %>
+    <%= form.email_field :email, placeholder: "you@example.com", required: true, class: "products-inventory__email" %>
     <%= form.submit "Submit" %>
   <% end %>
 <% end %>

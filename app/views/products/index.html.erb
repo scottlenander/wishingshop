@@ -1,12 +1,17 @@
 <h1><%= t ".title" %></h1>
 
-<%= link_to "New product", new_product_path if authenticated? %>
-<%= link_to "Login", new_session_path unless authenticated? %>
+<%= link_to "New product", new_product_path, class: "products-index__action" if authenticated? %>
+<%= link_to "Login", new_session_path, class: "products-index__action" unless authenticated? %>
 
-<div id="products">
+<div id="products" class="products-index__grid">
   <% @products.each do |product| %>
-    <div>
-      <%= link_to product.name, product_path(product.id) %>
+    <div class="products-index__card">
+      <% if product.featured_image.attached? %>
+        <%= image_tag product.featured_image.variant(:thumb), alt: "", loading: "lazy", class: "products-index__card-image" %>
+      <% else %>
+        <div class="products-index__card-placeholder"></div>
+      <% end %>
+      <%= link_to product.name, product_path(product.id), class: "products-index__card-link" %>
     </div>
   <% end %>
 </div>

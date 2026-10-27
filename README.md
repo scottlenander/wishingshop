@@ -15,6 +15,7 @@ A fake shopping website built for development and testing practice. Based on the
 
 - Ruby >= 3.2
 - Rails >= 8.1
+- [libvips](https://www.libvips.org/install.html)
 
 ### Installation
 

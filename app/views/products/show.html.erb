@@ -1,19 +1,21 @@
-<p><%= link_to "Back", products_path %></p>
+<p><%= link_to "Back", products_path, class: "products-show__back" %></p>
 
-<section class="product"> 
-  <%= image_tag @product.featured_image if @product.featured_image.attached? %>
+<%= tag.section class: ["products-show__product", { "products-show__product--no-image": !@product.featured_image.attached? }] do %>
+  <%= image_tag @product.featured_image, class: "products-show__image" if @product.featured_image.attached? %>
 
-  <section class="product-info">
+  <section class="products-show__info">
     <% cache @product do %>
-      <h1><%= @product.name %></h1>
-      <%= @product.description %>
+      <h1 class="products-show__title"><%= @product.name %></h1>
+      <div class="products-show__description"><%= @product.description %></div>
     <% end %>
 
     <%= render "inventory", product: @product %>
 
     <% if authenticated? %>
-      <%= link_to "Edit", edit_product_path(@product) %>
-      <%= button_to "Delete", @product, method: :delete, data: { turbo_confirm: "Are you sure?" } %>
+      <div class="products-show__actions">
+        <%= link_to "Edit", edit_product_path(@product), class: "btn btn--secondary products-show__edit" %>
+        <%= button_to "Delete", @product, method: :delete, class: "btn btn--danger products-show__delete", data: { turbo_confirm: "Are you sure?" } %>
+      </div>
     <% end %>
   </section>
-</section>
+<% end %>
