@@ -55,11 +55,17 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # Fake data for db/seeds.rb
+  gem "faker"
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+
+  # View sent emails in the browser at /letter_opener
+  gem "letter_opener_web"
 end
 
 group :test do
