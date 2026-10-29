@@ -51,6 +51,13 @@ All accounts use the password `password`.
 | `alice@example.com` | User |
 | `bob@example.com` | User |
 
+Admins can create, edit and delete products (including stock), and have two extra pages in the header:
+
+- **Users** (`/admin/users`): add, edit and delete standard users. Admin accounts aren't listed.
+- **Subscribers** (`/admin/subscribers`): add, edit, move and remove back-in-stock subscribers.
+
+Standard users and visitors can browse products and subscribe to out-of-stock items.
+
 ### Products
 
 20 clothing items with cartoon images and generated descriptions. Stock is between 1 and 50, except for 3 items that are out of stock: **Hoodie**, **Puffer Vest** and **Cargo Shorts**.
@@ -69,7 +76,7 @@ Each out-of-stock product has one subscriber:
 
 In development, emails aren't sent. They're saved and can be read at [localhost:3000/letter_opener](http://localhost:3000/letter_opener). To test the back-in-stock email:
 
-1. Log in as any account above.
+1. Log in as `admin@example.com`.
 2. Edit one of the out-of-stock products and set its inventory above 0.
 3. Open `/letter_opener` to see the email.
 

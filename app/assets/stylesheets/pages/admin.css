@@ -1,0 +1,131 @@
+/*
+ * Admin views: admin/users/* and admin/subscribers/*.
+ */
+
+.admin-page__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.admin-page__header h1 {
+  margin: 0;
+}
+
+.admin-page__cancel {
+  font-weight: 600;
+}
+
+.admin-page__empty,
+.admin-form__hint {
+  color: var(--color-text-muted);
+}
+
+.admin-form__hint {
+  margin-top: var(--space-1);
+  font-size: var(--font-size-sm);
+}
+
+/* ---------- Tables ---------- */
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table th {
+  background: var(--color-bg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.admin-table td {
+  overflow-wrap: anywhere;
+}
+
+.admin-table__actions-heading {
+  text-align: right;
+}
+
+/* Edit link and Delete button side by side; button_to wraps its button in a form. */
+.admin-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}
+
+.admin-table__actions form {
+  margin: 0;
+}
+
+/* ---------- admin/subscribers ---------- */
+
+.admin-subscribers__group {
+  margin-bottom: var(--space-6);
+}
+
+.admin-subscribers__product {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3);
+  font-size: var(--font-size-lg);
+}
+
+.admin-subscribers__stock {
+  color: var(--color-success);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.admin-subscribers__stock--out {
+  color: var(--color-danger);
+}
+
+/* Narrow screens: stack each row so the table never scrolls sideways. */
+@media (max-width: 600px) {
+  .admin-table thead {
+    display: none;
+  }
+
+  .admin-table tr,
+  .admin-table td {
+    display: block;
+  }
+
+  .admin-table td {
+    padding: var(--space-1) var(--space-4);
+    border-bottom: none;
+  }
+
+  .admin-table tr {
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .admin-table__actions {
+    justify-content: flex-start;
+  }
+}

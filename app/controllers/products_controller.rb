@@ -1,5 +1,6 @@
 class ProductsController < ApplicationController
   allow_unauthenticated_access only: %i[ index show ]
+  before_action :require_admin, except: %i[ index show ]
   before_action :set_product, only: %i[ show edit update destroy ]
 
   def index

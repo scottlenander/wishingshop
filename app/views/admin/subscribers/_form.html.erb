@@ -1,0 +1,17 @@
+<%= form_with model: [ :admin, subscriber ], class: "form-card" do |form| %>
+  <% if form.object.errors.any? %>
+    <p class="error"><%= form.object.errors.full_messages.first %></p>
+  <% end %>
+
+  <div>
+    <%= form.label :email %>
+    <%= form.email_field :email, required: true %>
+  </div>
+
+  <div>
+    <%= form.label :product_id, "Product" %>
+    <%= form.collection_select :product_id, Product.order(:name), :id, :name, { prompt: "Choose a product" }, required: true %>
+  </div>
+
+  <%= form.submit %>
+<% end %>
