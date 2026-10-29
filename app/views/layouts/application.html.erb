@@ -29,6 +29,10 @@
 
     <nav class="layouts-application__nav">
       <%= link_to "Home", root_path, class: "layouts-application__brand" %>
+      <% if admin? %>
+        <%= link_to "Users", admin_users_path, class: "layouts-application__link" %>
+        <%= link_to "Subscribers", admin_subscribers_path, class: "layouts-application__link" %>
+      <% end %>
       <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" if authenticated? %>
     </nav>
 

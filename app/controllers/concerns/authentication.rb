@@ -3,7 +3,7 @@ module Authentication
 
   included do
     before_action :require_authentication
-    helper_method :authenticated?
+    helper_method :authenticated?, :admin?
   end
 
   class_methods do
@@ -19,6 +19,17 @@ module Authentication
 
     def require_authentication
       resume_session || request_authentication
+    end
+
+    def admin?
+      resume_session
+      Current.user&.admin? || false
+    end
+
+    # Use as a before_action after require_authentication: visitors are sent
+    # to sign in first, then signed-in non-admins are turned away here.
+    def require_admin
+      redirect_to root_path, alert: "You're not authorized to do that." unless admin?
     end
 
     def resume_session

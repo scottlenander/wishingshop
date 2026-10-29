@@ -1,0 +1,6 @@
+<% content_for :title, "New subscriber" %>
+
+<h1>New subscriber</h1>
+
+<%= render "form", subscriber: @subscriber %>
+<%= link_to "Cancel", admin_subscribers_path, class: "admin-page__cancel" %>

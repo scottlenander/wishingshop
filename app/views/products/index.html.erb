@@ -1,6 +1,6 @@
 <h1><%= t ".title" %></h1>
 
-<%= link_to "New product", new_product_path, class: "products-index__action" if authenticated? %>
+<%= link_to "New product", new_product_path, class: "products-index__action" if admin? %>
 <%= link_to "Login", new_session_path, class: "products-index__action" unless authenticated? %>
 
 <div id="products" class="products-index__grid">

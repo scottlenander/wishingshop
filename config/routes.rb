@@ -21,6 +21,11 @@ Rails.application.routes.draw do
   end
   resource :unsubscribe, only: [ :show ]
 
+  namespace :admin do
+    resources :users, except: :show
+    resources :subscribers, except: :show
+  end
+
   # View sent emails in development
   mount LetterOpenerWeb::Engine, at: "/letter_opener" if Rails.env.development?
 end

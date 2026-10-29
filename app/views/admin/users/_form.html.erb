@@ -1,0 +1,25 @@
+<%= form_with model: [ :admin, user ], class: "form-card" do |form| %>
+  <% if form.object.errors.any? %>
+    <p class="error"><%= form.object.errors.full_messages.first %></p>
+  <% end %>
+
+  <div>
+    <%= form.label :email_address, "Email" %>
+    <%= form.email_field :email_address, required: true, autocomplete: "off" %>
+  </div>
+
+  <div>
+    <%= form.label :password %>
+    <%= form.password_field :password, required: user.new_record?, autocomplete: "new-password" %>
+    <% if user.persisted? %>
+      <p class="admin-form__hint">Leave blank to keep the current password.</p>
+    <% end %>
+  </div>
+
+  <div>
+    <%= form.label :password_confirmation %>
+    <%= form.password_field :password_confirmation, required: user.new_record?, autocomplete: "new-password" %>
+  </div>
+
+  <%= form.submit %>
+<% end %>

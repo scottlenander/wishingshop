@@ -47,3 +47,15 @@
   border-color: var(--color-on-brand);
   color: var(--color-on-brand);
 }
+
+/* Admin-only nav links (Users, Subscribers). */
+.layouts-application__link {
+  color: var(--color-on-brand);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.layouts-application__link:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
