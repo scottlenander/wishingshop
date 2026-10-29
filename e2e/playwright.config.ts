@@ -1,8 +1,8 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test'
 
 // bin/e2e-server resets + seeds storage/e2e.sqlite3 and serves the app here.
-const PORT = Number(process.env.E2E_PORT ?? 3100);
-const BASE_URL = `http://localhost:${PORT}`;
+const PORT = Number(process.env.E2E_PORT ?? 3100)
+const BASE_URL = `http://localhost:${PORT}`
 
 /**
  * Read environment variables from file.
@@ -53,7 +53,6 @@ export default defineConfig({
       name: 'Mobile Safari',
       use: { ...devices['iPhone 17'] },
     },
-
   ],
 
   /* Reset + seed the e2e database and start Rails before the tests; stopped afterwards. */
@@ -65,4 +64,4 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
-});
+})
