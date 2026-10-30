@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { LoginPage } from '../../pageObjects/loginPage'
 
-test('test', async ({ page }) => {
+test('Standard User smoke test', async ({ page }) => {
   const mainPage = new MainPage(page)
   const loginPage = new LoginPage(page)
   const { products } = mainPage
