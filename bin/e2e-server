@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Resets and seeds a dedicated e2e database, then serves the app for Playwright.
+# Playwright runs this automatically (see e2e/playwright.config.ts); run it by
+# hand to click around the same data the tests use.
+#
+#   bin/e2e-server            # http://localhost:3100
+#   PORT=3200 bin/e2e-server
+#
+# Uses the development environment (so /letter_opener works) but a separate
+# database, so storage/development.sqlite3 is never touched.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+export RAILS_ENV=development
+export DATABASE_URL="sqlite3:storage/e2e.sqlite3"
+PORT="${PORT:-3100}"
+PIDFILE="tmp/pids/e2e-server.pid"
+
+echo "== Resetting e2e database (storage/e2e.sqlite3)"
+# Drop in its own process: if drop and setup share one, the old SQLite
+# connection keeps writing to the deleted file and the server sees an empty DB.
+bin/rails db:drop
+bin/rails db:setup   # create + load schema + seed
+
+echo "== Starting server on http://localhost:$PORT"
+exec bin/rails server -p "$PORT" -P "$PIDFILE"
