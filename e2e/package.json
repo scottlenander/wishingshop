@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
+    "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "server": "../bin/e2e-server",
     "report": "playwright show-report",

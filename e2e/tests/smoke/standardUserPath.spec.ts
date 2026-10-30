@@ -1,51 +1,52 @@
 import { test, expect } from '@playwright/test'
+import { MainPage } from '../../pageObjects/mainPage'
+import { LoginPage } from '../../pageObjects/loginPage'
 
 test('test', async ({ page }) => {
+  const mainPage = new MainPage(page)
+  const loginPage = new LoginPage(page)
+  const { products } = mainPage
+  const { item } = products
+
   await test.step('Navigate to homepage', async () => {
-    await page.goto('http://localhost:3100/')
-    await expect(page.getByRole('heading', { name: 'Products' }), {
+    await mainPage.goto()
+    await expect(products.header, {
       message: 'Products heading should be visible',
     }).toBeVisible()
   })
 
   await test.step('Log in as standard user', async () => {
-    await page.getByRole('link', { name: 'Login' }).click()
-    await page.getByRole('textbox', { name: 'Enter your email address' }).fill('alice@example.com')
-    // await page.getByRole('textbox', { name: 'Enter your email address' }).press('Tab');
-    await page.getByRole('textbox', { name: 'Enter your password' }).fill('password')
-    await page.getByRole('textbox', { name: 'Enter your password' }).press('Enter') // form "Sign in" button or sessions-new__submit
-    await expect(page.getByRole('link', { name: 'Login' }), {
+    await mainPage.loginLink.click()
+    await loginPage.emailInput.fill('alice@example.com')
+    await loginPage.passwordInput.fill('password')
+    await loginPage.signInButton.click()
+    await expect(mainPage.loginLink, {
       message: 'Login link should not be present after login',
     }).not.toBeVisible()
   })
 
   await test.step('Verify item page', async () => {
-    await page.getByRole('link', { name: 'T-Shirt' }).click()
-    // locator class="products-show__product"
-    await expect(page.getByRole('img'), {
+    await products.card('T-Shirt').link.click()
+    await expect(item.image, {
       message: 'T-Shirt image should be present',
-    }).toBeVisible() // products-show__image
+    }).toBeVisible()
 
-    // locator class="products-show__info"
-
-    // assert item name in products-show__title
-    await expect(page.getByRole('main')).toContainText(
-      'Made from leather. Possimus vitae esse. Corrupti pariatur accusamus. Ullam illum ex.',
-    ) // products-show__description
-    // assert products-inventory__status is present
-    // stock can be products-inventory__status--in-stock or products-inventory__status--out-of-stock
-    await expect(page.getByRole('link', { name: 'Back' }), {
+    await expect(item.title).toHaveText('T-Shirt')
+    await expect(item.description).toBeVisible()
+    // In stock or out of stock, a status should always be shown.
+    await expect(item.stockStatus).toBeVisible()
+    await expect(item.backLink, {
       message: 'Back button should be present',
     }).toBeVisible()
   })
 
   await test.step('Return to Product page and log out', async () => {
-    await page.getByRole('link', { name: 'Back' }).click()
-    await expect(page.getByRole('heading', { name: 'Products' }), {
+    await item.backLink.click()
+    await expect(products.header, {
       message: 'Products heading should be visible',
     }).toBeVisible()
 
-    await page.getByRole('button', { name: 'Log out' }).click()
-    await expect(page.getByRole('textbox', { name: 'Enter your email address' })).toBeVisible()
+    await mainPage.logoutButton.click()
+    await expect(loginPage.emailInput).toBeVisible()
   })
 })
