@@ -7,6 +7,7 @@ export class Products {
   readonly grid: Locator
   readonly newProductLink: Locator
   readonly item: Item
+  readonly form: ProductForm
 
   constructor(page: Page) {
     this.page = page
@@ -14,6 +15,7 @@ export class Products {
     this.grid = page.locator('.products-index__grid')
     this.newProductLink = page.getByRole('link', { name: 'New product' }) // admins only
     this.item = new Item(page)
+    this.form = new ProductForm(page)
   }
 
   card(name: string): IndexCard {
@@ -72,5 +74,27 @@ export class Item {
     // Admins only.
     this.editLink = this.root.getByRole('link', { name: 'Edit' })
     this.deleteButton = this.root.getByRole('button', { name: 'Delete' })
+  }
+}
+
+// New/edit product form (products/new, products/edit). Admins only.
+export class ProductForm {
+  readonly root: Locator
+  readonly error: Locator
+  readonly nameInput: Locator
+  readonly imageInput: Locator
+  readonly inventoryInput: Locator
+  readonly saveButton: Locator
+  readonly cancelLink: Locator
+
+  constructor(page: Page) {
+    this.root = page.locator('.products-form')
+    this.error = this.root.locator('.error')
+    this.nameInput = this.root.getByLabel('Name')
+    this.imageInput = this.root.getByLabel('Featured image')
+    this.inventoryInput = this.root.getByLabel('Inventory count')
+    // "Create Product" on new, "Update Product" on edit.
+    this.saveButton = this.root.getByRole('button', { name: /^(Create|Update) Product$/ })
+    this.cancelLink = page.getByRole('link', { name: 'Cancel' })
   }
 }

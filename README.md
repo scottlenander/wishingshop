@@ -80,6 +80,45 @@ In development, emails aren't sent. They're saved and can be read at [localhost:
 2. Edit one of the out-of-stock products and set its inventory above 0.
 3. Open `/letter_opener` to see the email.
 
+## Testing
+
+### Rails tests
+
+Fast tests for models, controllers and mailers in `test/`, using fixture data from `test/fixtures/`. Use them to check app logic such as validations, admin-only access and back-in-stock emails.
+
+```bash
+bin/rails test                                   # all tests
+bin/rails test test/models/user_test.rb          # one file
+```
+
+### Playwright end-to-end tests
+
+Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
+
+- `tests/smoke/`: quick checks of the main standard-user and admin flows.
+- `tests/regression/`: longer flows, such as subscribing to an out-of-stock item and receiving the email.
+- `pageObjects/`: shared locators for each page, used by all tests.
+
+Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched.
+
+First-time setup:
+
+```bash
+cd e2e
+npm install
+npx playwright install
+```
+
+Run from `e2e/`:
+
+```bash
+npm test                # run all tests
+npm run test:headed     # watch the browser
+npm run test:ui         # Playwright's interactive UI
+npm run report          # open the last HTML report
+npm run lint && npm run typecheck && npm run format:check
+```
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.
