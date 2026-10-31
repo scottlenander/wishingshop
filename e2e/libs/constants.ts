@@ -17,31 +17,40 @@ export type SeededProduct = {
 }
 
 export const PRODUCTS = {
-  T_SHIRT: {
-    name: 'T-Shirt',
-    sku: 'T-SHIRT',
-    seededStock: 'in',
-    // Read-only, so it can be shared.
-    changes: false,
-    usedBy: ['smoke/standardUserPath.spec.ts', 'smoke/adminUserPath.spec.ts'],
-  },
-  GRAPHIC_TEE: {
-    name: 'Graphic Tee',
-    sku: 'GRAPHIC-TEE',
+  BASEBALL_CAP: {
+    name: 'Baseball Cap',
+    sku: 'BASEBALL-CAP',
     seededStock: 'in',
     changes: false,
     usedBy: [],
   },
-  POLO_SHIRT: {
-    name: 'Polo Shirt',
-    sku: 'POLO-SHIRT',
+  BEANIE: {
+    name: 'Beanie',
+    sku: 'BEANIE',
+    seededStock: 'in',
+    // Stock updated by CSV import.
+    changes: true,
+    usedBy: ['regression/bulkImport.spec.ts'],
+  },
+  BOMBER_JACKET: {
+    name: 'Bomber Jacket',
+    sku: 'BOMBER-JACKET',
     seededStock: 'in',
     changes: false,
     usedBy: [],
   },
-  OXFORD_SHIRT: {
-    name: 'Oxford Shirt',
-    sku: 'OXFORD-SHIRT',
+  CARDIGAN: { name: 'Cardigan', sku: 'CARDIGAN', seededStock: 'in', changes: false, usedBy: [] },
+  CARGO_SHORTS: {
+    name: 'Cargo Shorts',
+    sku: 'CARGO-SHORTS',
+    seededStock: 'out',
+    changes: false,
+    usedBy: [],
+  },
+  CHINOS: { name: 'Chinos', sku: 'CHINOS', seededStock: 'in', changes: false, usedBy: [] },
+  DENIM_JACKET: {
+    name: 'Denim Jacket',
+    sku: 'DENIM-JACKET',
     seededStock: 'in',
     changes: false,
     usedBy: [],
@@ -53,9 +62,9 @@ export const PRODUCTS = {
     changes: false,
     usedBy: [],
   },
-  DENIM_JACKET: {
-    name: 'Denim Jacket',
-    sku: 'DENIM-JACKET',
+  GRAPHIC_TEE: {
+    name: 'Graphic Tee',
+    sku: 'GRAPHIC-TEE',
     seededStock: 'in',
     changes: false,
     usedBy: [],
@@ -68,33 +77,9 @@ export const PRODUCTS = {
     changes: true,
     usedBy: ['regression/outOfStock.spec.ts'],
   },
-  WOOL_SWEATER: {
-    name: 'Wool Sweater',
-    sku: 'WOOL-SWEATER',
-    seededStock: 'in',
-    changes: false,
-    usedBy: [],
-  },
-  RAIN_COAT: { name: 'Rain Coat', sku: 'RAIN-COAT', seededStock: 'in', changes: false, usedBy: [] },
-  BOMBER_JACKET: {
-    name: 'Bomber Jacket',
-    sku: 'BOMBER-JACKET',
-    seededStock: 'in',
-    changes: false,
-    usedBy: [],
-  },
-  CARDIGAN: { name: 'Cardigan', sku: 'CARDIGAN', seededStock: 'in', changes: false, usedBy: [] },
-  PUFFER_VEST: {
-    name: 'Puffer Vest',
-    sku: 'PUFFER-VEST',
-    seededStock: 'out',
-    changes: false,
-    usedBy: [],
-  },
-  CHINOS: { name: 'Chinos', sku: 'CHINOS', seededStock: 'in', changes: false, usedBy: [] },
-  SWEATPANTS: {
-    name: 'Sweatpants',
-    sku: 'SWEATPANTS',
+  LEATHER_BELT: {
+    name: 'Leather Belt',
+    sku: 'LEATHER-BELT',
     seededStock: 'in',
     changes: false,
     usedBy: [],
@@ -106,28 +91,28 @@ export const PRODUCTS = {
     changes: false,
     usedBy: [],
   },
-  CARGO_SHORTS: {
-    name: 'Cargo Shorts',
-    sku: 'CARGO-SHORTS',
+  OXFORD_SHIRT: {
+    name: 'Oxford Shirt',
+    sku: 'OXFORD-SHIRT',
+    seededStock: 'in',
+    changes: false,
+    usedBy: [],
+  },
+  POLO_SHIRT: {
+    name: 'Polo Shirt',
+    sku: 'POLO-SHIRT',
+    seededStock: 'in',
+    changes: false,
+    usedBy: [],
+  },
+  PUFFER_VEST: {
+    name: 'Puffer Vest',
+    sku: 'PUFFER-VEST',
     seededStock: 'out',
     changes: false,
     usedBy: [],
   },
-  BEANIE: {
-    name: 'Beanie',
-    sku: 'BEANIE',
-    seededStock: 'in',
-    // Stock updated by CSV import.
-    changes: true,
-    usedBy: ['regression/bulkImport.spec.ts'],
-  },
-  BASEBALL_CAP: {
-    name: 'Baseball Cap',
-    sku: 'BASEBALL-CAP',
-    seededStock: 'in',
-    changes: false,
-    usedBy: [],
-  },
+  RAIN_COAT: { name: 'Rain Coat', sku: 'RAIN-COAT', seededStock: 'in', changes: false, usedBy: [] },
   SCARF: {
     name: 'Scarf',
     sku: 'SCARF',
@@ -136,9 +121,24 @@ export const PRODUCTS = {
     changes: true,
     usedBy: ['regression/purchase.spec.ts'],
   },
-  LEATHER_BELT: {
-    name: 'Leather Belt',
-    sku: 'LEATHER-BELT',
+  SWEATPANTS: {
+    name: 'Sweatpants',
+    sku: 'SWEATPANTS',
+    seededStock: 'in',
+    changes: false,
+    usedBy: [],
+  },
+  T_SHIRT: {
+    name: 'T-Shirt',
+    sku: 'T-SHIRT',
+    seededStock: 'in',
+    // Read-only, so it can be shared.
+    changes: false,
+    usedBy: ['smoke/standardUserPath.spec.ts', 'smoke/adminUserPath.spec.ts'],
+  },
+  WOOL_SWEATER: {
+    name: 'Wool Sweater',
+    sku: 'WOOL-SWEATER',
     seededStock: 'in',
     changes: false,
     usedBy: [],
