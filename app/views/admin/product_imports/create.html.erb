@@ -1,0 +1,56 @@
+<% content_for :title, "Import preview" %>
+<% summary = @import.summary %>
+
+<div class="admin-page__header">
+  <h1>Import preview</h1>
+</div>
+
+<ul class="admin-import__summary">
+  <li><strong><%= summary[:created] %></strong> to create</li>
+  <li><strong><%= summary[:updated] %></strong> to update</li>
+  <li><strong><%= summary[:unchanged] %></strong> unchanged</li>
+  <li class="<%= "admin-import__summary--errors" if summary[:failed].positive? %>"><strong><%= summary[:failed] %></strong> with errors</li>
+</ul>
+
+<% @import.errors.each do |error| %>
+  <p class="error"><%= error %></p>
+<% end %>
+
+<% if @import.rows.any? %>
+  <table class="admin-table admin-import__table">
+    <thead>
+      <tr>
+        <th>Line</th>
+        <th>SKU</th>
+        <th>Action</th>
+        <th>Changes</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @import.rows.each do |row| %>
+        <tr class="<%= "admin-import__row--error" if row.error? %>" data-line="<%= row.line %>">
+          <td><%= row.line %></td>
+          <td><%= row.sku %></td>
+          <td><%= row.error? ? "Error" : row.action.to_s.humanize %></td>
+          <td>
+            <% if row.error? %>
+              <%= safe_join(row.errors, tag.br) %>
+            <% else %>
+              <%= row.changes.any? ? safe_join(row.changes, tag.br) : "No changes" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>
+
+<div class="admin-import__actions">
+  <% if @import.valid? && @blob %>
+    <%= button_to "Apply import", apply_admin_product_import_path, params: { signed_id: @blob.signed_id(expires_in: 1.hour) }, class: "btn" %>
+    <%= link_to "Cancel", new_admin_product_import_path, class: "admin-page__cancel" %>
+  <% else %>
+    <p class="admin-page__empty">Nothing was saved. Fix the errors and upload the file again.</p>
+    <%= link_to "Upload again", new_admin_product_import_path, class: "btn btn--secondary" %>
+  <% end %>
+</div>

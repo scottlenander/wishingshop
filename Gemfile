@@ -73,3 +73,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# CSV parsing for product imports (no longer loaded by default since Ruby 3.4)
+gem "csv", "~> 3.3"

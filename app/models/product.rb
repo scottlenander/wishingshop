@@ -3,6 +3,8 @@ class Product < ApplicationRecord
 
   class NotEnoughStock < StandardError; end
 
+  SKU_FORMAT = /\A[A-Z0-9-]+\z/
+
   has_one_attached :featured_image do |attachable|
     # Smaller copy for the product cards on the index page.
     attachable.variant :thumb, resize_to_limit: [ 600, 600 ]
@@ -10,7 +12,14 @@ class Product < ApplicationRecord
   has_rich_text :description
   has_many :orders, dependent: :nullify
 
+  normalizes :sku, with: ->(sku) { sku.strip.upcase }
+
+  # Products created without a SKU get one from the name ("T-Shirt" -> "T-SHIRT").
+  before_validation :default_sku, on: :create
+
   validates :name, presence: true
+  validates :sku, presence: true, uniqueness: true,
+                  format: { with: SKU_FORMAT, message: "can only contain letters, numbers and dashes" }
   validates :inventory_count, numericality: { greater_than_or_equal_to: 0 }
 
   # Buys `quantity` for `user`: lowers stock and records an order.
@@ -29,4 +38,9 @@ class Product < ApplicationRecord
       orders.create!(user: user, product_name: name, quantity: quantity)
     end
   end
+
+  private
+    def default_sku
+      self.sku = name.to_s.parameterize.upcase if sku.blank?
+    end
 end

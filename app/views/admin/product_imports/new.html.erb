@@ -1,0 +1,38 @@
+<% content_for :title, "Import products" %>
+
+<div class="admin-page__header">
+  <h1>Import products</h1>
+</div>
+
+<%# Turbo ignores a 200 response to a form post, so submit normally to show the preview page. %>
+<%= form_with url: admin_product_import_path, multipart: true, data: { turbo: false }, class: "form-card admin-import__form" do |form| %>
+  <div>
+    <%= form.label :file, "CSV file" %>
+    <%= form.file_field :file, accept: ".csv,text/csv", required: true %>
+    <p class="admin-form__hint">Up to 1 MB and 1,000 rows. You'll see a preview before anything is saved.</p>
+  </div>
+
+  <%= form.submit "Preview import" %>
+<% end %>
+
+<section class="admin-import__help">
+  <h2>File format</h2>
+  <p>
+    <%= link_to "Download a blank template", template_admin_product_import_path %> or
+    <%= link_to "export current products", export_admin_product_import_path %> to edit and upload again.
+  </p>
+
+  <table class="admin-table">
+    <thead>
+      <tr><th>Column</th><th>Meaning</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>sku</code></td><td>Required. A known SKU updates that product; a new SKU creates one. Letters, numbers and dashes.</td></tr>
+      <tr><td><code>name</code></td><td>Required for new products.</td></tr>
+      <tr><td><code>description</code></td><td>Plain text.</td></tr>
+      <tr><td><code>inventory_count</code></td><td>Whole number of 0 or more. Sets the stock to this value (doesn't add to it).</td></tr>
+      <tr><td><code>image_url</code></td><td>Optional http/https link to an image (up to 5 MB). It's downloaded and attached.</td></tr>
+    </tbody>
+  </table>
+  <p class="admin-form__hint">For existing products, blank cells keep the current value.</p>
+</section>
