@@ -9,6 +9,11 @@
   </div>
 
   <div class="products-form__field">
+    <%= form.label :sku, "SKU" %>
+    <%= form.text_field :sku, placeholder: "Leave blank to create from the name", autocapitalize: "characters" %>
+  </div>
+
+  <div class="products-form__field">
     <%= form.label :description %>
     <%= form.rich_textarea :description %>
   </div>

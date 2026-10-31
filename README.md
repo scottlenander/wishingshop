@@ -51,8 +51,9 @@ All accounts use the password `password`.
 | `alice@example.com` | User |
 | `bob@example.com` | User |
 
-Admins can create, edit and delete products (including stock), and have three extra pages in the header:
+Admins can create, edit and delete products (including stock), and have four extra pages in the header:
 
+- **Import** (`/admin/product_import/new`): bulk add or update products from a CSV. See [Bulk import](#bulk-import).
 - **Orders** (`/admin/orders`): every purchase by every user.
 - **Users** (`/admin/users`): add, edit and delete standard users. Admin accounts aren't listed.
 - **Subscribers** (`/admin/subscribers`): add, edit, move and remove back-in-stock subscribers.
@@ -86,6 +87,37 @@ In development, emails aren't sent. They're saved and can be read at [localhost:
 2. Edit one of the out-of-stock products and set its inventory above 0.
 3. Open `/letter_opener` to see the email.
 
+## Bulk import
+
+Admins can create and update many products at once from a CSV file. Rows are matched by **SKU**: a known SKU updates that product, and a new SKU creates one.
+
+```csv
+sku,name,description,inventory_count,image_url
+HOODIE,,,25,
+WINTER-COAT,Winter Coat,A warm wool coat.,30,https://example.com/coat.png
+```
+
+| Column | Meaning |
+|---|---|
+| `sku` | Required. Letters, numbers and dashes. Existing products have SKUs made from their names (e.g. `T-SHIRT`). |
+| `name` | Required for new products. |
+| `description` | Plain text. |
+| `inventory_count` | Sets the stock to this number (it doesn't add to it). |
+| `image_url` | Optional http/https image, up to 5 MB. Downloaded and attached. |
+
+For existing products, blank cells keep the current value. Files can be up to 1 MB and 1,000 rows. Restocking an out-of-stock product sends the usual back-in-stock emails.
+
+**In the app:** go to **Import**, upload the file, check the preview, then click **Apply import**. Nothing is saved until you apply, and a file with any errors can't be applied. The page also has a blank template and an export of current products to edit and upload again.
+
+**From the command line** (handy in development):
+
+```bash
+bin/rails "products:import[db/seeds/products_import_example.csv]"           # preview only
+bin/rails "products:import[db/seeds/products_import_example.csv]" APPLY=1   # save
+```
+
+An example file is in [db/seeds/products_import_example.csv](db/seeds/products_import_example.csv).
+
 ## Testing
 
 ### Rails tests
@@ -102,7 +134,7 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as buying a product, or subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as buying a product, bulk importing products, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
 
 Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched.

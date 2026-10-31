@@ -58,4 +58,18 @@ class ProductTest < ActiveSupport::TestCase
     assert_nil order.product
     assert_equal "T-Shirt", order.product_name
   end
+
+  test "SKU is upper-cased and stripped" do
+    product = Product.create!(name: "Cap", sku: " cap-1 ")
+    assert_equal "CAP-1", product.sku
+  end
+
+  test "SKU defaults from the name" do
+    assert_equal "BASEBALL-CAP", Product.create!(name: "Baseball Cap").sku
+  end
+
+  test "SKU must be unique and use letters, numbers and dashes" do
+    assert_not Product.new(name: "Copy", sku: "T-SHIRT").valid?
+    assert_not Product.new(name: "Bad", sku: "BAD SKU").valid?
+  end
 end

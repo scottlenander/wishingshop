@@ -10,6 +10,7 @@ export class MainPage {
   readonly myOrdersLink: Locator
   readonly mySubscriptionsLink: Locator
   readonly ordersLink: Locator
+  readonly importLink: Locator
   readonly usersLink: Locator
   readonly subscribersLink: Locator
   readonly notice: Locator
@@ -26,6 +27,7 @@ export class MainPage {
     this.mySubscriptionsLink = page.getByRole('link', { name: 'My subscriptions' }) // signed in
     // exact: otherwise "My orders" also matches.
     this.ordersLink = page.getByRole('link', { name: 'Orders', exact: true }) // admins only
+    this.importLink = page.getByRole('link', { name: 'Import' }) // admins only
     this.usersLink = page.getByRole('link', { name: 'Users' }) // admins only
     this.subscribersLink = page.getByRole('link', { name: 'Subscribers' }) // admins only
 

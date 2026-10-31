@@ -98,6 +98,7 @@ export class ProductForm {
   readonly root: Locator
   readonly error: Locator
   readonly nameInput: Locator
+  readonly skuInput: Locator
   readonly imageInput: Locator
   readonly inventoryInput: Locator
   readonly saveButton: Locator
@@ -107,6 +108,7 @@ export class ProductForm {
     this.root = page.locator('.products-form')
     this.error = this.root.locator('.error')
     this.nameInput = this.root.getByLabel('Name')
+    this.skuInput = this.root.getByLabel('SKU')
     this.imageInput = this.root.getByLabel('Featured image')
     this.inventoryInput = this.root.getByLabel('Inventory count')
     // "Create Product" on new, "Update Product" on edit.

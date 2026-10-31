@@ -51,6 +51,7 @@ out_of_stock = PRODUCT_NAMES.sample(3, random: rng)
 
 products = PRODUCT_NAMES.map do |name|
   product = Product.find_or_initialize_by(name: name)
+  product.sku = name.parameterize.upcase
   product.description = "Made from #{Faker::Commerce.material.downcase}. #{Faker::Lorem.paragraph(sentence_count: 3)}"
   product.inventory_count = out_of_stock.include?(name) ? 0 : rng.rand(1..50)
 

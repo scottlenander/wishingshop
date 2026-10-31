@@ -35,6 +35,7 @@
       <% end %>
       <% if admin? %>
         <%= link_to "Orders", admin_orders_path, class: "layouts-application__link" %>
+        <%= link_to "Import", new_admin_product_import_path, class: "layouts-application__link" %>
         <%= link_to "Users", admin_users_path, class: "layouts-application__link" %>
         <%= link_to "Subscribers", admin_subscribers_path, class: "layouts-application__link" %>
       <% end %>

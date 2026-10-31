@@ -28,6 +28,11 @@ Rails.application.routes.draw do
     resources :users, except: :show
     resources :subscribers, except: :show
     resources :orders, only: [ :index ]
+    resource :product_import, only: %i[ new create ] do
+      get :template   # blank CSV with the column headers
+      get :export     # current products as CSV, to edit and upload again
+      post :apply
+    end
   end
 
   # View sent emails in development
