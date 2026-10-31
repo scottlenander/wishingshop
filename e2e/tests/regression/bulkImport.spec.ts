@@ -2,9 +2,10 @@ import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { LoginPage } from '../../pageObjects/loginPage'
 import { ProductImport } from '../../pageObjects/admin/productImport'
+import { PRODUCTS, USERS } from '../../libs/constants'
 
 // Existing product this test restocks. Only this test changes it.
-const EXISTING = { name: 'Beanie', sku: 'BEANIE' }
+const EXISTING = PRODUCTS.BEANIE
 
 // This test changes shared data (stock), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
@@ -23,8 +24,8 @@ test('admin bulk imports new products and updates stock', async ({ page }) => {
 
   await test.step('Log in as admin', async () => {
     await loginPage.goto()
-    await loginPage.emailInput.fill('admin@example.com')
-    await loginPage.passwordInput.fill('password')
+    await loginPage.emailInput.fill(USERS.admin.email)
+    await loginPage.passwordInput.fill(USERS.admin.password)
     await loginPage.signInButton.click()
     await expect(mainPage.logoutButton).toBeVisible()
   })

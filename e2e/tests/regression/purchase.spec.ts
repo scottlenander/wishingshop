@@ -2,9 +2,10 @@ import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { LoginPage } from '../../pageObjects/loginPage'
 import { MyOrders } from '../../pageObjects/myOrders'
+import { PRODUCTS, USERS } from '../../libs/constants'
 
 // Only this test buys or restocks it, so tests stay independent.
-const PRODUCT = 'Scarf'
+const PRODUCT = PRODUCTS.SCARF.name
 
 // This test changes shared data (stock), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
@@ -28,8 +29,8 @@ test('standard user buys a product and sees it in their orders', async ({ page, 
 
   await test.step('Admin sets the starting stock to 10', async () => {
     await adminLoginPage.goto()
-    await adminLoginPage.emailInput.fill('admin@example.com')
-    await adminLoginPage.passwordInput.fill('password')
+    await adminLoginPage.emailInput.fill(USERS.admin.email)
+    await adminLoginPage.passwordInput.fill(USERS.admin.password)
     await adminLoginPage.signInButton.click()
     await expect(adminMainPage.logoutButton).toBeVisible()
 
@@ -44,8 +45,8 @@ test('standard user buys a product and sees it in their orders', async ({ page, 
 
   await test.step('Log in as standard user and count existing orders', async () => {
     await loginPage.goto()
-    await loginPage.emailInput.fill('alice@example.com')
-    await loginPage.passwordInput.fill('password')
+    await loginPage.emailInput.fill(USERS.alice.email)
+    await loginPage.passwordInput.fill(USERS.alice.password)
     await loginPage.signInButton.click()
     await expect(mainPage.logoutButton).toBeVisible()
 

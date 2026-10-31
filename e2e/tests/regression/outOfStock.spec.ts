@@ -2,9 +2,10 @@ import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { LoginPage } from '../../pageObjects/loginPage'
 import { LetterOpener } from '../../pageObjects/letterOpener'
+import { PRODUCTS, USERS } from '../../libs/constants'
 
 // Seeded out of stock.
-const PRODUCT = 'Hoodie'
+const PRODUCT = PRODUCTS.HOODIE.name
 
 // This test changes shared data (stock), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
@@ -26,13 +27,13 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
   const adminProducts = adminMainPage.products
 
   // Signed-in users subscribe with their account email.
-  const subscriberEmail = 'alice@example.com'
+  const subscriberEmail = USERS.alice.email
   let lettersBefore = 0
 
   await test.step('Admin makes sure the item starts out of stock', async () => {
     await adminLoginPage.goto()
-    await adminLoginPage.emailInput.fill('admin@example.com')
-    await adminLoginPage.passwordInput.fill('password')
+    await adminLoginPage.emailInput.fill(USERS.admin.email)
+    await adminLoginPage.passwordInput.fill(USERS.admin.password)
     await adminLoginPage.signInButton.click()
     await expect(adminMainPage.logoutButton).toBeVisible()
 
@@ -47,8 +48,8 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
 
   await test.step('Log in as standard user and open the out-of-stock item', async () => {
     await loginPage.goto()
-    await loginPage.emailInput.fill('alice@example.com')
-    await loginPage.passwordInput.fill('password')
+    await loginPage.emailInput.fill(USERS.alice.email)
+    await loginPage.passwordInput.fill(USERS.alice.password)
     await loginPage.signInButton.click()
     await expect(mainPage.logoutButton).toBeVisible()
 
