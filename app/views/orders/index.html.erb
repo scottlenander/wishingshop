@@ -1,0 +1,28 @@
+<% content_for :title, "My orders" %>
+
+<div class="admin-page__header">
+  <h1>My orders</h1>
+</div>
+
+<% if @orders.any? %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Quantity</th>
+        <th>Ordered</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr id="<%= dom_id(order) %>">
+          <td><%= order.product ? link_to(order.product_name, order.product) : order.product_name %></td>
+          <td><%= order.quantity %></td>
+          <td><%= order.created_at.to_fs(:long) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="admin-page__empty">No orders yet. <%= link_to "Browse products", root_path %></p>
+<% end %>

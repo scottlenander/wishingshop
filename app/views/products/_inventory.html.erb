@@ -1,11 +1,32 @@
 <% if product.inventory_count.positive? %>
   <p class="products-inventory__status products-inventory__status--in-stock"><%= product.inventory_count %> in stock</p>
+
+  <% if authenticated? %>
+    <%= form_with url: product_orders_path(product), class: "products-inventory__form products-inventory__buy" do |form| %>
+      <%= form.label :quantity, "Quantity", class: "products-inventory__quantity-label" %>
+      <%= form.number_field :quantity, value: 1, min: 1, max: product.inventory_count, required: true, class: "products-inventory__quantity" %>
+      <%= form.submit "Buy", class: "btn" %>
+    <% end %>
+  <% else %>
+    <p class="products-inventory__note"><%= link_to "Log in to buy", new_session_path %></p>
+  <% end %>
 <% else %>
   <p class="products-inventory__status products-inventory__status--out-of-stock">Out of stock</p>
-  <p class="products-inventory__note">Email me when available.</p>
 
-  <%= form_with model: [product, Subscriber.new], class: "products-inventory__form" do |form| %>
-    <%= form.email_field :email, placeholder: "you@example.com", required: true, class: "products-inventory__email" %>
-    <%= form.submit "Submit" %>
+  <% if authenticated? %>
+    <% if (subscription = Current.user.subscribers.find_by(product: product)) %>
+      <p class="products-inventory__note products-inventory__subscribed">We'll email you when it's back.</p>
+      <%= button_to "Unsubscribe", subscription_path(subscription), method: :delete, class: "btn btn--secondary" %>
+    <% else %>
+      <p class="products-inventory__note">Email me when available.</p>
+      <%= button_to "Notify me", product_subscribers_path(product), class: "btn" %>
+    <% end %>
+  <% else %>
+    <p class="products-inventory__note">Email me when available.</p>
+
+    <%= form_with model: [product, Subscriber.new], class: "products-inventory__form" do |form| %>
+      <%= form.email_field :email, placeholder: "you@example.com", required: true, class: "products-inventory__email" %>
+      <%= form.submit "Submit" %>
+    <% end %>
   <% end %>
 <% end %>

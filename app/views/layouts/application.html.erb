@@ -29,7 +29,12 @@
 
     <nav class="layouts-application__nav">
       <%= link_to "Home", root_path, class: "layouts-application__brand" %>
+      <% if authenticated? %>
+        <%= link_to "My orders", orders_path, class: "layouts-application__link" %>
+        <%= link_to "My subscriptions", subscriptions_path, class: "layouts-application__link" %>
+      <% end %>
       <% if admin? %>
+        <%= link_to "Orders", admin_orders_path, class: "layouts-application__link" %>
         <%= link_to "Users", admin_users_path, class: "layouts-application__link" %>
         <%= link_to "Subscribers", admin_subscribers_path, class: "layouts-application__link" %>
       <% end %>

@@ -18,12 +18,16 @@ Rails.application.routes.draw do
   root "products#index"
   resources :products do
     resources :subscribers, only: [ :create ]
+    resources :orders, only: [ :create ]
   end
+  resources :orders, only: [ :index ]
+  resources :subscriptions, only: [ :index, :destroy ]
   resource :unsubscribe, only: [ :show ]
 
   namespace :admin do
     resources :users, except: :show
     resources :subscribers, except: :show
+    resources :orders, only: [ :index ]
   end
 
   # View sent emails in development

@@ -1,0 +1,32 @@
+<% content_for :title, "My subscriptions" %>
+
+<div class="admin-page__header">
+  <h1>My subscriptions</h1>
+</div>
+
+<p class="admin-page__empty">We'll email <%= Current.user.email_address %> when these are back in stock.</p>
+
+<% if @subscriptions.any? %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Stock</th>
+        <th class="admin-table__actions-heading">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @subscriptions.each do |subscription| %>
+        <tr id="<%= dom_id(subscription) %>">
+          <td><%= link_to subscription.product.name, subscription.product %></td>
+          <td><%= subscription.product.inventory_count.positive? ? "#{subscription.product.inventory_count} in stock" : "Out of stock" %></td>
+          <td class="admin-table__actions">
+            <%= button_to "Unsubscribe", subscription_path(subscription), method: :delete, class: "btn btn--secondary" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="admin-page__empty">No subscriptions. Use "Notify me" on an out-of-stock product to add one.</p>
+<% end %>

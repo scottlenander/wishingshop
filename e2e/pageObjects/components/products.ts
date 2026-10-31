@@ -50,6 +50,12 @@ export class Item {
   readonly stockStatus: Locator
   readonly inStock: Locator
   readonly outOfStock: Locator
+  readonly quantityInput: Locator
+  readonly buyButton: Locator
+  readonly loginToBuyLink: Locator
+  readonly notifyButton: Locator
+  readonly unsubscribeButton: Locator
+  readonly subscribedMessage: Locator
   readonly subscribeEmail: Locator
   readonly subscribeButton: Locator
   readonly editLink: Locator
@@ -67,7 +73,17 @@ export class Item {
     this.inStock = this.root.locator('.products-inventory__status--in-stock')
     this.outOfStock = this.root.locator('.products-inventory__status--out-of-stock')
 
-    // Back-in-stock form, only shown when out of stock.
+    // In stock: signed-in users buy; visitors get a log-in link.
+    this.quantityInput = this.root.getByLabel('Quantity')
+    this.buyButton = this.root.getByRole('button', { name: 'Buy', exact: true })
+    this.loginToBuyLink = this.root.getByRole('link', { name: 'Log in to buy' })
+
+    // Out of stock, signed in: one-click subscribe / unsubscribe.
+    this.notifyButton = this.root.getByRole('button', { name: 'Notify me' })
+    this.unsubscribeButton = this.root.getByRole('button', { name: 'Unsubscribe' })
+    this.subscribedMessage = this.root.getByText("We'll email you when it's back.")
+
+    // Out of stock, visitor: back-in-stock email form.
     this.subscribeEmail = this.root.getByPlaceholder('you@example.com')
     this.subscribeButton = this.root.getByRole('button', { name: 'Submit' })
 

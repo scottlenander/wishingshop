@@ -7,6 +7,9 @@ export class MainPage {
   readonly homeLink: Locator
   readonly loginLink: Locator
   readonly logoutButton: Locator
+  readonly myOrdersLink: Locator
+  readonly mySubscriptionsLink: Locator
+  readonly ordersLink: Locator
   readonly usersLink: Locator
   readonly subscribersLink: Locator
   readonly notice: Locator
@@ -19,6 +22,10 @@ export class MainPage {
     // Header nav
     this.homeLink = page.getByRole('link', { name: 'Home' })
     this.logoutButton = page.getByRole('button', { name: 'Log out' })
+    this.myOrdersLink = page.getByRole('link', { name: 'My orders' }) // signed in
+    this.mySubscriptionsLink = page.getByRole('link', { name: 'My subscriptions' }) // signed in
+    // exact: otherwise "My orders" also matches.
+    this.ordersLink = page.getByRole('link', { name: 'Orders', exact: true }) // admins only
     this.usersLink = page.getByRole('link', { name: 'Users' }) // admins only
     this.subscribersLink = page.getByRole('link', { name: 'Subscribers' }) // admins only
 

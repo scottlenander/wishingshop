@@ -5,3 +5,8 @@ david:
 chris:
   product: tshirt
   email: chris@example.org
+
+one_hoodie:
+  product: hoodie
+  user: one
+  email: one@example.com

@@ -10,4 +10,12 @@ class UserTest < ActiveSupport::TestCase
     assert_includes User.standard, users(:one)
     assert_not_includes User.standard, users(:admin)
   end
+
+  test "changing email updates the user's subscriptions" do
+    user = users(:one)
+    user.update!(email_address: "new-one@example.com")
+
+    assert_equal "new-one@example.com", subscribers(:one_hoodie).reload.email
+    assert_equal "david@example.org", subscribers(:david).reload.email
+  end
 end

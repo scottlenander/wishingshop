@@ -1,0 +1,11 @@
+one_tshirt:
+  user: one
+  product: tshirt
+  product_name: T-Shirt
+  quantity: 2
+
+two_tshirt:
+  user: two
+  product: tshirt
+  product_name: T-Shirt
+  quantity: 1

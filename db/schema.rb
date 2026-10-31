@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_28_152426) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_31_194122) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -49,6 +49,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_152426) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "orders", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "product_id"
+    t.string "product_name", null: false
+    t.integer "quantity", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_orders_on_product_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -70,7 +81,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_152426) do
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "user_id"
     t.index ["product_id"], name: "index_subscribers_on_product_id"
+    t.index ["user_id"], name: "index_subscribers_on_user_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -84,6 +97,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_152426) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "orders", "products"
+  add_foreign_key "orders", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "subscribers", "products"
+  add_foreign_key "subscribers", "users"
 end
