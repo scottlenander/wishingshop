@@ -51,12 +51,18 @@ All accounts use the password `password`.
 | `alice@example.com` | User |
 | `bob@example.com` | User |
 
-Admins can create, edit and delete products (including stock), and have two extra pages in the header:
+Admins can create, edit and delete products (including stock), and have three extra pages in the header:
 
+- **Orders** (`/admin/orders`): every purchase by every user.
 - **Users** (`/admin/users`): add, edit and delete standard users. Admin accounts aren't listed.
 - **Subscribers** (`/admin/subscribers`): add, edit, move and remove back-in-stock subscribers.
 
-Standard users and visitors can browse products and subscribe to out-of-stock items.
+Signed-in users (standard or admin) can:
+
+- **Buy** in-stock products by choosing a quantity on the product page. Stock goes down, and the purchase shows under **My orders** (`/orders`).
+- **Subscribe** to an out-of-stock product with **Notify me**, which uses their account email. They can unsubscribe from the product page or **My subscriptions** (`/subscriptions`).
+
+Visitors can browse products and subscribe to out-of-stock items by typing an email.
 
 ### Products
 
@@ -96,7 +102,7 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as buying a product, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
 
 Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched.

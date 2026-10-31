@@ -25,7 +25,9 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
   const adminLoginPage = new LoginPage(adminPage)
   const adminProducts = adminMainPage.products
 
-  const subscriberEmail = `alice+${Date.now()}@example.com`
+  // Signed-in users subscribe with their account email.
+  const subscriberEmail = 'alice@example.com'
+  let lettersBefore = 0
 
   await test.step('Admin makes sure the item starts out of stock', async () => {
     await adminLoginPage.goto()
@@ -57,9 +59,22 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
   })
 
   await test.step('Subscribe to the back-in-stock email', async () => {
-    await item.subscribeEmail.fill(subscriberEmail)
-    await item.subscribeButton.click()
+    // A previous run may have left Alice subscribed; start from not subscribed.
+    if (await item.unsubscribeButton.isVisible()) {
+      await item.unsubscribeButton.click()
+      await expect(item.notifyButton).toBeVisible()
+    }
+
+    await item.notifyButton.click()
     await expect(mainPage.notice).toHaveText('You are now subscribed.')
+    await expect(item.subscribedMessage).toBeVisible()
+  })
+
+  await test.step("Count Alice's emails before the restock", async () => {
+    // Earlier runs leave emails to Alice in the inbox, so look for one more.
+    await letterOpener.goto()
+    lettersBefore = await letterOpener.letter(subscriberEmail).count()
+    await page.goBack()
   })
 
   await test.step('Admin restocks the item', async () => {
@@ -78,10 +93,13 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
     // The email is sent in the background, so reload until it arrives.
     await expect(async () => {
       await letterOpener.refreshButton.click()
-      await expect(letterOpener.letter(subscriberEmail)).toBeVisible({ timeout: 1_000 })
+      await expect(letterOpener.letter(subscriberEmail)).toHaveCount(lettersBefore + 1, {
+        timeout: 1_000,
+      })
     }).toPass({ timeout: 15_000 })
 
-    await letterOpener.letter(subscriberEmail).click()
+    // Newest email is listed first.
+    await letterOpener.letter(subscriberEmail).first().click()
     await expect(letterOpener.mailBody.getByText(`${PRODUCT} is back in stock.`)).toBeVisible()
     await expect(letterOpener.mailBody.getByRole('link', { name: 'Unsubscribe' })).toBeVisible()
   })

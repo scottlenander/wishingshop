@@ -54,4 +54,25 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     end
     assert_difference("Product.count", -1) { delete product_path(Product.last) }
   end
+
+  test "visitors see log in to buy and the email form" do
+    get product_path(@product)
+    assert_select "a", text: "Log in to buy"
+
+    get product_path(products(:hoodie))
+    assert_select "input[type=email][placeholder='you@example.com']"
+  end
+
+  test "signed-in users see buy, notify me and unsubscribe" do
+    sign_in_as users(:two)
+    get product_path(@product)
+    assert_select "input[type=submit][value=Buy]"
+
+    get product_path(products(:hoodie))
+    assert_select "button", text: "Notify me"
+
+    sign_in_as users(:one) # already subscribed to Hoodie
+    get product_path(products(:hoodie))
+    assert_select "button", text: "Unsubscribe"
+  end
 end
