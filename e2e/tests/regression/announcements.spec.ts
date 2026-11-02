@@ -1,15 +1,16 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { LoginPage } from '../../pageObjects/loginPage'
+import { AUTH_FILES } from '../../libs/auth'
 import { Announcements } from '../../pageObjects/admin/announcements'
-import { USERS } from '../../libs/constants'
 
 // Every announcement this test creates starts with this, so leftovers are easy to clean up.
 const TITLE_PREFIX = 'E2E announcement'
 
+// Starts signed in (see tests/auth.setup.ts).
+test.use({ storageState: AUTH_FILES.admin })
+
 test('admin adds an announcement to the homepage carousel', async ({ page }) => {
   const mainPage = new MainPage(page)
-  const loginPage = new LoginPage(page)
   const announcements = new Announcements(page)
   const { carousel } = mainPage
   const title = `${TITLE_PREFIX} ${Date.now()}`
@@ -17,11 +18,8 @@ test('admin adds an announcement to the homepage carousel', async ({ page }) => 
   // Stops auto-advance, so slides only change when the test clicks.
   await page.emulateMedia({ reducedMotion: 'reduce' })
 
-  await test.step('Log in as admin', async () => {
-    await loginPage.goto()
-    await loginPage.emailInput.fill(USERS.admin.email)
-    await loginPage.passwordInput.fill(USERS.admin.password)
-    await loginPage.signInButton.click()
+  await test.step('Start signed in as admin', async () => {
+    await mainPage.goto()
     await expect(mainPage.logoutButton).toBeVisible()
   })
 
@@ -78,7 +76,7 @@ test('admin adds an announcement to the homepage carousel', async ({ page }) => 
     await expect(carousel.pauseButton).toHaveAccessibleName('Play announcements')
   })
 
-  await test.step('Delete it; it leaves the carousel', async () => {
+  await test.step('Delete announcement and verify in the carousel', async () => {
     await announcements.goto()
     await announcements.delete(title)
     await expect(mainPage.notice).toHaveText('Announcement deleted.')

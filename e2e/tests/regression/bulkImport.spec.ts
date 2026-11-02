@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { LoginPage } from '../../pageObjects/loginPage'
+import { AUTH_FILES } from '../../libs/auth'
 import { ProductImport } from '../../pageObjects/admin/productImport'
-import { PRODUCTS, USERS } from '../../libs/constants'
+import { PRODUCTS } from '../../libs/constants'
 
 // Existing product this test restocks. Only this test changes it.
 const EXISTING = PRODUCTS.BEANIE
@@ -10,9 +10,11 @@ const EXISTING = PRODUCTS.BEANIE
 // This test changes shared data (stock), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
 
+// Starts signed in (see tests/auth.setup.ts).
+test.use({ storageState: AUTH_FILES.admin })
+
 test('admin bulk imports new products and updates stock', async ({ page }) => {
   const mainPage = new MainPage(page)
-  const loginPage = new LoginPage(page)
   const productImport = new ProductImport(page)
   const { products } = mainPage
   const { item } = products
@@ -22,11 +24,8 @@ test('admin bulk imports new products and updates stock', async ({ page }) => {
   const newProduct = { name: `Import Jacket ${runId}`, sku: `IMPORT-JACKET-${runId}` }
   let newStock = 0
 
-  await test.step('Log in as admin', async () => {
-    await loginPage.goto()
-    await loginPage.emailInput.fill(USERS.admin.email)
-    await loginPage.passwordInput.fill(USERS.admin.password)
-    await loginPage.signInButton.click()
+  await test.step('Start signed in as admin', async () => {
+    await mainPage.goto()
     await expect(mainPage.logoutButton).toBeVisible()
   })
 

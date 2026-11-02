@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { LoginPage } from '../../pageObjects/loginPage'
+import { AUTH_FILES } from '../../libs/auth'
 import { FeaturedProducts } from '../../pageObjects/admin/featuredProducts'
-import { PRODUCTS, USERS } from '../../libs/constants'
+import { PRODUCTS } from '../../libs/constants'
 
 const PRODUCT = PRODUCTS.LEATHER_BELT.name
 // Read-only: only used to try an overlapping pick, which is refused.
@@ -11,18 +11,17 @@ const OTHER_PRODUCT = PRODUCTS.T_SHIRT.name
 // This test changes shared data (the featured pick), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
 
+// Starts signed in (see tests/auth.setup.ts).
+test.use({ storageState: AUTH_FILES.admin })
+
 test('admin features a product on the homepage, then removes it', async ({ page }) => {
   const mainPage = new MainPage(page)
-  const loginPage = new LoginPage(page)
   const featuredProducts = new FeaturedProducts(page)
   const { featured, products } = mainPage
   const { item } = products
 
-  await test.step('Log in as admin', async () => {
-    await loginPage.goto()
-    await loginPage.emailInput.fill(USERS.admin.email)
-    await loginPage.passwordInput.fill(USERS.admin.password)
-    await loginPage.signInButton.click()
+  await test.step('Start signed in as admin', async () => {
+    await mainPage.goto()
     await expect(mainPage.logoutButton).toBeVisible()
   })
 

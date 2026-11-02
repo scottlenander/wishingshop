@@ -145,6 +145,7 @@ Browser tests in `e2e/` that click through the app the way a user would. They're
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
 - `tests/regression/`: longer flows, such as buying a product, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
+- `tests/auth.setup.ts`: signs in as admin and Alice once per run and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form.
 
 Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched.
 
