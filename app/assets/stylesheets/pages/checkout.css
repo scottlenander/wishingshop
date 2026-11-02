@@ -1,0 +1,272 @@
+/*
+ * Checkout (checkouts/show) and order details (orders/show).
+ * Form on the left, order summary on the right; one column on phones.
+ */
+
+.checkout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.checkout__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.checkout__section {
+  max-width: none;
+  margin: 0;
+}
+
+.checkout__section legend {
+  padding: 0 var(--space-2);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.checkout__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: var(--space-4);
+}
+
+.checkout__errors ul {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-5);
+}
+
+.checkout__test-cards {
+  margin: 0;
+  padding: var(--space-3);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+/* Shipping options as selectable cards. */
+.checkout__methods {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.checkout__method {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-weight: 400;
+  cursor: pointer;
+  transition: border-color var(--transition), background-color var(--transition);
+}
+
+.checkout__method:hover {
+  border-color: var(--color-link);
+}
+
+.checkout__method:has(:checked) {
+  border-color: var(--color-link);
+  background: rgb(10 102 194 / 0.06);
+  box-shadow: 0 0 0 1px var(--color-link);
+}
+
+.checkout__method-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.checkout__method-text span {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.checkout__method-price {
+  font-weight: 700;
+}
+
+.checkout__summary {
+  position: sticky;
+  top: calc(var(--header-height) + var(--space-4));
+  margin: 0;
+}
+
+.checkout__summary h2,
+.order h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.checkout__items {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.checkout__items li,
+.checkout__totals {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.checkout__items li {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.checkout__totals {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  /* No column gap, so the line above the total runs straight across. */
+  gap: var(--space-2) 0;
+  margin: 0;
+}
+
+.checkout__totals dd {
+  margin: 0;
+  padding-left: var(--space-4);
+  text-align: right;
+}
+
+.checkout__total-label,
+.checkout__total {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+}
+
+.checkout__submit {
+  width: 100%;
+}
+
+/* ---------- orders/show ---------- */
+
+.order {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.order .form-card {
+  max-width: none;
+  margin: 0;
+}
+
+.order__address,
+.order__billing {
+  font-style: normal;
+  line-height: 1.6;
+}
+
+@media (max-width: 800px) {
+  .checkout,
+  .order {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .checkout__summary {
+    position: static;
+  }
+}
+
+/* ---------- Billing / shipping addresses ---------- */
+
+.checkout__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: 400;
+}
+
+.checkout__shipping {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.checkout__new-shipping {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.checkout__new-shipping legend {
+  padding: 0 var(--space-2);
+  font-weight: 600;
+}
+
+/* Shipping fields only when "Ship to my billing address" is unchecked... */
+.checkout:has(.checkout__same-as-billing input:checked) .checkout__shipping {
+  display: none;
+}
+
+/* ...the new-address form only when "New address" is picked (if there are saved ones)... */
+.checkout__shipping--choices .checkout__new-shipping {
+  display: none;
+}
+
+.checkout__shipping--choices:has(.checkout__choice-new input:checked) .checkout__new-shipping {
+  display: flex;
+}
+
+/* ...and the nickname only when saving it. */
+.checkout__nickname {
+  display: none;
+}
+
+.checkout__new-shipping:has(.checkout__save-shipping input:checked) .checkout__nickname {
+  display: block;
+}
+
+/* ---------- addresses/index ---------- */
+
+.addresses__group {
+  margin-bottom: var(--space-6);
+}
+
+.addresses__group h2 {
+  font-size: var(--font-size-lg);
+}
+
+.addresses__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--space-4);
+}
+
+.addresses__card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 420px;
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.addresses__card address {
+  font-style: normal;
+  line-height: 1.6;
+}
+
+.addresses__nickname {
+  margin: 0;
+  font-size: var(--font-size-base);
+}
+
+.addresses__actions {
+  justify-content: flex-start;
+}

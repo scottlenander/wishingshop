@@ -113,3 +113,29 @@
 .layouts-application__login:hover {
   text-decoration: none;
 }
+
+/* Cart link with item count. */
+.layouts-application__cart {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-on-brand);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.layouts-application__cart:hover {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.layouts-application__cart-count {
+  min-width: 1.4rem;
+  padding: 0 var(--space-1);
+  background: var(--color-accent);
+  color: var(--color-text);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  line-height: 1.4rem;
+  text-align: center;
+}

@@ -1,0 +1,4 @@
+one_tshirt:
+  cart: one
+  product: tshirt
+  quantity: 2

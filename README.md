@@ -48,7 +48,7 @@ All accounts use the password `password`.
 | Email | Name | Role |
 |---|---|---|
 | `admin@example.com` | Admin Manager | Admin |
-| `alice@example.com` | Alice Cooper | User |
+| `alice@example.com` | Alice Cooper | User (saved billing address: 18 Elm Street, Springfield, IL 62704) |
 | `bob@example.com` | Bob Builder | User |
 
 Admins can create, edit and delete products (including stock), and have six extra pages in the header:
@@ -62,16 +62,42 @@ Admins can create, edit and delete products (including stock), and have six extr
 
 Signed-in users (standard or admin) can:
 
-- **Buy** in-stock products by choosing a quantity on the product page. Stock goes down, and the purchase shows under **My orders** (`/orders`).
+- **Shop:** see [Shopping and checkout](#shopping-and-checkout).
 - **Subscribe** to an out-of-stock product with **Notify me**, which uses their account email. They can unsubscribe from the product page or **My subscriptions** (`/subscriptions`).
 
-Visitors can browse products and subscribe to out-of-stock items by typing an email.
+Visitors can browse products, add them to a cart, and subscribe to out-of-stock items by typing an email.
+
+### Shopping and checkout
+
+Every product has a price (seeded from $14.99 to $119.99).
+
+1. **Cart:** on a product page, choose a quantity and click **Add to cart**. The **Cart** link in the header shows how many items are in it. On the cart page you can change quantities or remove items. Visitors have a cart too, kept in their browser's session cookie (not the database), up to 50 different products.
+2. **Checkout:** enter a billing address, choose where to ship, pick a shipping method and pay. Visitors are asked to log in first, and their cart is kept. Addresses are US only.
+   - **Billing address:** filled in from your saved one if you have one, and you can still edit it. Tick **Save as my billing address** (or **Update my saved billing address**) to keep it.
+   - **Shipping address:** **Ship to my billing address** is ticked by default. Untick it to pick a saved shipping address or enter a new one, which you can save with a nickname (e.g. "Work").
+3. **My addresses** (`/addresses`): view, add, edit and delete your billing address and saved shipping addresses.
+4. **My orders** (`/orders`): every order, with its items, prices, billing and shipping addresses, shipping and payment, kept as they were when ordered.
+
+| Shipping | Price | Delivery |
+|---|---|---|
+| Standard | $4.99, **free on orders of $50 or more** | 3–5 business days |
+| Two-day | $9.99 | 2 business days |
+| Same-day | $19.99 | Today, order by 2pm |
+
+Payment is fake (no money is taken). Only the card type and last 4 digits are saved, and card details are filtered out of the logs.
+
+| Test card | Result |
+|---|---|
+| `4242 4242 4242 4242` | Paid |
+| `4000 0000 0000 0002` | Declined |
+
+Use any future expiry (e.g. `12/30`) and any 3-digit code.
 
 ### Homepage
 
 The top of the products page has an **announcements carousel** and a **featured product** (side by side on desktop, stacked on phones).
 
-- **Carousel:** shows live announcements. Seeded with three: "New: Rain Coat", "20% off scarves this week" and "Free shipping over $50". It moves every 6 seconds, pauses on hover, focus or the Pause button, and doesn't move at all for visitors who prefer reduced motion. Sales are text only, since products don't have prices yet.
+- **Carousel:** shows live announcements. Seeded with three: "New: Rain Coat", "20% off scarves this week" and "Free shipping over $50". It moves every 6 seconds, pauses on hover, focus or the Pause button, and doesn't move at all for visitors who prefer reduced motion. Sales are text only: they don't change prices.
 - **Featured product:** the admin's active pick, marked "Picked by our team". Without one, a random in-stock product is shown, the same for everyone all day and changing each day (UTC).
 
 ### Products
@@ -101,9 +127,9 @@ In development, emails aren't sent. They're saved and can be read at [localhost:
 Admins can create and update many products at once from a CSV file. Rows are matched by **SKU**: a known SKU updates that product, and a new SKU creates one.
 
 ```csv
-sku,name,description,inventory_count,image_url
-HOODIE,,,25,
-WINTER-COAT,Winter Coat,A warm wool coat.,30,https://example.com/coat.png
+sku,name,description,price,inventory_count,image_url
+HOODIE,,,,25,
+WINTER-COAT,Winter Coat,A warm wool coat.,129.00,30,https://example.com/coat.png
 ```
 
 | Column | Meaning |
@@ -111,6 +137,7 @@ WINTER-COAT,Winter Coat,A warm wool coat.,30,https://example.com/coat.png
 | `sku` | Required. Letters, numbers and dashes. Existing products have SKUs made from their names (e.g. `T-SHIRT`). |
 | `name` | Required for new products. |
 | `description` | Plain text. |
+| `price` | Dollars, like `19.99`. A product priced 0 isn't for sale. |
 | `inventory_count` | Sets the stock to this number (it doesn't add to it). |
 | `image_url` | Optional http/https image, up to 5 MB. Downloaded and attached. |
 
@@ -143,7 +170,7 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as buying a product, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as checking out a cart, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
 - `tests/auth.setup.ts`: signs in as admin and Alice once per run and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form.
 

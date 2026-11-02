@@ -3,20 +3,20 @@ require "csv"
 # Bulk create/update of products from a CSV. Used by the admin import page and
 # the products:import rake task.
 #
-#   sku,name,description,inventory_count,image_url
+#   sku,name,description,price,inventory_count,image_url
 #   HOODIE,,,25,
 #   WINTER-COAT,Winter Coat,Warm wool coat.,40,https://example.com/coat.png
 #
 # Rows are matched by SKU: known SKUs update that product, new SKUs create one.
 # For existing products a blank cell keeps the current value, and
-# inventory_count sets the stock (it isn't added to it).
+# inventory_count sets the stock (it isn't added to it). price is in dollars (19.99).
 #
 #   import = Product::Import.new(csv_text)
 #   import.rows      # preview: action, changes and errors per row
 #   import.valid?    # no errors anywhere
 #   import.apply!    # save everything in one transaction; false on failure
 class Product::Import
-  HEADERS = %w[ sku name description inventory_count image_url ].freeze
+  HEADERS = %w[ sku name description price inventory_count image_url ].freeze
   MAX_BYTES = 1.megabyte
   MAX_ROWS = 1_000
 
@@ -158,6 +158,16 @@ class Product::Import
         end
       end
 
+      if (price = values["price"])
+        cents = parse_price(price)
+        if cents.nil?
+          row.errors << "Price must be a dollar amount like 19.99 (got #{price.inspect})."
+        elsif cents != product.price_cents || product.new_record?
+          row.changes << change_text("Price", (format_dollars(product.price_cents) unless product.new_record?), format_dollars(cents))
+          product.price_cents = cents
+        end
+      end
+
       if (stock = values["inventory_count"])
         if stock.match?(/\A\d+\z/)
           stock = stock.to_i
@@ -181,6 +191,13 @@ class Product::Import
         end
       end
     end
+
+    def parse_price(text)
+      text = text.delete_prefix("$").delete(",")
+      (BigDecimal(text) * 100).to_i if text.match?(/\A\d+(\.\d{1,2})?\z/)
+    end
+
+    def format_dollars(cents) = format("$%.2f", cents / 100.0)
 
     def change_text(label, from, to)
       from.nil? ? "#{label}: #{to}" : "#{label}: #{from} → #{to}"

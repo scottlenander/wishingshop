@@ -1,22 +1,27 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { AUTH_FILES } from '../../libs/auth'
 import { MyOrders } from '../../pageObjects/myOrders'
-import { PRODUCTS } from '../../libs/constants'
+import { Cart } from '../../pageObjects/cart'
+import { Checkout } from '../../pageObjects/checkout'
+import { OrderPage } from '../../pageObjects/orderPage'
+import { ALICE_BILLING, PRODUCTS, TEST_CARDS, futureExpiry } from '../../libs/constants'
+import { AUTH_FILES } from '../../libs/auth'
 
-// Only this test buys or restocks it, so tests stay independent.
+// Only this test buys or restocks it, so tests stay independent. Seeded at $14.99.
 const PRODUCT = PRODUCTS.SCARF.name
 
-// This test changes shared data (stock), so don't run its steps in parallel.
+// This test changes shared data (stock, Alice's cart), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
 
 // Starts signed in as Alice; the admin context uses the saved admin session
 // (see tests/auth.setup.ts).
 test.use({ storageState: AUTH_FILES.alice })
 
-test('standard user buys a product and sees it in their orders', async ({ page, browser }) => {
-  // Standard user
+test('standard user checks out a cart and sees the order', async ({ page, browser }) => {
   const mainPage = new MainPage(page)
+  const cart = new Cart(page)
+  const checkout = new Checkout(page)
+  const orderPage = new OrderPage(page)
   const myOrders = new MyOrders(page)
   const { products } = mainPage
   const { item } = products
@@ -27,7 +32,7 @@ test('standard user buys a product and sees it in their orders', async ({ page, 
   const adminMainPage = new MainPage(adminPage)
   const adminProducts = adminMainPage.products
 
-  let ordersBefore = 0
+  let orderNumber = ''
 
   await test.step('Admin sets the starting stock to 10', async () => {
     await adminMainPage.goto()
@@ -39,42 +44,80 @@ test('standard user buys a product and sees it in their orders', async ({ page, 
     await adminContext.close()
   })
 
-  await test.step('Standard user counts existing orders', async () => {
-    await mainPage.goto()
-    await expect(mainPage.logoutButton).toBeVisible()
-
-    // Earlier runs may have left Scarf orders.
-    await mainPage.myOrdersLink.click()
-    await expect(myOrders.header).toBeVisible()
-    ordersBefore = await myOrders.orders(PRODUCT).count()
+  await test.step('Start with an empty cart', async () => {
+    // Earlier runs may have left items in Alice's cart.
+    await cart.empty()
   })
 
-  await test.step('Buy 2 of the product', async () => {
+  await test.step('Add 2 to the cart from the product page', async () => {
     await mainPage.goto()
     await products.card(PRODUCT).link.click()
-    await expect(item.inStock).toHaveText('10 in stock')
+    await expect(item.price).toHaveText('$14.99')
 
     await item.quantityInput.fill('2')
-    await item.buyButton.click()
-    await expect(mainPage.notice).toHaveText(`Purchased 2 × ${PRODUCT}.`)
-    await expect(item.inStock, { message: 'Stock should drop by 2' }).toHaveText('8 in stock')
+    await item.addToCartButton.click()
+    await expect(mainPage.notice).toHaveText(`Added 2 × ${PRODUCT} to your cart.`)
+    await expect(mainPage.cartCount).toHaveText('2')
+    // Adding to the cart doesn't take stock.
+    await expect(item.inStock).toHaveText('10 in stock')
   })
 
-  await test.step("Can't buy more than is in stock", async () => {
-    await item.quantityInput.fill('9')
-    await item.buyButton.click()
+  await test.step('Change the quantity in the cart', async () => {
+    await mainPage.cartLink.click()
+    await expect(cart.item(PRODUCT)).toBeVisible()
 
-    // The browser blocks the form (max is the stock), so nothing is bought.
-    expect(await item.quantityInput.evaluate((el: HTMLInputElement) => el.checkValidity())).toBe(
-      false,
-    )
-    await expect(item.inStock).toHaveText('8 in stock')
+    await cart.setQuantity(PRODUCT, 3)
+    await expect(mainPage.notice).toHaveText(`Updated ${PRODUCT}.`)
+    await expect(cart.lineTotal(PRODUCT)).toHaveText('$44.97')
+    await expect(cart.subtotal).toHaveText('$44.97')
+    await expect(cart.shippingNote).toContainText('Add $5.03 more for free standard shipping')
   })
 
-  await test.step('The order shows in My orders', async () => {
+  await test.step('Check out with two-day shipping', async () => {
+    await cart.checkoutButton.click()
+    await expect(checkout.header).toBeVisible()
+    await expect(checkout.summaryItems).toHaveText([/3 × Scarf\s*\$44\.97/])
+    // Alice's saved billing address is filled in, and orders ship there by default.
+    await expect(checkout.billing.nameInput).toHaveValue(ALICE_BILLING.name)
+    await expect(checkout.billing.line1Input).toHaveValue(ALICE_BILLING.line1)
+    await expect(checkout.billing.zipInput).toHaveValue(ALICE_BILLING.zip)
+    await expect(checkout.saveBillingCheckbox).not.toBeChecked()
+    await expect(checkout.sameAsBillingCheckbox).toBeChecked()
+    await expect(checkout.newShipping.root).toBeHidden()
+
+    // The total updates as the shipping method changes.
+    await expect(checkout.shippingCost).toHaveText('$4.99')
+    await checkout.shippingOption('Two-day').check()
+    await expect(checkout.shippingCost).toHaveText('$9.99')
+    await expect(checkout.total).toHaveText('$54.96')
+
+    await checkout.fillCard({ number: TEST_CARDS.success, expiry: futureExpiry() })
+    await checkout.placeOrderButton.click()
+  })
+
+  await test.step('The order page shows what was bought', async () => {
+    await expect(mainPage.notice).toContainText('Thanks! Your order WS-')
+    orderNumber = await orderPage.number()
+
+    await expect(orderPage.item(PRODUCT)).toContainText('$14.99')
+    await expect(orderPage.item(PRODUCT)).toContainText('3')
+    await expect(orderPage.total).toHaveText('$54.96')
+    await expect(orderPage.payment).toHaveText('Visa ending 4242')
+    await expect(orderPage.address).toContainText(ALICE_BILLING.line1)
+    await expect(orderPage.billing).toHaveText('Same as shipping')
+    await expect(mainPage.cartCount, { message: 'The cart is empty after checkout' }).toBeHidden()
+  })
+
+  await test.step('Stock dropped and the order is in My orders', async () => {
+    await mainPage.goto()
+    await products.card(PRODUCT).link.click()
+    await expect(item.inStock, { message: 'Stock should drop by 3' }).toHaveText('7 in stock')
+
     await mainPage.myOrdersLink.click()
-    await expect(myOrders.orders(PRODUCT)).toHaveCount(ordersBefore + 1)
-    // Newest first.
-    await expect(myOrders.orders(PRODUCT).first().getByRole('cell').nth(1)).toHaveText('2')
+    await expect(myOrders.header).toBeVisible()
+    const row = myOrders.order(orderNumber)
+    await expect(row).toContainText(`3 × ${PRODUCT}`)
+    await expect(row).toContainText('Two-day')
+    await expect(row).toContainText('$54.96')
   })
 })

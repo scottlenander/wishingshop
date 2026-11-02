@@ -1,0 +1,62 @@
+<% content_for :title, "Order #{@order.number}" %>
+
+<div class="admin-page__header">
+  <h1>Order <%= @order.number %></h1>
+  <%= link_to "All orders", orders_path, class: "admin-page__cancel" %>
+</div>
+
+<p class="admin-page__empty">Placed <%= @order.placed_at.to_fs(:long) %>.</p>
+
+<div class="order">
+  <section class="form-card order__items" aria-labelledby="order-items-title">
+    <h2 id="order-items-title">Items</h2>
+    <table class="admin-table">
+      <thead>
+        <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th></tr>
+      </thead>
+      <tbody>
+        <% @order.order_items.each do |item| %>
+          <tr>
+            <td><%= item.product ? link_to(item.product_name, item.product) : item.product_name %></td>
+            <td><%= @order.legacy? ? "—" : format_price(item.unit_price_cents) %></td>
+            <td><%= item.quantity %></td>
+            <td><%= @order.legacy? ? "—" : format_price(item.line_total_cents) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <% if @order.legacy? %>
+      <p class="admin-page__empty">This order was placed before checkout existed, so prices weren't recorded.</p>
+    <% else %>
+      <dl class="checkout__totals order__totals">
+        <dt>Subtotal</dt>
+        <dd><%= format_price(@order.subtotal_cents) %></dd>
+        <dt>Shipping (<%= @order.shipping_option&.label %>)</dt>
+        <dd><%= @order.shipping_cents.zero? ? "Free" : format_price(@order.shipping_cents) %></dd>
+        <dt class="checkout__total-label">Total</dt>
+        <dd class="checkout__total order__total"><%= format_price(@order.total_cents) %></dd>
+      </dl>
+    <% end %>
+  </section>
+
+  <% unless @order.legacy? %>
+    <section class="form-card order__shipping" aria-labelledby="order-shipping-title">
+      <h2 id="order-shipping-title">Shipping to</h2>
+      <address class="order__address"><%= safe_join(@order.address_lines, tag.br) %></address>
+
+      <% if @order.billing_lines.any? %>
+        <h2>Billing address</h2>
+        <% if @order.ships_to_billing? %>
+          <p class="order__billing">Same as shipping</p>
+        <% else %>
+          <address class="order__billing"><%= safe_join(@order.billing_lines, tag.br) %></address>
+        <% end %>
+      <% end %>
+      <p><strong><%= @order.shipping_option&.label %></strong>: <%= @order.shipping_option&.estimate %></p>
+
+      <h2>Payment</h2>
+      <p class="order__payment"><%= @order.payment_summary %></p>
+    </section>
+  <% end %>
+</div>

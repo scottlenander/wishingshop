@@ -8,17 +8,21 @@
   <table class="admin-table">
     <thead>
       <tr>
-        <th>Product</th>
-        <th>Quantity</th>
-        <th>Ordered</th>
+        <th>Order</th>
+        <th>Placed</th>
+        <th>Items</th>
+        <th>Shipping</th>
+        <th>Total</th>
       </tr>
     </thead>
     <tbody>
       <% @orders.each do |order| %>
         <tr id="<%= dom_id(order) %>">
-          <td><%= order.product ? link_to(order.product_name, order.product) : order.product_name %></td>
-          <td><%= order.quantity %></td>
-          <td><%= order.created_at.to_fs(:long) %></td>
+          <td><%= link_to order.number, order_path(order) %></td>
+          <td><%= order.placed_at.to_fs(:long) %></td>
+          <td><%= safe_join(order.order_items.map { |i| "#{i.quantity} × #{i.product_name}" }, tag.br) %></td>
+          <td><%= order.shipping_option&.label || "—" %></td>
+          <td><%= order.legacy? ? "Price not recorded" : format_price(order.total_cents) %></td>
         </tr>
       <% end %>
     </tbody>

@@ -50,9 +50,9 @@ export class Item {
   readonly stockStatus: Locator
   readonly inStock: Locator
   readonly outOfStock: Locator
+  readonly price: Locator
   readonly quantityInput: Locator
-  readonly buyButton: Locator
-  readonly loginToBuyLink: Locator
+  readonly addToCartButton: Locator
   readonly notifyButton: Locator
   readonly unsubscribeButton: Locator
   readonly subscribedMessage: Locator
@@ -74,10 +74,12 @@ export class Item {
     this.inStock = this.root.locator('.products-inventory__status--in-stock')
     this.outOfStock = this.root.locator('.products-inventory__status--out-of-stock')
 
-    // In stock: signed-in users buy; visitors get a log-in link.
+    // Price ("$19.99", or "Not for sale yet").
+    this.price = this.root.locator('.products-inventory__price')
+
+    // In stock: anyone can add to the cart (visitors log in at checkout).
     this.quantityInput = this.root.getByLabel('Quantity')
-    this.buyButton = this.root.getByRole('button', { name: 'Buy', exact: true })
-    this.loginToBuyLink = this.root.getByRole('link', { name: 'Log in to buy' })
+    this.addToCartButton = this.root.getByRole('button', { name: 'Add to cart' })
 
     // Out of stock, signed in: one-click subscribe / unsubscribe.
     this.notifyButton = this.root.getByRole('button', { name: 'Notify me' })

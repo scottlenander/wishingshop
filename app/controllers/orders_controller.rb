@@ -1,15 +1,12 @@
-# Buying products and "My orders". Any signed-in user can buy.
+# "My orders": the signed-in user's order history.
 class OrdersController < ApplicationController
   def index
-    @orders = Current.user.orders.order(created_at: :desc)
+    @orders = Current.user.orders.includes(:order_items).order(placed_at: :desc)
   end
 
-  def create
-    product = Product.find(params[:product_id])
-    quantity = params.fetch(:quantity, 1)
-    order = product.purchase!(Current.user, quantity)
-    redirect_to product, notice: "Purchased #{order.quantity} × #{order.product_name}."
-  rescue Product::NotEnoughStock, ArgumentError => e
-    redirect_to product, alert: e.message
+  def show
+    # Scoped to the current user, so someone else's order is a 404.
+    @order = Current.user.orders.includes(order_items: { product: { featured_image_attachment: :blob } })
+                         .find_by!(number: params[:number])
   end
 end

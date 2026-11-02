@@ -1,14 +1,15 @@
+<p class="products-inventory__price"><%= product.for_sale? ? format_price(product.price_cents) : "Not for sale yet" %></p>
+
 <% if product.inventory_count.positive? %>
   <p class="products-inventory__status products-inventory__status--in-stock"><%= product.inventory_count %> in stock</p>
 
-  <% if authenticated? %>
-    <%= form_with url: product_orders_path(product), class: "products-inventory__form products-inventory__buy" do |form| %>
+  <% if product.for_sale? %>
+    <%= form_with url: cart_items_path, class: "products-inventory__form products-inventory__buy" do |form| %>
+      <%= hidden_field_tag :product_id, product.id %>
       <%= form.label :quantity, "Quantity", class: "products-inventory__quantity-label" %>
       <%= form.number_field :quantity, value: 1, min: 1, max: product.inventory_count, required: true, class: "products-inventory__quantity" %>
-      <%= form.submit "Buy", class: "btn" %>
+      <%= form.submit "Add to cart", class: "btn" %>
     <% end %>
-  <% else %>
-    <p class="products-inventory__note"><%= link_to "Log in to buy", new_session_path %></p>
   <% end %>
 <% else %>
   <p class="products-inventory__status products-inventory__status--out-of-stock">Out of stock</p>

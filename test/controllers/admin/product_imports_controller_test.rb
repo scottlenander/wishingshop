@@ -67,10 +67,10 @@ class Admin::ProductImportsControllerTest < ActionDispatch::IntegrationTest
 
     get template_admin_product_import_path
     assert_equal "text/csv", response.media_type
-    assert_equal "sku,name,description,inventory_count,image_url\n", response.body
+    assert_equal "sku,name,description,price,inventory_count,image_url\n", response.body
 
     get export_admin_product_import_path
     assert_equal "text/csv", response.media_type
-    assert_includes response.body, "T-SHIRT,T-Shirt,,15,"
+    assert_includes response.body, "T-SHIRT,T-Shirt,,19.99,15,"
   end
 end

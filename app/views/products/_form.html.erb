@@ -24,6 +24,11 @@
   </div>
 
   <div class="products-form__field">
+    <%= form.label :price, "Price ($)" %>
+    <%= form.text_field :price, value: (product.price && format("%.2f", product.price)), inputmode: "decimal", placeholder: "19.99" %>
+  </div>
+
+  <div class="products-form__field">
     <%= form.label :inventory_count %>
     <%= form.number_field :inventory_count %>
   </div>

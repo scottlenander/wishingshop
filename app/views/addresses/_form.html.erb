@@ -1,0 +1,17 @@
+<%= form_with model: address, class: "form-card" do |form| %>
+  <% if address.errors.any? %>
+    <p class="error"><%= address.errors.full_messages.first %></p>
+  <% end %>
+  <%= hidden_field_tag "address[kind]", address.kind if address.new_record? %>
+
+  <% if address.shipping? %>
+    <div>
+      <%= form.label :nickname %>
+      <%= form.text_field :nickname, required: true, maxlength: 30, placeholder: "Home, Work, Mom's house" %>
+    </div>
+  <% end %>
+
+  <%= render "addresses/fields", form: form, prefix: nil %>
+
+  <%= form.submit address.new_record? ? "Save address" : "Update address" %>
+<% end %>

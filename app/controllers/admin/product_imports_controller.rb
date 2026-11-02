@@ -53,7 +53,8 @@ class Admin::ProductImportsController < Admin::BaseController
     csv = CSV.generate do |rows|
       rows << Product::Import::HEADERS
       Product.with_rich_text_description.order(:name).each do |product|
-        rows << [ product.sku, product.name, product.description&.to_plain_text.presence, product.inventory_count, nil ]
+        rows << [ product.sku, product.name, product.description&.to_plain_text.presence,
+                  (format("%.2f", product.price) if product.for_sale?), product.inventory_count, nil ]
       end
     end
     send_data csv, filename: "products-#{Date.current}.csv", type: "text/csv"

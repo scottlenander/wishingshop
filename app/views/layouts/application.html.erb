@@ -43,6 +43,7 @@
       <% if authenticated? %>
         <%= link_to "My orders", orders_path, class: "layouts-application__link" %>
         <%= link_to "My subscriptions", subscriptions_path, class: "layouts-application__link" %>
+        <%= link_to "My addresses", addresses_path, class: "layouts-application__link" %>
       <% end %>
       <% if admin? %>
         <%= link_to "Orders", admin_orders_path, class: "layouts-application__link" %>
@@ -53,6 +54,10 @@
         <%= link_to "Subscribers", admin_subscribers_path, class: "layouts-application__link" %>
       <% end %>
       <div class="layouts-application__account">
+        <% count = current_cart_count %>
+        <%= link_to cart_path, class: "layouts-application__cart", aria: { label: "Cart, #{pluralize(count, "item")}" } do %>
+          Cart<% if count.positive? %> <span class="layouts-application__cart-count"><%= count %></span><% end %>
+        <% end %>
         <% if authenticated? %>
           <span class="layouts-application__greeting">Hi, <%= Current.user.first_name %>!</span>
           <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" %>

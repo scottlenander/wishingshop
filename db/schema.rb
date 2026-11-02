@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_02_201830) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_02_212816) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -49,6 +49,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_201830) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "addresses", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.string "kind", null: false
+    t.string "nickname"
+    t.string "name", null: false
+    t.string "line1", null: false
+    t.string "line2"
+    t.string "city", null: false
+    t.string "state", null: false
+    t.string "postal_code", null: false
+    t.string "country", default: "US", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "nickname"], name: "index_addresses_unique_shipping_nickname", unique: true, where: "kind = 'shipping'"
+    t.index ["user_id"], name: "index_addresses_on_user_id"
+    t.index ["user_id"], name: "index_addresses_one_billing_per_user", unique: true, where: "kind = 'billing'"
+  end
+
   create_table "announcement_products", force: :cascade do |t|
     t.integer "announcement_id", null: false
     t.integer "product_id", null: false
@@ -71,6 +89,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_201830) do
     t.index ["starts_at", "ends_at"], name: "index_announcements_on_starts_at_and_ends_at"
   end
 
+  create_table "cart_items", force: :cascade do |t|
+    t.integer "cart_id", null: false
+    t.integer "product_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cart_id", "product_id"], name: "index_cart_items_on_cart_id_and_product_id", unique: true
+    t.index ["cart_id"], name: "index_cart_items_on_cart_id"
+    t.index ["product_id"], name: "index_cart_items_on_product_id"
+  end
+
+  create_table "carts", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_carts_on_user_id", unique: true
+  end
+
   create_table "featured_products", force: :cascade do |t|
     t.integer "product_id", null: false
     t.integer "user_id"
@@ -83,14 +119,46 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_201830) do
     t.index ["user_id"], name: "index_featured_products_on_user_id"
   end
 
-  create_table "orders", force: :cascade do |t|
-    t.integer "user_id", null: false
+  create_table "order_items", force: :cascade do |t|
+    t.integer "order_id", null: false
     t.integer "product_id"
     t.string "product_name", null: false
+    t.string "sku"
+    t.integer "unit_price_cents", default: 0, null: false
     t.integer "quantity", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["product_id"], name: "index_orders_on_product_id"
+    t.index ["order_id"], name: "index_order_items_on_order_id"
+    t.index ["product_id"], name: "index_order_items_on_product_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "number", null: false
+    t.string "status", default: "paid", null: false
+    t.datetime "placed_at", null: false
+    t.integer "subtotal_cents", default: 0, null: false
+    t.integer "shipping_cents", default: 0, null: false
+    t.integer "total_cents", default: 0, null: false
+    t.string "shipping_method"
+    t.string "ship_name"
+    t.string "ship_line1"
+    t.string "ship_line2"
+    t.string "ship_city"
+    t.string "ship_state"
+    t.string "ship_postal_code"
+    t.string "ship_country", default: "US", null: false
+    t.string "card_brand"
+    t.string "card_last4"
+    t.string "bill_name"
+    t.string "bill_line1"
+    t.string "bill_line2"
+    t.string "bill_city"
+    t.string "bill_state"
+    t.string "bill_postal_code"
+    t.index ["number"], name: "index_orders_on_number", unique: true
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -100,6 +168,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_201830) do
     t.datetime "updated_at", null: false
     t.integer "inventory_count", default: 0
     t.string "sku", null: false
+    t.integer "price_cents", default: 0, null: false
     t.index ["sku"], name: "index_products_on_sku", unique: true
   end
 
@@ -135,11 +204,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_201830) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "addresses", "users"
   add_foreign_key "announcement_products", "announcements"
   add_foreign_key "announcement_products", "products"
+  add_foreign_key "cart_items", "carts"
+  add_foreign_key "cart_items", "products"
+  add_foreign_key "carts", "users"
   add_foreign_key "featured_products", "products"
   add_foreign_key "featured_products", "users"
-  add_foreign_key "orders", "products"
+  add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "subscribers", "products"

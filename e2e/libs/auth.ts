@@ -7,4 +7,5 @@ import path from 'node:path'
 export const AUTH_FILES = {
   admin: path.join(__dirname, '../playwright/.auth/admin.json'),
   alice: path.join(__dirname, '../playwright/.auth/alice.json'),
+  bob: path.join(__dirname, '../playwright/.auth/bob.json'),
 } as const

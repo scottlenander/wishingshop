@@ -11,7 +11,9 @@ class Admin::OrdersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
     get admin_orders_path
     assert_response :success
-    assert_select "td", text: "one@example.com"
-    assert_select "td", text: "two@example.com"
+    assert_select "td", text: /one@example\.com/
+    assert_select "td", text: /two@example\.com/
+    assert_select "td", text: "WS-ONE001"
+    assert_select "td", text: "$44.97"
   end
 end

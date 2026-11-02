@@ -18,10 +18,13 @@ export class MyOrders {
     await this.page.goto('/orders')
   }
 
-  // Order rows for a product, newest first.
+  // Order rows that include a product (items show as "2 × Scarf"), newest first.
   orders(productName: string): Locator {
-    return this.rows.filter({
-      has: this.page.getByRole('cell', { name: productName, exact: true }),
-    })
+    return this.rows.filter({ hasText: ` × ${productName}` })
+  }
+
+  // Row for an order number, e.g. "WS-7F3K2Q".
+  order(number: string): Locator {
+    return this.rows.filter({ has: this.page.getByRole('link', { name: number, exact: true }) })
   }
 }

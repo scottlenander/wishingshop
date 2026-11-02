@@ -47,7 +47,14 @@ export const PRODUCTS = {
     changes: false,
     usedBy: [],
   },
-  CHINOS: { name: 'Chinos', sku: 'CHINOS', seededStock: 'in', changes: false, usedBy: [] },
+  CHINOS: {
+    name: 'Chinos',
+    sku: 'CHINOS',
+    seededStock: 'in',
+    // Added to Bob's cart; the declined payment leaves stock unchanged.
+    changes: false,
+    usedBy: ['regression/checkoutEdgeCases.spec.ts'],
+  },
   DENIM_JACKET: {
     name: 'Denim Jacket',
     sku: 'DENIM-JACKET',
@@ -89,8 +96,9 @@ export const PRODUCTS = {
     name: 'Linen Pants',
     sku: 'LINEN-PANTS',
     seededStock: 'in',
-    changes: false,
-    usedBy: [],
+    // Bob buys 1 per run while saving addresses at checkout.
+    changes: true,
+    usedBy: ['regression/checkoutEdgeCases.spec.ts'],
   },
   OXFORD_SHIRT: {
     name: 'Oxford Shirt',
@@ -118,7 +126,7 @@ export const PRODUCTS = {
     name: 'Scarf',
     sku: 'SCARF',
     seededStock: 'in',
-    // Stock set to 10, then Alice buys 2.
+    // Stock set to 10, then Alice checks out 3.
     changes: true,
     usedBy: ['regression/purchase.spec.ts'],
   },
@@ -126,8 +134,9 @@ export const PRODUCTS = {
     name: 'Sweatpants',
     sku: 'SWEATPANTS',
     seededStock: 'in',
+    // Added to a visitor cart, which moves to Bob's cart on login. Not bought.
     changes: false,
-    usedBy: [],
+    usedBy: ['regression/checkoutEdgeCases.spec.ts'],
   },
   T_SHIRT: {
     name: 'T-Shirt',
@@ -162,3 +171,40 @@ export const USERS = {
   },
   bob: { email: 'bob@example.com', password: 'password', firstName: 'Bob', lastName: 'Builder' },
 } as const
+
+// Fake payment cards (app/models/payment/fake_gateway.rb). Any future expiry and
+// any 3-digit code work.
+export const TEST_CARDS = {
+  success: '4242 4242 4242 4242',
+  declined: '4000 0000 0000 0002',
+} as const
+
+// Alice's seeded billing address (db/seeds.rb). Tests must not change it.
+export const ALICE_BILLING = {
+  name: 'Alice Cooper',
+  line1: '18 Elm Street',
+  city: 'Springfield',
+  state: 'IL',
+  zip: '62704',
+} as const
+
+// Addresses for checkout tests.
+export const TEST_ADDRESS = {
+  line1: '1 Test Street',
+  city: 'Springfield',
+  state: 'IL',
+  zip: '62701',
+} as const
+
+export const TEST_WORK_ADDRESS = {
+  line1: '500 Office Park',
+  city: 'Chicago',
+  state: 'IL',
+  zip: '60601',
+} as const
+
+// An expiry date two years from now, as MM/YY.
+export function futureExpiry(): string {
+  const year = (new Date().getFullYear() + 2) % 100
+  return `12/${String(year).padStart(2, '0')}`
+}

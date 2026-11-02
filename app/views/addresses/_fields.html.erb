@@ -1,0 +1,33 @@
+<%# Address inputs, shared by My addresses (prefix: nil, fields like "name") and
+    checkout (prefix: "bill" / "ship", fields like "bill_name"). %>
+<% field = ->(name) { prefix ? :"#{prefix}_#{name}" : name } %>
+<% required = local_assigns.fetch(:required, true) %>
+<% section = prefix == "ship" ? "shipping" : "billing" %>
+<div>
+  <%= form.label field.(:name), "Full name" %>
+  <%= form.text_field field.(:name), required: required, autocomplete: "#{section} name" %>
+</div>
+<div>
+  <%= form.label field.(:line1), "Address" %>
+  <%= form.text_field field.(:line1), required: required, autocomplete: "#{section} address-line1" %>
+</div>
+<div>
+  <%= form.label field.(:line2), "Apartment, suite, etc. (optional)" %>
+  <%= form.text_field field.(:line2), autocomplete: "#{section} address-line2" %>
+</div>
+<div class="checkout__row">
+  <div>
+    <%= form.label field.(:city), "City" %>
+    <%= form.text_field field.(:city), required: required, autocomplete: "#{section} address-level2" %>
+  </div>
+  <div>
+    <%= form.label field.(:state), "State" %>
+    <%= form.text_field field.(:state), required: required, maxlength: 2, autocomplete: "#{section} address-level1",
+                                        autocapitalize: "characters", placeholder: "NY" %>
+  </div>
+  <div>
+    <%= form.label field.(:postal_code), "ZIP code" %>
+    <%= form.text_field field.(:postal_code), required: required, inputmode: "numeric", autocomplete: "#{section} postal-code",
+                                              placeholder: "12345" %>
+  </div>
+</div>

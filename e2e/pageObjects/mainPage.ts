@@ -10,8 +10,11 @@ export class MainPage {
   readonly loginLink: Locator
   readonly logoutButton: Locator
   readonly greeting: Locator
+  readonly cartLink: Locator
+  readonly cartCount: Locator
   readonly myOrdersLink: Locator
   readonly mySubscriptionsLink: Locator
+  readonly myAddressesLink: Locator
   readonly ordersLink: Locator
   readonly importLink: Locator
   readonly announcementsLink: Locator
@@ -32,6 +35,7 @@ export class MainPage {
     this.logoutButton = page.getByRole('button', { name: 'Log out' })
     this.myOrdersLink = page.getByRole('link', { name: 'My orders' }) // signed in
     this.mySubscriptionsLink = page.getByRole('link', { name: 'My subscriptions' }) // signed in
+    this.myAddressesLink = page.getByRole('link', { name: 'My addresses' }) // signed in
     // exact: otherwise "My orders" also matches.
     this.ordersLink = page.getByRole('link', { name: 'Orders', exact: true }) // admins only
     this.importLink = page.getByRole('link', { name: 'Import' }) // admins only
@@ -43,6 +47,9 @@ export class MainPage {
     // Right end of the nav: "Login" when signed out; "Hi, Alice!" and Log out when signed in.
     this.loginLink = page.getByRole('navigation').getByRole('link', { name: 'Login' })
     this.greeting = page.locator('.layouts-application__greeting')
+    // Named "Cart, 2 items"; the badge shows the count when there are items.
+    this.cartLink = page.getByRole('navigation').getByRole('link', { name: /^Cart, / })
+    this.cartCount = page.locator('.layouts-application__cart-count')
 
     // Flash messages
     this.notice = page.locator('.notice')
