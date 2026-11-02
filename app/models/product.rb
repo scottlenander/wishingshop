@@ -10,7 +10,8 @@ class Product < ApplicationRecord
     attachable.variant :thumb, resize_to_limit: [ 600, 600 ]
   end
   has_rich_text :description
-  has_many :orders, dependent: :nullify
+  has_many :cart_items, dependent: :destroy
+  has_many :order_items, dependent: :nullify
   has_many :featured_products, dependent: :destroy
   has_many :announcement_products, dependent: :destroy
 
@@ -23,22 +24,36 @@ class Product < ApplicationRecord
   validates :sku, presence: true, uniqueness: true,
                   format: { with: SKU_FORMAT, message: "can only contain letters, numbers and dashes" }
   validates :inventory_count, numericality: { greater_than_or_equal_to: 0 }
+  validates :price_cents, numericality: { only_integer: true, greater_than_or_equal_to: 0,
+                                          message: "must be a dollar amount like 19.99" }
 
-  # Buys `quantity` for `user`: lowers stock and records an order.
-  # The stock check and decrement are one UPDATE, so two buyers at once can't
-  # oversell. Raises NotEnoughStock (nothing changes) if there isn't enough.
-  def purchase!(user, quantity)
-    quantity = Integer(quantity, exception: false)
-    raise ArgumentError, "Quantity must be a whole number of 1 or more" unless quantity&.positive?
+  # Lowers stock by `quantity`. The check and the decrease are one UPDATE, so
+  # two buyers at once can't oversell. Raises NotEnoughStock if there isn't
+  # enough (nothing changes).
+  def self.take_stock!(product_id, quantity)
+    updated = where(id: product_id).where(inventory_count: quantity..)
+                                   .update_all([ "inventory_count = inventory_count - ?, updated_at = ?", quantity, Time.current ])
+    return if updated.positive?
 
-    transaction do
-      updated = Product.where(id: id).where(inventory_count: quantity..)
-                       .update_all([ "inventory_count = inventory_count - ?, updated_at = ?", quantity, Time.current ])
-      raise NotEnoughStock, "Only #{reload.inventory_count} #{name} left in stock" if updated.zero?
+    product = find(product_id)
+    raise NotEnoughStock, "Only #{product.inventory_count} #{product.name} left in stock"
+  end
 
-      reload
-      orders.create!(user: user, product_name: name, quantity: quantity)
-    end
+  # Price in dollars for forms and CSV ("19.99"); stored as whole cents.
+  def price
+    price_cents && BigDecimal(price_cents) / 100
+  end
+
+  def price=(value)
+    text = value.to_s.strip.delete_prefix("$").delete(",")
+    self.price_cents = text.match?(/\A\d+(\.\d{1,2})?\z/) ? (BigDecimal(text) * 100).to_i : text.presence && -1
+  end
+
+  def for_sale? = price_cents.to_i.positive?
+
+  # "Price must be a dollar amount", not "Price cents ...".
+  def self.human_attribute_name(attribute, options = {})
+    attribute.to_s == "price_cents" ? "Price" : super
   end
 
   private

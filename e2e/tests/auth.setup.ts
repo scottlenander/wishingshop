@@ -12,6 +12,7 @@ import { USERS } from '../libs/constants'
 const ACCOUNTS = [
   { role: 'admin', user: USERS.admin, file: AUTH_FILES.admin },
   { role: 'alice', user: USERS.alice, file: AUTH_FILES.alice },
+  { role: 'bob', user: USERS.bob, file: AUTH_FILES.bob },
 ] as const
 
 // A saved session is reused only if the server still knows it AND it belongs to

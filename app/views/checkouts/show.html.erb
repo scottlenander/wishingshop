@@ -1,0 +1,145 @@
+<% content_for :title, "Checkout" %>
+<% subtotal = @cart.subtotal_cents %>
+
+<div class="admin-page__header">
+  <h1>Checkout</h1>
+  <%= link_to "Back to cart", cart_path, class: "admin-page__cancel" %>
+</div>
+
+<%= form_with model: @checkout, scope: :checkout, url: checkout_path, method: :post, class: "checkout",
+              data: { controller: "checkout", checkout_subtotal_value: subtotal } do |form| %>
+  <div class="checkout__form">
+    <% if @checkout.errors.any? %>
+      <div class="error checkout__errors" role="alert">
+        <p><strong>Please check the details below.</strong></p>
+        <ul>
+          <% @checkout.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <fieldset class="form-card checkout__section">
+      <legend>Billing address</legend>
+      <%= render "addresses/fields", form: form, prefix: "bill" %>
+      <label class="checkout__check">
+        <%= form.check_box :save_billing %>
+        <%= Current.user.billing_address ? "Update my saved billing address" : "Save as my billing address" %>
+      </label>
+    </fieldset>
+
+    <fieldset class="form-card checkout__section">
+      <legend>Shipping address</legend>
+      <label class="checkout__check checkout__same-as-billing">
+        <%= form.check_box :same_as_billing %>
+        Ship to my billing address
+      </label>
+
+      <%# Shown when "Ship to my billing address" is unchecked (CSS :has, no JavaScript needed). %>
+      <% saved = @checkout.saved_shipping_addresses.to_a %>
+      <div class="checkout__shipping <%= "checkout__shipping--choices" if saved.any? %>">
+        <% if saved.any? %>
+          <div class="checkout__methods" role="radiogroup" aria-label="Saved shipping addresses">
+            <% saved.each do |address| %>
+              <label class="checkout__method">
+                <%= form.radio_button :shipping_choice, address.id %>
+                <span class="checkout__method-text">
+                  <strong><%= address.nickname %></strong>
+                  <span><%= address.lines.join(", ") %></span>
+                </span>
+              </label>
+            <% end %>
+            <label class="checkout__method checkout__choice-new">
+              <%= form.radio_button :shipping_choice, Checkout::NEW_ADDRESS %>
+              <span class="checkout__method-text"><strong>New address</strong></span>
+            </label>
+          </div>
+        <% else %>
+          <%= form.hidden_field :shipping_choice, value: Checkout::NEW_ADDRESS %>
+        <% end %>
+
+        <fieldset class="checkout__new-shipping">
+          <legend>New shipping address</legend>
+          <%# Not marked required: these are hidden unless used, and the server checks them. %>
+          <%= render "addresses/fields", form: form, prefix: "ship", required: false %>
+          <label class="checkout__check checkout__save-shipping">
+            <%= form.check_box :save_shipping %>
+            Save this address for next time
+          </label>
+          <div class="checkout__nickname">
+            <%= form.label :shipping_nickname, "Nickname" %>
+            <%= form.text_field :shipping_nickname, maxlength: 30, placeholder: "Home, Work, Mom's house" %>
+          </div>
+        </fieldset>
+      </div>
+      <p class="admin-form__hint">We ship within the United States.</p>
+    </fieldset>
+
+    <fieldset class="form-card checkout__section">
+      <legend>Shipping method</legend>
+      <div class="checkout__methods">
+        <% ShippingMethod.all.each do |option| %>
+          <% cost = option.cost_cents(subtotal) %>
+          <label class="checkout__method">
+            <%= form.radio_button :shipping_method, option.id, data: { action: "checkout#update", cost_cents: cost } %>
+            <span class="checkout__method-text">
+              <strong><%= option.label %></strong>
+              <span><%= option.estimate %></span>
+            </span>
+            <span class="checkout__method-price"><%= cost.zero? ? "Free" : format_price(cost) %></span>
+          </label>
+        <% end %>
+      </div>
+    </fieldset>
+
+    <fieldset class="form-card checkout__section">
+      <legend>Payment</legend>
+      <p class="admin-form__hint checkout__test-cards">
+        This is a practice shop: no money is taken. Use <strong>4242 4242 4242 4242</strong> to pay, or
+        <strong>4000 0000 0000 0002</strong> to see a declined card. Any future expiry and any 3-digit code work.
+      </p>
+      <div>
+        <%= form.label :card_name %>
+        <%= form.text_field :card_name, required: true, autocomplete: "cc-name" %>
+      </div>
+      <div>
+        <%= form.label :card_number %>
+        <%= form.text_field :card_number, required: true, inputmode: "numeric", autocomplete: "cc-number", placeholder: "1234 1234 1234 1234" %>
+      </div>
+      <div class="checkout__row">
+        <div>
+          <%= form.label :card_expiry %>
+          <%= form.text_field :card_expiry, required: true, autocomplete: "cc-exp", inputmode: "numeric", maxlength: 5, placeholder: "MM/YY",
+                                            data: { controller: "card-expiry", action: "input->card-expiry#format" } %>
+        </div>
+        <div>
+          <%= form.label :card_cvc %>
+          <%= form.text_field :card_cvc, required: true, inputmode: "numeric", autocomplete: "cc-csc", maxlength: 4, placeholder: "123" %>
+        </div>
+      </div>
+      <p class="admin-form__hint">Only the card type and last 4 digits are saved.</p>
+    </fieldset>
+  </div>
+
+  <aside class="checkout__summary form-card" aria-labelledby="checkout-summary-title">
+    <h2 id="checkout-summary-title">Order summary</h2>
+    <ul class="checkout__items">
+      <% @cart.cart_items.includes(:product).each do |item| %>
+        <li>
+          <span><%= item.quantity %> × <%= item.product.name %></span>
+          <span><%= format_price(item.line_total_cents) %></span>
+        </li>
+      <% end %>
+    </ul>
+    <dl class="checkout__totals">
+      <dt>Subtotal</dt>
+      <dd><%= format_price(subtotal) %></dd>
+      <dt>Shipping</dt>
+      <dd data-checkout-target="shipping"><%= @checkout.shipping_cents.zero? ? "Free" : format_price(@checkout.shipping_cents) %></dd>
+      <dt class="checkout__total-label">Total</dt>
+      <dd class="checkout__total" data-checkout-target="total"><%= format_price(@checkout.total_cents) %></dd>
+    </dl>
+    <%= form.submit "Place order", class: "checkout__submit" %>
+  </aside>
+<% end %>

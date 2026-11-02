@@ -55,9 +55,10 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     assert_difference("Product.count", -1) { delete product_path(Product.last) }
   end
 
-  test "visitors see log in to buy and the email form" do
+  test "visitors see the price, add to cart and the email form" do
     get product_path(@product)
-    assert_select "a", text: "Log in to buy"
+    assert_select ".products-inventory__price", text: "$19.99"
+    assert_select "input[type=submit][value='Add to cart']"
 
     get product_path(products(:hoodie))
     assert_select "input[type=email][placeholder='you@example.com']"
@@ -66,7 +67,7 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
   test "signed-in users see buy, notify me and unsubscribe" do
     sign_in_as users(:two)
     get product_path(@product)
-    assert_select "input[type=submit][value=Buy]"
+    assert_select "input[type=submit][value='Add to cart']"
 
     get product_path(products(:hoodie))
     assert_select "button", text: "Notify me"

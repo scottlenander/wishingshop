@@ -3,7 +3,7 @@ require "test_helper"
 class Product::ImportTest < ActiveSupport::TestCase
   include ActionMailer::TestHelper
 
-  HEADER = "sku,name,description,inventory_count,image_url\n"
+  HEADER = "sku,name,description,price,inventory_count,image_url\n"
 
   # Stands in for real downloads.
   class FakeFetcher
@@ -27,7 +27,7 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "creates new products and updates known SKUs" do
-    result = import("t-shirt,,,40,\nWINTER-COAT,Winter Coat,Warm wool.,7,\n")
+    result = import("t-shirt,,,,40,\nWINTER-COAT,Winter Coat,Warm wool.,,7,\n")
 
     assert result.valid?
     assert_equal({ created: 1, updated: 1, unchanged: 0, failed: 0 }, result.summary)
@@ -43,7 +43,7 @@ class Product::ImportTest < ActiveSupport::TestCase
   test "blank cells keep existing values and stock is set, not added" do
     products(:tshirt).update!(description: "Soft cotton.")
 
-    assert import("T-SHIRT,,,5,\n").apply!
+    assert import("T-SHIRT,,,,5,\n").apply!
 
     tshirt = products(:tshirt).reload
     assert_equal "T-Shirt", tshirt.name
@@ -52,13 +52,13 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "rows with nothing to change are unchanged" do
-    result = import("T-SHIRT,T-Shirt,,15,\n")
+    result = import("T-SHIRT,T-Shirt,,,15,\n")
     assert_equal :unchanged, result.rows.first.action
   end
 
   test "importing the same file twice gives the same result" do
-    import("T-SHIRT,,,9,\n").apply!
-    result = import("T-SHIRT,,,9,\n")
+    import("T-SHIRT,,,,9,\n").apply!
+    result = import("T-SHIRT,,,,9,\n")
     assert_equal :unchanged, result.rows.first.action
   end
 
@@ -70,7 +70,7 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "reports row errors with line numbers" do
-    result = import(",No SKU,,1,\nHAT,,,1,\nCAP,Cap,,lots,\nSOCK,Sock,,1,ftp://x\nSOCK,Sock,,2,\n")
+    result = import(",No SKU,,,1,\nHAT,,,,1,\nCAP,Cap,,,lots,\nSOCK,Sock,,,1,ftp://x\nSOCK,Sock,,,2,\n")
 
     errors = result.rows.to_h { |row| [ row.line, row.errors.join(" ") ] }
     assert_equal "SKU is required.", errors[2]
@@ -82,11 +82,11 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "an invalid SKU is reported" do
-    assert_match "Sku can only contain", import("BAD SKU!,Hat,,1,\n").rows.first.errors.join
+    assert_match "Sku can only contain", import("BAD SKU!,Hat,,,1,\n").rows.first.errors.join
   end
 
   test "an invalid file saves nothing" do
-    result = import("T-SHIRT,,,99,\nNEW,,,1,\n")
+    result = import("T-SHIRT,,,,99,\nNEW,,,,1,\n")
 
     assert_no_difference("Product.count") { assert_not result.apply! }
     assert_equal 15, products(:tshirt).reload.inventory_count
@@ -94,7 +94,7 @@ class Product::ImportTest < ActiveSupport::TestCase
 
   test "a failed save rolls back the whole import" do
     Product.create!(name: "Taken", sku: "TAKEN")
-    result = import("T-SHIRT,,,99,\nNEW-ONE,Taken,,1,\n")
+    result = import("T-SHIRT,,,,99,\nNEW-ONE,Taken,,,1,\n")
     # Make the second row fail on save, after the first has been saved.
     result.rows.last.product.define_singleton_method(:save) { errors.add(:base, "Boom"); false }
 
@@ -105,13 +105,13 @@ class Product::ImportTest < ActiveSupport::TestCase
 
   test "restocking from 0 sends the back-in-stock emails" do
     assert_emails 1 do
-      assert import("HOODIE,,,10,\n").apply!
+      assert import("HOODIE,,,,10,\n").apply!
     end
   end
 
   test "an image URL downloads and attaches the image" do
     fetcher = FakeFetcher.new
-    result = import("T-SHIRT,,,,https://example.com/pixel.png\n", image_fetcher: fetcher)
+    result = import("T-SHIRT,,,,,https://example.com/pixel.png\n", image_fetcher: fetcher)
 
     assert_equal [ "Image added" ], result.rows.first.changes
     assert result.apply!
@@ -121,10 +121,25 @@ class Product::ImportTest < ActiveSupport::TestCase
 
   test "a failed image download saves nothing" do
     fetcher = FakeFetcher.new(fail_for: "https://example.com/missing.png")
-    result = import("T-SHIRT,,,1,\nCAP,Cap,,1,https://example.com/missing.png\n", image_fetcher: fetcher)
+    result = import("T-SHIRT,,,,1,\nCAP,Cap,,,1,https://example.com/missing.png\n", image_fetcher: fetcher)
 
     assert_not result.apply!
     assert_match "Couldn't download image", result.rows.last.errors.join
     assert_equal 15, products(:tshirt).reload.inventory_count
+  end
+
+  test "sets prices in dollars" do
+    result = import("T-SHIRT,,,24.50,,\nCAP,Cap,,$9,3,\n")
+
+    assert_equal [ "Price: $19.99 → $24.50" ], result.rows.first.changes
+    assert_includes result.rows.last.changes, "Price: $9.00"
+    assert result.apply!
+    assert_equal 2450, products(:tshirt).reload.price_cents
+    assert_equal 900, Product.find_by!(sku: "CAP").price_cents
+  end
+
+  test "an invalid price is a row error" do
+    result = import("T-SHIRT,,,cheap,,\n")
+    assert_match "Price must be a dollar amount", result.rows.first.errors.join
   end
 end

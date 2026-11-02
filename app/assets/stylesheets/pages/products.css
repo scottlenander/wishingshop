@@ -192,7 +192,8 @@
   align-items: center;
 }
 
-.products-inventory__quantity {
+/* input. so it beats the general full-width input style in forms.css. */
+input.products-inventory__quantity {
   width: 6rem;
 }
 
@@ -269,4 +270,19 @@
 .products-featured__link {
   align-self: flex-start;
   margin-top: auto;
+}
+
+/* ---------- Prices ---------- */
+
+.products-inventory__price,
+.products-featured__price {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+}
+
+.products-index__card-price {
+  margin: calc(-1 * var(--space-3)) 0 0;
+  padding: 0 var(--space-4) var(--space-4);
+  font-weight: 700;
 }

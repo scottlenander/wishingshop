@@ -1,0 +1,45 @@
+<% content_for :title, "My addresses" %>
+
+<div class="admin-page__header">
+  <h1>My addresses</h1>
+  <%= link_to "Add shipping address", new_address_path(kind: "shipping"), class: "btn" %>
+</div>
+
+<section class="addresses__group" aria-labelledby="billing-title">
+  <h2 id="billing-title">Billing address</h2>
+  <% if @billing %>
+    <div class="addresses__card" id="<%= dom_id(@billing) %>">
+      <address><%= safe_join(@billing.lines, tag.br) %></address>
+      <div class="admin-table__actions addresses__actions">
+        <%= link_to "Edit", edit_address_path(@billing), class: "btn btn--secondary", aria: { label: "Edit billing address" } %>
+        <%= button_to "Delete", address_path(@billing), method: :delete, class: "btn btn--danger",
+                      aria: { label: "Delete billing address" }, data: { turbo_confirm: "Delete your billing address?" } %>
+      </div>
+    </div>
+  <% else %>
+    <p class="admin-page__empty">
+      No billing address saved. <%= link_to "Add one", new_address_path(kind: "billing") %>, or save it at checkout.
+    </p>
+  <% end %>
+</section>
+
+<section class="addresses__group" aria-labelledby="shipping-title">
+  <h2 id="shipping-title">Shipping addresses</h2>
+  <% if @shipping.any? %>
+    <div class="addresses__grid">
+      <% @shipping.each do |address| %>
+        <div class="addresses__card" id="<%= dom_id(address) %>">
+          <h3 class="addresses__nickname"><%= address.nickname %></h3>
+          <address><%= safe_join(address.lines, tag.br) %></address>
+          <div class="admin-table__actions addresses__actions">
+            <%= link_to "Edit", edit_address_path(address), class: "btn btn--secondary", aria: { label: "Edit #{address.nickname}" } %>
+            <%= button_to "Delete", address_path(address), method: :delete, class: "btn btn--danger",
+                          aria: { label: "Delete #{address.nickname}" }, data: { turbo_confirm: "Delete \"#{address.nickname}\"?" } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="admin-page__empty">No shipping addresses saved. Orders ship to your billing address unless you add one.</p>
+  <% end %>
+</section>

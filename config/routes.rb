@@ -18,9 +18,12 @@ Rails.application.routes.draw do
   root "products#index"
   resources :products do
     resources :subscribers, only: [ :create ]
-    resources :orders, only: [ :create ]
   end
-  resources :orders, only: [ :index ]
+  resource :cart, only: :show
+  resources :cart_items, only: %i[ create update destroy ]
+  resource :checkout, only: %i[ show create ]
+  resources :addresses, except: :show
+  resources :orders, only: %i[ index show ], param: :number
   resources :subscriptions, only: [ :index, :destroy ]
   resource :unsubscribe, only: [ :show ]
 

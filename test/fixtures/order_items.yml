@@ -1,0 +1,22 @@
+one_tshirt:
+  order: one_tshirt
+  product: tshirt
+  product_name: T-Shirt
+  sku: T-SHIRT
+  unit_price_cents: 1999
+  quantity: 2
+
+two_tshirt:
+  order: two_tshirt
+  product: tshirt
+  product_name: T-Shirt
+  sku: T-SHIRT
+  unit_price_cents: 1999
+  quantity: 1
+
+one_legacy:
+  order: one_legacy
+  product: hoodie
+  product_name: Hoodie
+  unit_price_cents: 0
+  quantity: 1

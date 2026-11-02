@@ -1,11 +1,37 @@
 one_tshirt:
   user: one
-  product: tshirt
-  product_name: T-Shirt
-  quantity: 2
+  number: WS-ONE001
+  placed_at: <%= 2.days.ago.to_fs(:db) %>
+  subtotal_cents: 3998
+  shipping_cents: 499
+  total_cents: 4497
+  shipping_method: standard
+  ship_name: Olive One
+  ship_line1: 1 Main St
+  ship_city: Springfield
+  ship_state: IL
+  ship_postal_code: "62701"
+  card_brand: Visa
+  card_last4: "4242"
 
 two_tshirt:
   user: two
-  product: tshirt
-  product_name: T-Shirt
-  quantity: 1
+  number: WS-TWO001
+  placed_at: <%= 1.day.ago.to_fs(:db) %>
+  subtotal_cents: 1999
+  shipping_cents: 999
+  total_cents: 2998
+  shipping_method: two_day
+  ship_name: Tom Two
+  ship_line1: 2 Oak Ave
+  ship_city: Portland
+  ship_state: OR
+  ship_postal_code: "97201"
+  card_brand: Visa
+  card_last4: "4242"
+
+# Placed before checkout existed: no prices, address or payment.
+one_legacy:
+  user: one
+  number: WS-L00001
+  placed_at: <%= 30.days.ago.to_fs(:db) %>

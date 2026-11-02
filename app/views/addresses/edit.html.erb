@@ -1,0 +1,7 @@
+<% title = "Edit #{@address.billing? ? "billing" : "shipping"} address" %>
+<% content_for :title, title %>
+
+<h1><%= title %></h1>
+
+<%= render "form", address: @address %>
+<%= link_to "Cancel", addresses_path, class: "admin-page__cancel" %>

@@ -14,49 +14,51 @@ class ProductTest < ActiveSupport::TestCase
     end
   end
 
-  test "purchase! lowers stock and records an order" do
-    product = products(:tshirt)
-
-    order = assert_difference("Order.count", 1) { product.purchase!(users(:one), 3) }
-
-    assert_equal 12, product.inventory_count
-    assert_equal 12, product.reload.inventory_count
-    assert_equal users(:one), order.user
-    assert_equal "T-Shirt", order.product_name
-    assert_equal 3, order.quantity
+  test "take_stock! lowers stock" do
+    Product.take_stock!(products(:tshirt).id, 3)
+    assert_equal 12, products(:tshirt).reload.inventory_count
   end
 
-  test "purchase! can buy the last items" do
-    product = products(:tshirt)
-    product.purchase!(users(:one), 15)
-    assert_equal 0, product.reload.inventory_count
+  test "take_stock! can take the last items" do
+    Product.take_stock!(products(:tshirt).id, 15)
+    assert_equal 0, products(:tshirt).reload.inventory_count
   end
 
-  test "purchase! refuses more than is in stock and changes nothing" do
-    product = products(:tshirt)
-
-    assert_no_difference("Order.count") do
-      assert_raises(Product::NotEnoughStock) { product.purchase!(users(:one), 16) }
-    end
-    assert_equal 15, product.reload.inventory_count
+  test "take_stock! refuses more than is in stock and changes nothing" do
+    error = assert_raises(Product::NotEnoughStock) { Product.take_stock!(products(:tshirt).id, 16) }
+    assert_equal "Only 15 T-Shirt left in stock", error.message
+    assert_equal 15, products(:tshirt).reload.inventory_count
   end
 
-  test "purchase! rejects a quantity below 1 or not a number" do
-    product = products(:tshirt)
+  test "price is read and written in dollars and stored in cents" do
+    product = Product.new(name: "Cap")
+    product.price = "19.99"
+    assert_equal 1999, product.price_cents
+    assert_equal BigDecimal("19.99"), product.price
 
-    [ 0, -1, "abc", nil ].each do |quantity|
-      assert_raises(ArgumentError) { product.purchase!(users(:one), quantity) }
-    end
-    assert_equal 15, product.reload.inventory_count
+    product.price = "$1,250"
+    assert_equal 125_000, product.price_cents
+  end
+
+  test "an invalid price is an error" do
+    product = Product.new(name: "Cap", price: "lots")
+    assert_not product.valid?
+    assert_includes product.errors.full_messages, "Price must be a dollar amount like 19.99"
+  end
+
+  test "only priced products are for sale" do
+    assert products(:tshirt).for_sale?
+    assert_not Product.new(name: "Free", price_cents: 0).for_sale?
   end
 
   test "deleting a product keeps its order history" do
-    order = orders(:one_tshirt)
+    item = order_items(:one_tshirt)
     products(:tshirt).destroy
 
-    order.reload
-    assert_nil order.product
-    assert_equal "T-Shirt", order.product_name
+    item.reload
+    assert_nil item.product
+    assert_equal "T-Shirt", item.product_name
+    assert_equal 1999, item.unit_price_cents
   end
 
   test "SKU is upper-cased and stripped" do

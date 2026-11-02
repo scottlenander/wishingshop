@@ -2,6 +2,10 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_one :cart, dependent: :destroy
+  has_many :addresses, dependent: :destroy
+  has_one :billing_address, -> { billing }, class_name: "Address", inverse_of: :user
+  has_many :shipping_addresses, -> { shipping.order(:nickname) }, class_name: "Address", inverse_of: :user
   has_many :subscribers, dependent: :destroy
 
   normalizes :email_address, with: ->(e) { e.strip.downcase }

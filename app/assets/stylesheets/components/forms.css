@@ -85,3 +85,22 @@ input[type="file"]::file-selector-button:hover {
   color: var(--color-danger);
   font-weight: 600;
 }
+
+/*
+ * Rails wraps a field (and its label) that failed validation in
+ * .field_with_errors. Keep the layout and mark the field red.
+ */
+.field_with_errors {
+  display: contents;
+}
+
+.field_with_errors label {
+  color: var(--color-danger);
+}
+
+.field_with_errors input,
+.field_with_errors select,
+.field_with_errors textarea {
+  border-color: var(--color-danger);
+  background: var(--color-danger-bg);
+}

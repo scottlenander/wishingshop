@@ -18,6 +18,9 @@
         <div class="products-index__card-placeholder"></div>
       <% end %>
       <%= link_to product.name, product_path(product.id), class: "products-index__card-link" %>
+      <% if product.for_sale? %>
+        <p class="products-index__card-price"><%= format_price(product.price_cents) %></p>
+      <% end %>
     </div>
   <% end %>
 </div>

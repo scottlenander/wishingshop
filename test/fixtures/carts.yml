@@ -1,0 +1,3 @@
+# Saved carts belong to a user. Visitor carts live in the session (VisitorCart).
+one:
+  user: one
