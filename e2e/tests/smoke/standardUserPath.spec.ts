@@ -27,6 +27,9 @@ test('Standard User smoke test', async ({ page }) => {
     await expect(mainPage.loginLink, {
       message: 'Login link should not be present after login',
     }).not.toBeVisible()
+    await expect(mainPage.greeting, {
+      message: 'Nav should greet the user by first name',
+    }).toHaveText(`Hi, ${USERS.alice.firstName}!`)
   })
 
   await test.step('Verify item page', async () => {

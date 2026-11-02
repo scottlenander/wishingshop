@@ -81,8 +81,9 @@ export const PRODUCTS = {
     name: 'Leather Belt',
     sku: 'LEATHER-BELT',
     seededStock: 'in',
-    changes: false,
-    usedBy: [],
+    // Made the admin featured pick, then removed.
+    changes: true,
+    usedBy: ['regression/featuredProduct.spec.ts'],
   },
   LINEN_PANTS: {
     name: 'Linen Pants',
@@ -147,7 +148,17 @@ export const PRODUCTS = {
 
 // Seeded accounts (db/seeds.rb). All use the same password.
 export const USERS = {
-  admin: { email: 'admin@example.com', password: 'password' },
-  alice: { email: 'alice@example.com', password: 'password' },
-  bob: { email: 'bob@example.com', password: 'password' },
+  admin: {
+    email: 'admin@example.com',
+    password: 'password',
+    firstName: 'Admin',
+    lastName: 'Manager',
+  },
+  alice: {
+    email: 'alice@example.com',
+    password: 'password',
+    firstName: 'Alice',
+    lastName: 'Cooper',
+  },
+  bob: { email: 'bob@example.com', password: 'password', firstName: 'Bob', lastName: 'Builder' },
 } as const

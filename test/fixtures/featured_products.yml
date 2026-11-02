@@ -1,0 +1,6 @@
+# Only a past pick, so tests start with no active admin pick.
+last_month:
+  product: hoodie
+  user: admin
+  starts_at: <%= 40.days.ago.to_fs(:db) %>
+  ends_at: <%= 33.days.ago.to_fs(:db) %>

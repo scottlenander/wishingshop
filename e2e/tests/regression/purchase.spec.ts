@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { LoginPage } from '../../pageObjects/loginPage'
+import { AUTH_FILES } from '../../libs/auth'
 import { MyOrders } from '../../pageObjects/myOrders'
-import { PRODUCTS, USERS } from '../../libs/constants'
+import { PRODUCTS } from '../../libs/constants'
 
 // Only this test buys or restocks it, so tests stay independent.
 const PRODUCT = PRODUCTS.SCARF.name
@@ -10,30 +10,26 @@ const PRODUCT = PRODUCTS.SCARF.name
 // This test changes shared data (stock), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
 
+// Starts signed in as Alice; the admin context uses the saved admin session
+// (see tests/auth.setup.ts).
+test.use({ storageState: AUTH_FILES.alice })
+
 test('standard user buys a product and sees it in their orders', async ({ page, browser }) => {
   // Standard user
   const mainPage = new MainPage(page)
-  const loginPage = new LoginPage(page)
   const myOrders = new MyOrders(page)
   const { products } = mainPage
   const { item } = products
 
   // Admin, in a separate browser context, sets a known starting stock.
-  const adminContext = await browser.newContext()
+  const adminContext = await browser.newContext({ storageState: AUTH_FILES.admin })
   const adminPage = await adminContext.newPage()
   const adminMainPage = new MainPage(adminPage)
-  const adminLoginPage = new LoginPage(adminPage)
   const adminProducts = adminMainPage.products
 
   let ordersBefore = 0
 
   await test.step('Admin sets the starting stock to 10', async () => {
-    await adminLoginPage.goto()
-    await adminLoginPage.emailInput.fill(USERS.admin.email)
-    await adminLoginPage.passwordInput.fill(USERS.admin.password)
-    await adminLoginPage.signInButton.click()
-    await expect(adminMainPage.logoutButton).toBeVisible()
-
     await adminMainPage.goto()
     await adminProducts.card(PRODUCT).link.click()
     await adminProducts.item.editLink.click()
@@ -43,11 +39,8 @@ test('standard user buys a product and sees it in their orders', async ({ page, 
     await adminContext.close()
   })
 
-  await test.step('Log in as standard user and count existing orders', async () => {
-    await loginPage.goto()
-    await loginPage.emailInput.fill(USERS.alice.email)
-    await loginPage.passwordInput.fill(USERS.alice.password)
-    await loginPage.signInButton.click()
+  await test.step('Standard user counts existing orders', async () => {
+    await mainPage.goto()
     await expect(mainPage.logoutButton).toBeVisible()
 
     // Earlier runs may have left Scarf orders.

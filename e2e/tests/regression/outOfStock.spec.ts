@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { LoginPage } from '../../pageObjects/loginPage'
+import { AUTH_FILES } from '../../libs/auth'
 import { LetterOpener } from '../../pageObjects/letterOpener'
 import { PRODUCTS, USERS } from '../../libs/constants'
 
@@ -10,20 +10,22 @@ const PRODUCT = PRODUCTS.HOODIE.name
 // This test changes shared data (stock), so don't run its steps in parallel.
 test.describe.configure({ mode: 'serial' })
 
+// Starts signed in as Alice; the admin context uses the saved admin session
+// (see tests/auth.setup.ts).
+test.use({ storageState: AUTH_FILES.alice })
+
 test('subscriber is emailed when an out-of-stock item is restocked', async ({ page, browser }) => {
   // Standard user
   const mainPage = new MainPage(page)
-  const loginPage = new LoginPage(page)
   const letterOpener = new LetterOpener(page)
   const { products } = mainPage
   const { item } = products
 
   // Admin, in a separate browser context so the standard user stays logged in.
   // Stock changes go through the app, so Rails sends the back-in-stock email.
-  const adminContext = await browser.newContext()
+  const adminContext = await browser.newContext({ storageState: AUTH_FILES.admin })
   const adminPage = await adminContext.newPage()
   const adminMainPage = new MainPage(adminPage)
-  const adminLoginPage = new LoginPage(adminPage)
   const adminProducts = adminMainPage.products
 
   // Signed-in users subscribe with their account email.
@@ -31,12 +33,6 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
   let lettersBefore = 0
 
   await test.step('Admin makes sure the item starts out of stock', async () => {
-    await adminLoginPage.goto()
-    await adminLoginPage.emailInput.fill(USERS.admin.email)
-    await adminLoginPage.passwordInput.fill(USERS.admin.password)
-    await adminLoginPage.signInButton.click()
-    await expect(adminMainPage.logoutButton).toBeVisible()
-
     // Lets the test be re-run against the same server without reseeding.
     await adminMainPage.goto()
     await adminProducts.card(PRODUCT).link.click()
@@ -46,14 +42,10 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
     await expect(adminProducts.item.outOfStock).toBeVisible()
   })
 
-  await test.step('Log in as standard user and open the out-of-stock item', async () => {
-    await loginPage.goto()
-    await loginPage.emailInput.fill(USERS.alice.email)
-    await loginPage.passwordInput.fill(USERS.alice.password)
-    await loginPage.signInButton.click()
+  await test.step('Standard user opens the out-of-stock item', async () => {
+    await mainPage.goto()
     await expect(mainPage.logoutButton).toBeVisible()
 
-    await mainPage.goto()
     await products.card(PRODUCT).link.click()
     await expect(item.title).toHaveText(PRODUCT)
     await expect(item.outOfStock, { message: `${PRODUCT} should be out of stock` }).toBeVisible()

@@ -1,0 +1,6 @@
+<% content_for :title, "Edit featured pick" %>
+
+<h1>Edit featured pick</h1>
+
+<%= render "form", featured_product: @featured_product %>
+<%= link_to "Cancel", admin_featured_products_path, class: "admin-page__cancel" %>

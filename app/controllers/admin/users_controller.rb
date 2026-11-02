@@ -4,7 +4,7 @@ class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: %i[ edit update destroy ]
 
   def index
-    @users = User.standard.order(:email_address)
+    @users = User.standard.order(:last_name, :first_name)
   end
 
   def new
@@ -43,7 +43,7 @@ class Admin::UsersController < Admin::BaseController
 
     # Leaving both password fields blank on edit keeps the current password.
     def user_params
-      permitted = params.expect(user: [ :email_address, :password, :password_confirmation ])
+      permitted = params.expect(user: [ :first_name, :last_name, :email_address, :password, :password_confirmation ])
       if action_name == "update" && permitted[:password].blank? && permitted[:password_confirmation].blank?
         permitted.except(:password, :password_confirmation)
       else

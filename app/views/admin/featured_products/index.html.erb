@@ -1,0 +1,55 @@
+<% content_for :title, "Featured product" %>
+
+<div class="admin-page__header">
+  <h1>Featured product</h1>
+  <%= link_to "Feature a product", new_admin_featured_product_path, class: "btn" %>
+</div>
+
+<section class="admin-featured__current">
+  <h2>Showing now</h2>
+  <% if @current %>
+    <p>
+      <strong><%= link_to @current.product.name, @current.product %></strong>, picked until
+      <%= @current.ends_at.to_fs(:long) %>.
+    </p>
+  <% elsif @random_today %>
+    <p>Random today: <strong><%= link_to @random_today.name, @random_today %></strong>. A new random product is picked each day when there's no admin pick.</p>
+  <% else %>
+    <p class="admin-page__empty">Nothing to feature: no products are in stock.</p>
+  <% end %>
+</section>
+
+<% { "Current and upcoming" => [ @current, *@upcoming ].compact, "Past" => @past }.each do |heading, picks| %>
+  <section class="admin-featured__group">
+    <h2><%= heading %></h2>
+    <% if picks.any? %>
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>From</th>
+            <th>Until</th>
+            <th>Picked by</th>
+            <th class="admin-table__actions-heading">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% picks.each do |pick| %>
+            <tr id="<%= dom_id(pick) %>">
+              <td><%= pick.product.name %></td>
+              <td><%= pick.starts_at.to_fs(:short) %></td>
+              <td><%= pick.ends_at.to_fs(:short) %></td>
+              <td><%= pick.user&.email_address || "—" %></td>
+              <td class="admin-table__actions">
+                <%= link_to "Edit", edit_admin_featured_product_path(pick), class: "btn btn--secondary" %>
+                <%= button_to "Remove", admin_featured_product_path(pick), method: :delete, class: "btn btn--danger", data: { turbo_confirm: "Remove #{pick.product.name} from featured?" } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% else %>
+      <p class="admin-page__empty">None.</p>
+    <% end %>
+  </section>
+<% end %>

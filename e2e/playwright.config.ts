@@ -29,9 +29,12 @@ export default defineConfig({
 
   /* Configure projects for major browsers */
   projects: [
+    // Signs in once per account and saves the sessions (tests/auth.setup.ts).
+    { name: 'setup', testMatch: /.*\.setup\.ts/ },
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+      dependencies: ['setup'],
     },
 
     // {

@@ -1,0 +1,23 @@
+sale:
+  kind: sale
+  title: Big T-Shirt sale
+  body: Everything must go.
+  starts_at: <%= 1.day.ago.to_fs(:db) %>
+  position: 0
+
+news:
+  kind: general
+  title: Free shipping
+  starts_at: <%= 2.days.ago.to_fs(:db) %>
+  position: 1
+
+scheduled:
+  kind: new_product
+  title: Coming soon
+  starts_at: <%= 1.day.from_now.to_fs(:db) %>
+
+ended:
+  kind: general
+  title: Last week's news
+  starts_at: <%= 10.days.ago.to_fs(:db) %>
+  ends_at: <%= 3.days.ago.to_fs(:db) %>

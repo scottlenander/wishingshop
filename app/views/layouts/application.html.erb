@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Store" %></title>
+    <%# Page title first, then the site name, e.g. "Users · WishingShop". %>
+    <title><%= [ content_for(:title), "WishingShop" ].compact_blank.join(" · ") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="Store">
+    <meta name="application-name" content="WishingShop">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -28,7 +29,17 @@
     <%= tag.div(flash[:alert], class: "alert") if flash[:alert] %>
 
     <nav class="layouts-application__nav">
-      <%= link_to "Home", root_path, class: "layouts-application__brand" %>
+      <%= link_to root_path, class: "layouts-application__brand" do %>
+        <%# Magic wand with stars. Decorative: the link's name is "WishingShop". %>
+        <svg class="layouts-application__logo" viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" focusable="false">
+          <line x1="3" y1="21" x2="13" y2="11" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+          <line x1="13" y1="11" x2="14.8" y2="9.2" class="layouts-application__logo-star" stroke-width="2.6" stroke-linecap="round" />
+          <path class="layouts-application__logo-star" d="M17 1.5Q17 6 21.5 6Q17 6 17 10.5Q17 6 12.5 6Q17 6 17 1.5Z" />
+          <path class="layouts-application__logo-star" d="M21.5 10Q21.5 12 23.5 12Q21.5 12 21.5 14Q21.5 12 19.5 12Q21.5 12 21.5 10Z" />
+          <path class="layouts-application__logo-star" d="M9.5 1Q9.5 3 11.5 3Q9.5 3 9.5 5Q9.5 3 7.5 3Q9.5 3 9.5 1Z" />
+        </svg>
+        WishingShop
+      <% end %>
       <% if authenticated? %>
         <%= link_to "My orders", orders_path, class: "layouts-application__link" %>
         <%= link_to "My subscriptions", subscriptions_path, class: "layouts-application__link" %>
@@ -36,10 +47,19 @@
       <% if admin? %>
         <%= link_to "Orders", admin_orders_path, class: "layouts-application__link" %>
         <%= link_to "Import", new_admin_product_import_path, class: "layouts-application__link" %>
+        <%= link_to "Announcements", admin_announcements_path, class: "layouts-application__link" %>
+        <%= link_to "Featured", admin_featured_products_path, class: "layouts-application__link" %>
         <%= link_to "Users", admin_users_path, class: "layouts-application__link" %>
         <%= link_to "Subscribers", admin_subscribers_path, class: "layouts-application__link" %>
       <% end %>
-      <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" if authenticated? %>
+      <div class="layouts-application__account">
+        <% if authenticated? %>
+          <span class="layouts-application__greeting">Hi, <%= Current.user.first_name %>!</span>
+          <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" %>
+        <% else %>
+          <%= link_to "Login", new_session_path, class: "layouts-application__logout layouts-application__login" %>
+        <% end %>
+      </div>
     </nav>
 
     <main class="layouts-application__main">

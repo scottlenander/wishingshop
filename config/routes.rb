@@ -28,6 +28,8 @@ Rails.application.routes.draw do
     resources :users, except: :show
     resources :subscribers, except: :show
     resources :orders, only: [ :index ]
+    resources :announcements, except: :show
+    resources :featured_products, except: :show
     resource :product_import, only: %i[ new create ] do
       get :template   # blank CSV with the column headers
       get :export     # current products as CSV, to edit and upload again

@@ -59,6 +59,7 @@ export class Item {
   readonly subscribeEmail: Locator
   readonly subscribeButton: Locator
   readonly editLink: Locator
+  readonly featureLink: Locator
   readonly deleteButton: Locator
 
   constructor(page: Page) {
@@ -89,6 +90,7 @@ export class Item {
 
     // Admins only.
     this.editLink = this.root.getByRole('link', { name: 'Edit' })
+    this.featureLink = this.root.getByRole('link', { name: 'Feature this product' })
     this.deleteButton = this.root.getByRole('button', { name: 'Delete' })
   }
 }

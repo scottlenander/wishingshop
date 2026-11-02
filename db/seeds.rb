@@ -19,9 +19,9 @@ end
 PASSWORD = "password"
 
 USERS = [
-  { email_address: "admin@example.com", admin: true },
-  { email_address: "alice@example.com", admin: false },
-  { email_address: "bob@example.com",   admin: false }
+  { email_address: "admin@example.com", first_name: "Admin", last_name: "Manager", admin: true },
+  { email_address: "alice@example.com", first_name: "Alice", last_name: "Cooper",  admin: false },
+  { email_address: "bob@example.com",   first_name: "Bob",   last_name: "Builder", admin: false }
 ]
 
 PRODUCT_NAMES = [
@@ -43,7 +43,8 @@ Faker::Config.random = rng
 # Users
 USERS.each do |attrs|
   User.find_or_initialize_by(email_address: attrs[:email_address])
-      .update!(admin: attrs[:admin], password: PASSWORD, password_confirmation: PASSWORD)
+      .update!(first_name: attrs[:first_name], last_name: attrs[:last_name], admin: attrs[:admin],
+               password: PASSWORD, password_confirmation: PASSWORD)
 end
 
 # Products: exactly 3 out of stock, the rest between 1 and 50.
@@ -70,12 +71,29 @@ SUBSCRIBER_EMAILS.zip(oos_products).each do |email, product|
   product.subscribers.find_or_create_by!(email: email)
 end
 
+# Homepage carousel announcements. No admin featured pick, so the homepage
+# shows the daily random featured product.
+ANNOUNCEMENTS = [
+  { title: "New: Rain Coat", kind: "new_product", position: 0,
+    body: "Stay dry in style with our new lightweight rain coat.", products: [ "Rain Coat" ] },
+  { title: "20% off scarves this week", kind: "sale", position: 1,
+    body: "Wrap up for winter. Sale ends Sunday.", products: [ "Scarf" ] },
+  { title: "Free shipping over $50", kind: "general", position: 2,
+    body: "On every order, every day.", products: [] }
+]
+ANNOUNCEMENTS.each do |attrs|
+  announcement = Announcement.find_or_initialize_by(title: attrs[:title])
+  announcement.update!(kind: attrs[:kind], body: attrs[:body], position: attrs[:position],
+                       starts_at: announcement.persisted? ? announcement.starts_at : 1.day.ago, ends_at: nil,
+                       products: Product.where(name: attrs[:products]))
+end
+
 puts <<~SUMMARY
 
-  Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers.
+  Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers, #{Announcement.count} announcements.
 
   Logins (password: "#{PASSWORD}")
-  #{USERS.map { |u| "  #{u[:email_address].ljust(20)} #{u[:admin] ? "admin" : "user"}" }.join("\n")}
+  #{USERS.map { |u| "  #{u[:email_address].ljust(20)} #{"#{u[:first_name]} #{u[:last_name]}".ljust(16)} #{u[:admin] ? "admin" : "user"}" }.join("\n")}
 
   Out of stock, with subscribers
   #{oos_products.map { |p| "  #{p.name.ljust(16)} #{p.subscribers.pluck(:email).join(", ")}" }.join("\n")}

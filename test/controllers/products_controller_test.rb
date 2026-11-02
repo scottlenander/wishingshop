@@ -75,4 +75,73 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     get product_path(products(:hoodie))
     assert_select "button", text: "Unsubscribe"
   end
+
+  test "homepage shows live announcements in the carousel" do
+    get products_path
+    assert_select "section.carousel[aria-roledescription=carousel]" do
+      assert_select "[aria-roledescription=slide]", 2
+      assert_select ".carousel__title", text: "Big T-Shirt sale"
+      assert_select ".carousel__title", text: "Coming soon", count: 0
+      assert_select "button.carousel__dot", 2
+    end
+  end
+
+  test "homepage hides the carousel when nothing is live" do
+    Announcement.destroy_all
+    get products_path
+    assert_select "section.carousel", count: 0
+    assert_select ".products-index__hero--single .products-featured"
+  end
+
+  test "homepage shows the admin featured pick" do
+    FeaturedProduct.create!(product: products(:hoodie), starts_at: 1.hour.ago, ends_at: 1.hour.from_now)
+    get products_path
+    assert_select ".products-featured" do
+      assert_select "h2", text: "Hoodie"
+      assert_select ".products-featured__note", text: "Picked by our team"
+      assert_select ".products-inventory__status", text: "Out of stock"
+    end
+  end
+
+  test "homepage shows a random featured product without the admin note" do
+    get products_path
+    assert_select ".products-featured h2", text: "T-Shirt"
+    assert_select ".products-featured__note", count: 0
+  end
+
+  test "admins see a feature this product button" do
+    sign_in_as users(:admin)
+    get product_path(@product)
+    assert_select "a[href='#{new_admin_featured_product_path(product_id: @product.id)}']", text: "Feature this product"
+  end
+
+  test "the nav shows Login when signed out" do
+    get products_path
+    assert_select "nav a[href='#{new_session_path}']", text: "Login"
+    assert_select "nav .layouts-application__greeting", count: 0
+  end
+
+  test "the nav greets the signed-in user by first name" do
+    sign_in_as users(:one)
+    get products_path
+    assert_select "nav .layouts-application__greeting", text: "Hi, Olive!"
+    assert_select "nav button", text: "Log out"
+    assert_select "a", text: "Login", count: 0
+  end
+
+  test "the nav brand is WishingShop and links home" do
+    get products_path
+    assert_select "nav a.layouts-application__brand[href='#{root_path}']", text: "WishingShop" do
+      assert_select "svg[aria-hidden=true]"
+    end
+  end
+
+  test "the tab title is the site name, after the page title" do
+    get products_path
+    assert_select "title", text: "WishingShop"
+
+    sign_in_as users(:admin)
+    get admin_users_path
+    assert_select "title", text: "Users · WishingShop"
+  end
 end

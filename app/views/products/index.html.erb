@@ -1,7 +1,13 @@
+<% if @announcements.any? || @featured %>
+  <%= tag.section class: ["products-index__hero", { "products-index__hero--single": @announcements.none? || @featured.nil? }] do %>
+    <%= render "announcements", announcements: @announcements if @announcements.any? %>
+    <%= render "featured", product: @featured, source: @featured_source if @featured %>
+  <% end %>
+<% end %>
+
 <h1><%= t ".title" %></h1>
 
 <%= link_to "New product", new_product_path, class: "products-index__action" if admin? %>
-<%= link_to "Login", new_session_path, class: "products-index__action" unless authenticated? %>
 
 <div id="products" class="products-index__grid">
   <% @products.each do |product| %>
