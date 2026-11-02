@@ -1,0 +1,54 @@
+<%= form_with model: [ :admin, announcement ], class: "form-card" do |form| %>
+  <% if form.object.errors.any? %>
+    <p class="error"><%= form.object.errors.full_messages.first %></p>
+  <% end %>
+
+  <div>
+    <%= form.label :kind, "Type" %>
+    <%= form.select :kind, Announcement::KIND_LABELS.map { |kind, label| [ label, kind ] } %>
+  </div>
+
+  <div>
+    <%= form.label :title %>
+    <%= form.text_field :title, required: true, maxlength: 80 %>
+  </div>
+
+  <div>
+    <%= form.label :body, "Message" %>
+    <%= form.text_area :body, rows: 3, maxlength: 280 %>
+    <p class="admin-form__hint">Optional, up to 280 characters.</p>
+  </div>
+
+  <fieldset class="admin-form__products">
+    <legend>Products</legend>
+    <p class="admin-form__hint">Optional. One product links the title to it; their images show when there's no announcement image.</p>
+    <%= form.collection_check_boxes :product_ids, Product.order(:name), :id, :name do |box| %>
+      <%= box.label(class: "admin-form__check") { box.check_box + " " + box.text } %>
+    <% end %>
+  </fieldset>
+
+  <div>
+    <%= form.label :image %>
+    <%= form.file_field :image, accept: "image/*" %>
+  </div>
+
+  <div class="admin-form__row">
+    <div>
+      <%= form.label :starts_at, "Starts" %>
+      <%= form.datetime_local_field :starts_at, required: true %>
+    </div>
+    <div>
+      <%= form.label :ends_at, "Ends" %>
+      <%= form.datetime_local_field :ends_at %>
+      <p class="admin-form__hint">Leave blank to keep it running.</p>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :position %>
+    <%= form.number_field :position, step: 1 %>
+    <p class="admin-form__hint">Lower numbers show first.</p>
+  </div>
+
+  <%= form.submit %>
+<% end %>

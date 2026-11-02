@@ -81,8 +81,9 @@ export const PRODUCTS = {
     name: 'Leather Belt',
     sku: 'LEATHER-BELT',
     seededStock: 'in',
-    changes: false,
-    usedBy: [],
+    // Made the admin featured pick, then removed.
+    changes: true,
+    usedBy: ['regression/featuredProduct.spec.ts'],
   },
   LINEN_PANTS: {
     name: 'Linen Pants',

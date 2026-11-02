@@ -1,0 +1,43 @@
+<% content_for :title, "Announcements" %>
+
+<div class="admin-page__header">
+  <h1>Announcements</h1>
+  <%= link_to "New announcement", new_admin_announcement_path, class: "btn" %>
+</div>
+
+<p class="admin-page__empty">Live announcements show in the homepage carousel, lowest position first.</p>
+
+<% if @announcements.any? %>
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Runs</th>
+        <th>Position</th>
+        <th class="admin-table__actions-heading">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @announcements.each do |announcement| %>
+        <tr id="<%= dom_id(announcement) %>">
+          <td><%= announcement.title %></td>
+          <td><%= announcement.kind_label %></td>
+          <td><%= announcement.status %></td>
+          <td>
+            <%= announcement.starts_at.to_fs(:short) %> –
+            <%= announcement.ends_at ? announcement.ends_at.to_fs(:short) : "no end" %>
+          </td>
+          <td><%= announcement.position %></td>
+          <td class="admin-table__actions">
+            <%= link_to "Edit", edit_admin_announcement_path(announcement), class: "btn btn--secondary" %>
+            <%= button_to "Delete", admin_announcement_path(announcement), method: :delete, class: "btn btn--danger", data: { turbo_confirm: "Delete \"#{announcement.title}\"?" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p class="admin-page__empty">No announcements yet.</p>
+<% end %>

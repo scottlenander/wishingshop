@@ -70,9 +70,26 @@ SUBSCRIBER_EMAILS.zip(oos_products).each do |email, product|
   product.subscribers.find_or_create_by!(email: email)
 end
 
+# Homepage carousel announcements. No admin featured pick, so the homepage
+# shows the daily random featured product.
+ANNOUNCEMENTS = [
+  { title: "New: Rain Coat", kind: "new_product", position: 0,
+    body: "Stay dry in style with our new lightweight rain coat.", products: [ "Rain Coat" ] },
+  { title: "20% off scarves this week", kind: "sale", position: 1,
+    body: "Wrap up for winter. Sale ends Sunday.", products: [ "Scarf" ] },
+  { title: "Free shipping over $50", kind: "general", position: 2,
+    body: "On every order, every day.", products: [] }
+]
+ANNOUNCEMENTS.each do |attrs|
+  announcement = Announcement.find_or_initialize_by(title: attrs[:title])
+  announcement.update!(kind: attrs[:kind], body: attrs[:body], position: attrs[:position],
+                       starts_at: announcement.persisted? ? announcement.starts_at : 1.day.ago, ends_at: nil,
+                       products: Product.where(name: attrs[:products]))
+end
+
 puts <<~SUMMARY
 
-  Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers.
+  Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers, #{Announcement.count} announcements.
 
   Logins (password: "#{PASSWORD}")
   #{USERS.map { |u| "  #{u[:email_address].ljust(20)} #{u[:admin] ? "admin" : "user"}" }.join("\n")}

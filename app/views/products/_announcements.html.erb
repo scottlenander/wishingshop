@@ -1,0 +1,59 @@
+<%# Announcements carousel. Follows the W3C ARIA carousel pattern; see carousel_controller.js. %>
+<% count = announcements.size %>
+<section class="carousel" aria-roledescription="carousel" aria-label="Announcements"
+         data-controller="carousel" data-carousel-interval-value="6000"
+         data-action="mouseenter->carousel#hoverStart mouseleave->carousel#hoverEnd focusin->carousel#focusStart focusout->carousel#focusEnd">
+  <% if count > 1 %>
+    <div class="carousel__controls">
+      <button type="button" class="carousel__button carousel__pause" data-carousel-target="pauseButton" data-action="carousel#togglePause" aria-label="Pause announcements">Pause</button>
+      <button type="button" class="carousel__button" data-action="carousel#previous" aria-label="Previous announcement">‹</button>
+      <button type="button" class="carousel__button" data-action="carousel#next" aria-label="Next announcement">›</button>
+    </div>
+  <% end %>
+
+  <div class="carousel__slides" data-carousel-target="status" aria-live="polite">
+    <% announcements.each_with_index do |announcement, index| %>
+      <% products = announcement.products.sort_by(&:name) %>
+      <div class="carousel__slide carousel__slide--<%= announcement.kind.dasherize %>"
+           role="group" aria-roledescription="slide" aria-label="<%= index + 1 %> of <%= count %>"
+           data-carousel-target="slide" <%= "hidden" unless index.zero? %>>
+        <div class="carousel__content">
+          <p class="carousel__badge"><%= announcement.kind_label %></p>
+          <h2 class="carousel__title">
+            <%= products.one? ? link_to(announcement.title, products.first) : announcement.title %>
+          </h2>
+          <% if announcement.body.present? %>
+            <p class="carousel__body"><%= announcement.body %></p>
+          <% end %>
+        </div>
+
+        <% if announcement.image.attached? %>
+          <%= image_tag announcement.image, alt: "", class: "carousel__image" %>
+        <% elsif products.any? %>
+          <ul class="carousel__products">
+            <% products.first(3).each do |product| %>
+              <li>
+                <%= link_to product, class: "carousel__product", aria: { label: product.name } do %>
+                  <% if product.featured_image.attached? %>
+                    <%= image_tag product.featured_image.variant(:thumb), alt: "" %>
+                  <% else %>
+                    <span><%= product.name %></span>
+                  <% end %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if count > 1 %>
+    <div class="carousel__dots">
+      <% count.times do |index| %>
+        <button type="button" class="carousel__dot" data-carousel-target="dot" data-action="carousel#goTo" data-carousel-index-param="<%= index %>"
+                aria-label="Show slide <%= index + 1 %> of <%= count %>" <%= 'aria-current="true"'.html_safe if index.zero? %>></button>
+      <% end %>
+    </div>
+  <% end %>
+</section>

@@ -51,8 +51,10 @@ All accounts use the password `password`.
 | `alice@example.com` | User |
 | `bob@example.com` | User |
 
-Admins can create, edit and delete products (including stock), and have four extra pages in the header:
+Admins can create, edit and delete products (including stock), and have six extra pages in the header:
 
+- **Announcements** (`/admin/announcements`): slides for the homepage carousel (new products, sales, news), each with optional linked products, an image, and start/end times.
+- **Featured** (`/admin/featured_products`): pick the homepage featured product for a time window. Picks can't overlap. Admins can also click **Feature this product** on any product page.
 - **Import** (`/admin/product_import/new`): bulk add or update products from a CSV. See [Bulk import](#bulk-import).
 - **Orders** (`/admin/orders`): every purchase by every user.
 - **Users** (`/admin/users`): add, edit and delete standard users. Admin accounts aren't listed.
@@ -64,6 +66,13 @@ Signed-in users (standard or admin) can:
 - **Subscribe** to an out-of-stock product with **Notify me**, which uses their account email. They can unsubscribe from the product page or **My subscriptions** (`/subscriptions`).
 
 Visitors can browse products and subscribe to out-of-stock items by typing an email.
+
+### Homepage
+
+The top of the products page has an **announcements carousel** and a **featured product** (side by side on desktop, stacked on phones).
+
+- **Carousel:** shows live announcements. Seeded with three: "New: Rain Coat", "20% off scarves this week" and "Free shipping over $50". It moves every 6 seconds, pauses on hover, focus or the Pause button, and doesn't move at all for visitors who prefer reduced motion. Sales are text only, since products don't have prices yet.
+- **Featured product:** the admin's active pick, marked "Picked by our team". Without one, a random in-stock product is shown, the same for everyone all day and changing each day (UTC).
 
 ### Products
 
@@ -134,7 +143,7 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as buying a product, bulk importing products, or subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as buying a product, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
 
 Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched.

@@ -14,6 +14,7 @@
     <% if admin? %>
       <div class="products-show__actions">
         <%= link_to "Edit", edit_product_path(@product), class: "btn btn--secondary products-show__edit" %>
+        <%= link_to "Feature this product", new_admin_featured_product_path(product_id: @product.id), class: "btn btn--secondary" %>
         <%= button_to "Delete", @product, method: :delete, class: "btn btn--danger products-show__delete", data: { turbo_confirm: "Are you sure?" } %>
       </div>
     <% end %>

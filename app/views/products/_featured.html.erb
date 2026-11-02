@@ -1,0 +1,28 @@
+<%# The homepage featured product: an admin pick or today's random pick. %>
+<article class="products-featured" aria-labelledby="featured-product-title">
+  <p class="products-featured__label">Featured</p>
+
+  <% if product.featured_image.attached? %>
+    <%= image_tag product.featured_image.variant(:thumb), alt: product.name, class: "products-featured__image" %>
+  <% else %>
+    <div class="products-featured__image products-index__card-placeholder"></div>
+  <% end %>
+
+  <h2 id="featured-product-title" class="products-featured__title"><%= product.name %></h2>
+
+  <% if (summary = product.description&.to_plain_text.presence) %>
+    <p class="products-featured__description"><%= truncate(summary, length: 120, separator: " ") %></p>
+  <% end %>
+
+  <% if product.inventory_count.positive? %>
+    <p class="products-inventory__status products-inventory__status--in-stock"><%= product.inventory_count %> in stock</p>
+  <% else %>
+    <p class="products-inventory__status products-inventory__status--out-of-stock">Out of stock</p>
+  <% end %>
+
+  <% if source == :admin %>
+    <p class="products-featured__note">Picked by our team</p>
+  <% end %>
+
+  <%= link_to "View product", product, class: "btn products-featured__link", aria: { label: "View #{product.name}" } %>
+</article>

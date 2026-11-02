@@ -11,6 +11,8 @@ class Product < ApplicationRecord
   end
   has_rich_text :description
   has_many :orders, dependent: :nullify
+  has_many :featured_products, dependent: :destroy
+  has_many :announcement_products, dependent: :destroy
 
   normalizes :sku, with: ->(sku) { sku.strip.upcase }
 

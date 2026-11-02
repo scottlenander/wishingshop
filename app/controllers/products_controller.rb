@@ -5,6 +5,8 @@ class ProductsController < ApplicationController
 
   def index
     @products = Product.with_attached_featured_image
+    @announcements = Announcement.live.includes(image_attachment: :blob, products: { featured_image_attachment: :blob })
+    @featured, @featured_source = FeaturedProduct.product_for
   end
 
   def show

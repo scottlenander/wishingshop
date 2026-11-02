@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_31_201418) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_02_194230) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -47,6 +47,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_201418) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "announcement_products", force: :cascade do |t|
+    t.integer "announcement_id", null: false
+    t.integer "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["announcement_id", "product_id"], name: "index_announcement_products_on_announcement_id_and_product_id", unique: true
+    t.index ["announcement_id"], name: "index_announcement_products_on_announcement_id"
+    t.index ["product_id"], name: "index_announcement_products_on_product_id"
+  end
+
+  create_table "announcements", force: :cascade do |t|
+    t.string "kind", default: "general", null: false
+    t.string "title", null: false
+    t.text "body"
+    t.datetime "starts_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "ends_at"
+    t.integer "position", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["starts_at", "ends_at"], name: "index_announcements_on_starts_at_and_ends_at"
+  end
+
+  create_table "featured_products", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "user_id"
+    t.datetime "starts_at", null: false
+    t.datetime "ends_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_featured_products_on_product_id"
+    t.index ["starts_at", "ends_at"], name: "index_featured_products_on_starts_at_and_ends_at"
+    t.index ["user_id"], name: "index_featured_products_on_user_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -99,6 +133,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_31_201418) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "announcement_products", "announcements"
+  add_foreign_key "announcement_products", "products"
+  add_foreign_key "featured_products", "products"
+  add_foreign_key "featured_products", "users"
   add_foreign_key "orders", "products"
   add_foreign_key "orders", "users"
   add_foreign_key "sessions", "users"
