@@ -9,6 +9,7 @@ export class MainPage {
   readonly homeLink: Locator
   readonly loginLink: Locator
   readonly logoutButton: Locator
+  readonly greeting: Locator
   readonly myOrdersLink: Locator
   readonly mySubscriptionsLink: Locator
   readonly ordersLink: Locator
@@ -27,7 +28,7 @@ export class MainPage {
     this.page = page
 
     // Header nav
-    this.homeLink = page.getByRole('link', { name: 'Home' })
+    this.homeLink = page.getByRole('link', { name: 'WishingShop' })
     this.logoutButton = page.getByRole('button', { name: 'Log out' })
     this.myOrdersLink = page.getByRole('link', { name: 'My orders' }) // signed in
     this.mySubscriptionsLink = page.getByRole('link', { name: 'My subscriptions' }) // signed in
@@ -39,8 +40,9 @@ export class MainPage {
     this.usersLink = page.getByRole('link', { name: 'Users' }) // admins only
     this.subscribersLink = page.getByRole('link', { name: 'Subscribers' }) // admins only
 
-    // Shown on the product list when signed out
-    this.loginLink = page.getByRole('link', { name: 'Login' })
+    // Right end of the nav: "Login" when signed out; "Hi, Alice!" and Log out when signed in.
+    this.loginLink = page.getByRole('navigation').getByRole('link', { name: 'Login' })
+    this.greeting = page.locator('.layouts-application__greeting')
 
     // Flash messages
     this.notice = page.locator('.notice')

@@ -2,13 +2,19 @@
 
 one:
   email_address: one@example.com
+  first_name: Olive
+  last_name: One
   password_digest: <%= password_digest %>
 
 two:
   email_address: two@example.com
+  first_name: Tom
+  last_name: Two
   password_digest: <%= password_digest %>
 
 admin:
   email_address: admin@example.com
+  first_name: Admin
+  last_name: Manager
   password_digest: <%= password_digest %>
   admin: true

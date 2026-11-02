@@ -18,4 +18,15 @@ class UserTest < ActiveSupport::TestCase
     assert_equal "new-one@example.com", subscribers(:one_hoodie).reload.email
     assert_equal "david@example.org", subscribers(:david).reload.email
   end
+
+  test "first and last name are required and tidied" do
+    user = User.new(email_address: "x@example.com", password: "secret123", first_name: "  Ann  ", last_name: " van  Dyke ")
+    assert user.valid?
+    assert_equal "Ann", user.first_name
+    assert_equal "Ann van Dyke", user.full_name
+
+    user.first_name = ""
+    assert_not user.valid?
+    assert_includes user.errors[:first_name], "can't be blank"
+  end
 end

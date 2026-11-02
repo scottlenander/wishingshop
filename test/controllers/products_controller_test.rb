@@ -114,4 +114,34 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     get product_path(@product)
     assert_select "a[href='#{new_admin_featured_product_path(product_id: @product.id)}']", text: "Feature this product"
   end
+
+  test "the nav shows Login when signed out" do
+    get products_path
+    assert_select "nav a[href='#{new_session_path}']", text: "Login"
+    assert_select "nav .layouts-application__greeting", count: 0
+  end
+
+  test "the nav greets the signed-in user by first name" do
+    sign_in_as users(:one)
+    get products_path
+    assert_select "nav .layouts-application__greeting", text: "Hi, Olive!"
+    assert_select "nav button", text: "Log out"
+    assert_select "a", text: "Login", count: 0
+  end
+
+  test "the nav brand is WishingShop and links home" do
+    get products_path
+    assert_select "nav a.layouts-application__brand[href='#{root_path}']", text: "WishingShop" do
+      assert_select "svg[aria-hidden=true]"
+    end
+  end
+
+  test "the tab title is the site name, after the page title" do
+    get products_path
+    assert_select "title", text: "WishingShop"
+
+    sign_in_as users(:admin)
+    get admin_users_path
+    assert_select "title", text: "Users · WishingShop"
+  end
 end

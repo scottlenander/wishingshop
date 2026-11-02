@@ -27,6 +27,9 @@ test('Admin User smoke test', async ({ page }) => {
     await expect(mainPage.loginLink, {
       message: 'Login link should not be present after login',
     }).not.toBeVisible()
+    await expect(mainPage.greeting, {
+      message: 'Nav should greet the user by first name',
+    }).toHaveText(`Hi, ${USERS.admin.firstName}!`)
     await expect(mainPage.usersLink, {
       message: 'Users link should be visible for admin users.',
     }).toBeVisible()

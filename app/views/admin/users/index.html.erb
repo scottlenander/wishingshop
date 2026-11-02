@@ -9,6 +9,7 @@
   <table class="admin-table">
     <thead>
       <tr>
+        <th>Name</th>
         <th>Email</th>
         <th>Joined</th>
         <th class="admin-table__actions-heading">Actions</th>
@@ -17,6 +18,7 @@
     <tbody>
       <% @users.each do |user| %>
         <tr id="<%= dom_id(user) %>">
+          <td><%= user.full_name %></td>
           <td><%= user.email_address %></td>
           <td><%= user.created_at.to_date.to_fs(:long) %></td>
           <td class="admin-table__actions">

@@ -28,7 +28,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   test "creates a user" do
     sign_in_as users(:admin)
     assert_difference("User.count", 1) do
-      post admin_users_path, params: { user: { email_address: "new@example.com", password: "secret123", password_confirmation: "secret123" } }
+      post admin_users_path, params: { user: { first_name: "Nia", last_name: "New", email_address: "new@example.com", password: "secret123", password_confirmation: "secret123" } }
     end
     assert_redirected_to admin_users_path
     assert_not User.find_by(email_address: "new@example.com").admin?
@@ -37,7 +37,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
   test "rejects a duplicate email" do
     sign_in_as users(:admin)
     assert_no_difference("User.count") do
-      post admin_users_path, params: { user: { email_address: "two@example.com", password: "secret123", password_confirmation: "secret123" } }
+      post admin_users_path, params: { user: { first_name: "Tom", last_name: "Twin", email_address: "two@example.com", password: "secret123", password_confirmation: "secret123" } }
     end
     assert_response :unprocessable_entity
   end
@@ -67,5 +67,20 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
     assert_difference("User.count", -1) { delete admin_user_path(@user) }
     assert_redirected_to admin_users_path
+  end
+
+  test "first and last name are required" do
+    sign_in_as users(:admin)
+    assert_no_difference("User.count") do
+      post admin_users_path, params: { user: { first_name: "", last_name: "", email_address: "nameless@example.com", password: "secret123", password_confirmation: "secret123" } }
+    end
+    assert_response :unprocessable_entity
+    assert_select "p.error", text: "First name can't be blank"
+  end
+
+  test "index shows names" do
+    sign_in_as users(:admin)
+    get admin_users_path
+    assert_select "td", text: "Olive One"
   end
 end

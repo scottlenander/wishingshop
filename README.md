@@ -45,11 +45,11 @@ bin/rails db:reset   # start over: drop, recreate and seed
 
 All accounts use the password `password`.
 
-| Email | Role |
-|---|---|
-| `admin@example.com` | Admin |
-| `alice@example.com` | User |
-| `bob@example.com` | User |
+| Email | Name | Role |
+|---|---|---|
+| `admin@example.com` | Admin Manager | Admin |
+| `alice@example.com` | Alice Cooper | User |
+| `bob@example.com` | Bob Builder | User |
 
 Admins can create, edit and delete products (including stock), and have six extra pages in the header:
 

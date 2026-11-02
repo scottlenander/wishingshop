@@ -19,9 +19,9 @@ end
 PASSWORD = "password"
 
 USERS = [
-  { email_address: "admin@example.com", admin: true },
-  { email_address: "alice@example.com", admin: false },
-  { email_address: "bob@example.com",   admin: false }
+  { email_address: "admin@example.com", first_name: "Admin", last_name: "Manager", admin: true },
+  { email_address: "alice@example.com", first_name: "Alice", last_name: "Cooper",  admin: false },
+  { email_address: "bob@example.com",   first_name: "Bob",   last_name: "Builder", admin: false }
 ]
 
 PRODUCT_NAMES = [
@@ -43,7 +43,8 @@ Faker::Config.random = rng
 # Users
 USERS.each do |attrs|
   User.find_or_initialize_by(email_address: attrs[:email_address])
-      .update!(admin: attrs[:admin], password: PASSWORD, password_confirmation: PASSWORD)
+      .update!(first_name: attrs[:first_name], last_name: attrs[:last_name], admin: attrs[:admin],
+               password: PASSWORD, password_confirmation: PASSWORD)
 end
 
 # Products: exactly 3 out of stock, the rest between 1 and 50.
@@ -92,7 +93,7 @@ puts <<~SUMMARY
   Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers, #{Announcement.count} announcements.
 
   Logins (password: "#{PASSWORD}")
-  #{USERS.map { |u| "  #{u[:email_address].ljust(20)} #{u[:admin] ? "admin" : "user"}" }.join("\n")}
+  #{USERS.map { |u| "  #{u[:email_address].ljust(20)} #{"#{u[:first_name]} #{u[:last_name]}".ljust(16)} #{u[:admin] ? "admin" : "user"}" }.join("\n")}
 
   Out of stock, with subscribers
   #{oos_products.map { |p| "  #{p.name.ljust(16)} #{p.subscribers.pluck(:email).join(", ")}" }.join("\n")}

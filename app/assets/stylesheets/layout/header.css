@@ -27,6 +27,27 @@
   letter-spacing: -0.02em;
 }
 
+.layouts-application__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Wand uses the text color; the tip and stars are amber. */
+.layouts-application__logo {
+  flex: none;
+}
+
+.layouts-application__logo-star {
+  fill: var(--color-accent);
+  stroke: var(--color-accent);
+}
+
+.layouts-application__brand:hover .layouts-application__logo-star {
+  fill: var(--color-on-brand);
+  stroke: var(--color-on-brand);
+}
+
 .layouts-application__brand:hover {
   color: var(--color-accent);
   text-decoration: none;
@@ -57,5 +78,38 @@
 
 .layouts-application__link:hover {
   color: var(--color-accent);
+  text-decoration: none;
+}
+
+/* Greeting + Log out (or Login), kept together and on the right when the nav wraps. */
+.layouts-application__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.layouts-application__account form {
+  margin: 0;
+}
+
+/* "Hi, Alice!" beside the Log out button. */
+.layouts-application__greeting {
+  color: var(--color-on-brand);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/* "Login" link: same outlined look as the Log out button. */
+.layouts-application__login {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgb(255 255 255 / 0.4);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.layouts-application__login:hover {
   text-decoration: none;
 }
