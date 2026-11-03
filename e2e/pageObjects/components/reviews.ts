@@ -79,6 +79,17 @@ export class Reviews {
     await this.submitButton.click()
   }
 
+  // Admins only: the Delete button on someone else's review, named "Delete review by Mo M.".
+  adminDeleteButton(authorName: string): Locator {
+    return this.items.getByRole('button', { name: `Delete review by ${authorName}` })
+  }
+
+  // Admins only: deletes someone else's review, accepting the confirm dialog.
+  async adminDelete(authorName: string) {
+    this.page.once('dialog', (dialog) => void dialog.accept())
+    await this.adminDeleteButton(authorName).click()
+  }
+
   // Deletes the signed-in user's review if there is one, accepting the dialog.
   async deleteMine() {
     if (await this.deleteButton.isVisible()) {

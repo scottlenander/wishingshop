@@ -80,8 +80,7 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({
     await letterOpener.goto()
     await letterOpener.waitForLetters(subscriberEmail, lettersBefore + 1)
 
-    // Newest email is listed first.
-    await letterOpener.letter(subscriberEmail).first().click()
+    await letterOpener.openLetter(subscriberEmail)
     await expect(letterOpener.mailBody.getByText(`${PRODUCT} is back in stock.`)).toBeVisible()
     await expect(letterOpener.mailBody.getByRole('link', { name: 'Unsubscribe' })).toBeVisible()
   })

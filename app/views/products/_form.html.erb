@@ -15,7 +15,8 @@
 
   <div class="products-form__field">
     <%= form.label :description %>
-    <%= form.rich_textarea :description %>
+    <%# The editor is a <trix-editor>, which the label above doesn't name, so it gets its own. %>
+    <%= form.rich_textarea :description, aria: { label: "Description" } %>
   </div>
 
   <div class="products-form__field">

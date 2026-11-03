@@ -112,6 +112,12 @@ export class Item {
     // Below the product card.
     this.reviews = new Reviews(page)
   }
+
+  // Admins only: deletes the product, accepting the confirm dialog.
+  async deleteProduct() {
+    this.root.page().once('dialog', (dialog) => void dialog.accept())
+    await this.deleteButton.click()
+  }
 }
 
 // New/edit product form (products/new, products/edit). Admins only.
@@ -121,6 +127,7 @@ export class ProductForm {
   readonly nameInput: Locator
   readonly skuInput: Locator
   readonly imageInput: Locator
+  readonly priceInput: Locator
   readonly inventoryInput: Locator
   readonly saveButton: Locator
   readonly cancelLink: Locator
@@ -131,6 +138,7 @@ export class ProductForm {
     this.nameInput = this.root.getByLabel('Name')
     this.skuInput = this.root.getByLabel('SKU')
     this.imageInput = this.root.getByLabel('Featured image')
+    this.priceInput = this.root.getByLabel('Price ($)')
     this.inventoryInput = this.root.getByLabel('Inventory count')
     // "Create Product" on new, "Update Product" on edit.
     this.saveButton = this.root.getByRole('button', { name: /^(Create|Update) Product$/ })

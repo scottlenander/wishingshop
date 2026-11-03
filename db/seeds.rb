@@ -155,7 +155,10 @@ E2E_USERS = [
   { email_address: "e2e-reviews@example.com",          first_name: "Rita",  last_name: "Reviewer" },
   { email_address: "e2e-reviews-nonbuyer@example.com", first_name: "Nina",  last_name: "Nonbuyer" },
   { email_address: "e2e-checkout@example.com",         first_name: "Chris", last_name: "Checkout" },
-  { email_address: "e2e-deactivate@example.com",       first_name: "Dana",  last_name: "Deactivate" }
+  { email_address: "e2e-deactivate@example.com",       first_name: "Dana",  last_name: "Deactivate" },
+  { email_address: "e2e-review-moderation@example.com", first_name: "Mo",    last_name: "Moderated" },
+  { email_address: "e2e-access@example.com",           first_name: "Ace",   last_name: "Access" },
+  { email_address: "e2e-a11y@example.com",             first_name: "Ally",  last_name: "Checker" }
 ]
 
 if ENV["E2E"] == "1"
@@ -172,6 +175,8 @@ if ENV["E2E"] == "1"
 
   # reviews.spec: has bought the Graphic Tee, so can review it.
   seed_past_order(User.find_by!(email_address: "e2e-reviews@example.com"), Product.find_by!(name: "Graphic Tee"), 10.days.ago)
+  # reviewModeration.spec: has bought the Flannel Shirt; reviews it so an admin can delete it.
+  seed_past_order(User.find_by!(email_address: "e2e-review-moderation@example.com"), Product.find_by!(name: "Flannel Shirt"), 10.days.ago)
 end
 
 puts <<~SUMMARY

@@ -1,7 +1,7 @@
 <p><%= link_to "Back", products_path, class: "products-show__back" %></p>
 
 <%= tag.section class: ["products-show__product", { "products-show__product--no-image": !@product.featured_image.attached? }] do %>
-  <%= image_tag @product.featured_image, class: "products-show__image" if @product.featured_image.attached? %>
+  <%= image_tag @product.featured_image, alt: @product.name, class: "products-show__image" if @product.featured_image.attached? %>
 
   <section class="products-show__info">
     <% cache @product do %>

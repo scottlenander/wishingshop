@@ -27,6 +27,17 @@ export class LetterOpener {
     return this.letters.filter({ hasText: text }).getByRole('link')
   }
 
+  // Opens the newest email matching `text` (e.g. a recipient) and waits until
+  // the viewer shows it. Refresh reloads the list and then points the viewer at
+  // the newest email, which can land after our click and replace it (e.g. with
+  // another subscriber's copy of the same message), so click until it sticks.
+  async openLetter(text: string) {
+    await expect(async () => {
+      await this.letter(text).first().click()
+      await expect(this.mail.locator('body')).toContainText(text, { timeout: 1_000 })
+    }).toPass({ timeout: 10_000 })
+  }
+
   // Emails are sent in the background, so refresh until `count` matching ones are listed.
   async waitForLetters(text: string, count: number) {
     await expect(async () => {

@@ -124,8 +124,7 @@ test('a deactivated user reactivates by resetting their password', async ({ page
   await test.step('The email says resetting reactivates the account', async () => {
     await letterOpener.goto()
     await letterOpener.waitForLetters(USER.email, lettersBefore + 1)
-    // Newest email is listed first.
-    await letterOpener.letter(USER.email).first().click()
+    await letterOpener.openLetter(USER.email)
     await expect(
       letterOpener.mailBody.getByText('Resetting your password will also reactivate your account.'),
     ).toBeVisible()

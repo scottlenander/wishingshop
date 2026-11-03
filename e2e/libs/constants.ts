@@ -21,8 +21,9 @@ export const PRODUCTS = {
     name: 'Baseball Cap',
     sku: 'BASEBALL-CAP',
     seededStock: 'in',
+    // Added to the a11y account's cart to scan checkout. Not bought.
     changes: false,
-    usedBy: [],
+    usedBy: ['accessibility/pages.spec.ts'],
   },
   BEANIE: {
     name: 'Beanie',
@@ -39,13 +40,21 @@ export const PRODUCTS = {
     changes: false,
     usedBy: [],
   },
-  CARDIGAN: { name: 'Cardigan', sku: 'CARDIGAN', seededStock: 'in', changes: false, usedBy: [] },
+  CARDIGAN: {
+    name: 'Cardigan',
+    sku: 'CARDIGAN',
+    seededStock: 'in',
+    // Stock set to 3, then 1, around a visitor's cart.
+    changes: true,
+    usedBy: ['regression/cartStock.spec.ts'],
+  },
   CARGO_SHORTS: {
     name: 'Cargo Shorts',
     sku: 'CARGO-SHORTS',
     seededStock: 'out',
+    // Read-only: out of stock, so no Add to cart button.
     changes: false,
-    usedBy: [],
+    usedBy: ['regression/cartStock.spec.ts'],
   },
   CHINOS: {
     name: 'Chinos',
@@ -66,8 +75,9 @@ export const PRODUCTS = {
     name: 'Flannel Shirt',
     sku: 'FLANNEL-SHIRT',
     seededStock: 'in',
-    changes: false,
-    usedBy: [],
+    // The review-moderation account reviews it; admin deletes the review.
+    changes: true,
+    usedBy: ['regression/reviewModeration.spec.ts'],
   },
   GRAPHIC_TEE: {
     name: 'Graphic Tee',
@@ -119,8 +129,9 @@ export const PRODUCTS = {
     name: 'Puffer Vest',
     sku: 'PUFFER-VEST',
     seededStock: 'out',
-    changes: false,
-    usedBy: [],
+    // Stock set to 0, a visitor subscribes, then restocked.
+    changes: true,
+    usedBy: ['regression/visitorSubscribe.spec.ts'],
   },
   RAIN_COAT: { name: 'Rain Coat', sku: 'RAIN-COAT', seededStock: 'in', changes: false, usedBy: [] },
   SCARF: {
@@ -247,6 +258,30 @@ export const USERS = {
     firstName: 'Dana',
     lastName: 'Deactivate',
     usedBy: ['regression/deactivateUser.spec.ts'],
+  },
+  // Has a seeded Flannel Shirt order; writes a review that admin deletes.
+  reviewModeration: {
+    email: 'e2e-review-moderation@example.com',
+    password: 'password',
+    firstName: 'Mo',
+    lastName: 'Moderated',
+    usedBy: ['regression/reviewModeration.spec.ts'],
+  },
+  // Tries admin pages and another customer's order. Changes nothing.
+  access: {
+    email: 'e2e-access@example.com',
+    password: 'password',
+    firstName: 'Ace',
+    lastName: 'Access',
+    usedBy: ['regression/accessControl.spec.ts'],
+  },
+  // Accessibility scans of signed-in pages; adds one item to the cart for checkout.
+  a11y: {
+    email: 'e2e-a11y@example.com',
+    password: 'password',
+    firstName: 'Ally',
+    lastName: 'Checker',
+    usedBy: ['accessibility/pages.spec.ts'],
   },
 } as const satisfies Record<string, SeededUser>
 

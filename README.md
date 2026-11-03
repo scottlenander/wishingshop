@@ -191,7 +191,13 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as checking out a cart, writing a review, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, deactivating and restoring a user (and reactivating by password reset), or subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as:
+  - **Shopping:** checking out a cart, a declined card, a visitor's cart surviving login, cart quantities kept within stock.
+  - **Reviews:** writing, editing and deleting a review; an admin deleting someone else's.
+  - **Stock emails:** subscribing to an out-of-stock item (signed in, or as a visitor by email), receiving the email, and unsubscribing from My subscriptions or the email's link.
+  - **Admin:** creating, editing and deleting products; adding and editing users; the Orders page; bulk import; featuring a product; announcements.
+  - **Accounts:** deactivating and restoring a user, and reactivating by password reset; standard users and visitors kept out of admin and account pages.
+- `tests/accessibility/`: automated WCAG 2.2 AA scans (axe-core) of the visitor, signed-in and admin pages. A failure lists each problem and the element it's on. These catch common problems (labels, alt text, contrast, ARIA), not everything; keyboard and screen reader checks still need a person.
 - `pageObjects/`: shared locators for each page, used by all tests.
 - `tests/auth.setup.ts`: signs in once per run as admin and each test account, and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form, as admin and Alice.
 - **One account per spec:** each regression spec that changes a standard user's data (cart, addresses, subscriptions, reviews) has its own account, such as `e2e-purchase@example.com` or `e2e-checkout@example.com`. So specs running in parallel never share data. They're listed in `E2E_USERS` in `db/seeds.rb` and `USERS` in `e2e/libs/constants.ts`, and only seeded on the e2e server. Admin is shared, since admin specs only change the products they claim.

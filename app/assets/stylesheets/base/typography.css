@@ -31,6 +31,12 @@ a {
   transition: color var(--transition);
 }
 
+/* Links inside a sentence are underlined, so they don't rely on colour alone. */
+p a:not(.btn) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
 a:hover {
   color: var(--color-link-hover);
   text-decoration: underline;

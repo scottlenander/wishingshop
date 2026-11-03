@@ -14,4 +14,7 @@ export const AUTH_FILES = {
   reviews: authFile('reviews'),
   reviewsNonBuyer: authFile('reviews-nonbuyer'),
   checkout: authFile('checkout'),
+  reviewModeration: authFile('review-moderation'),
+  access: authFile('access'),
+  a11y: authFile('a11y'),
 } as const

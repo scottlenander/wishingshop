@@ -17,6 +17,9 @@ const ACCOUNTS = [
   { role: 'reviews', user: USERS.reviews, file: AUTH_FILES.reviews },
   { role: 'reviews-nonbuyer', user: USERS.reviewsNonBuyer, file: AUTH_FILES.reviewsNonBuyer },
   { role: 'checkout', user: USERS.checkout, file: AUTH_FILES.checkout },
+  { role: 'review-moderation', user: USERS.reviewModeration, file: AUTH_FILES.reviewModeration },
+  { role: 'access', user: USERS.access, file: AUTH_FILES.access },
+  { role: 'a11y', user: USERS.a11y, file: AUTH_FILES.a11y },
 ] as const
 
 // A saved session is reused only if the server still knows it AND it belongs to
