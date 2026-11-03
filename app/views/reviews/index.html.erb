@@ -1,0 +1,13 @@
+<% content_for :title, "Reviews of #{@product.name}" %>
+
+<%# Without JavaScript this is a page of its own; in a Turbo Frame only the
+    frame below is used, and it's added to the list on the product page. %>
+<p><%= link_to "Back to #{@product.name}", product_path(@product, anchor: "reviews"), class: "products-show__back" %></p>
+<h1>Reviews of <%= @product.name %></h1>
+
+<%= turbo_frame_tag "reviews_from_#{@offset}", class: "reviews__more" do %>
+  <div class="reviews__list">
+    <%= render partial: "reviews/review", collection: @reviews, locals: { product: @product } %>
+  </div>
+  <%= render "reviews/more", product: @product, offset: @next_offset, remaining: @remaining if @remaining.positive? %>
+<% end %>

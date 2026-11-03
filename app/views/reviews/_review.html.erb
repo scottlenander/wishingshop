@@ -1,0 +1,17 @@
+<article class="reviews-item" id="<%= dom_id(review) %>">
+  <header class="reviews-item__header">
+    <%= star_rating(review.rating) %>
+    <strong class="reviews-item__author"><%= review.author_name %></strong>
+    <span class="reviews-item__badge">Verified purchase</span>
+  </header>
+  <p class="reviews-item__date">
+    <time datetime="<%= review.created_at.iso8601 %>"><%= review.created_at.to_date.to_fs(:long) %></time>
+    <%= "· Edited" if review.edited? %>
+  </p>
+  <div class="reviews-item__body"><%= simple_format(review.body) %></div>
+
+  <% if admin? && review.user != Current.user %>
+    <%= button_to "Delete", product_review_path(product, review), method: :delete, class: "btn btn--danger reviews-item__delete",
+                  aria: { label: "Delete review by #{review.author_name}" }, data: { turbo_confirm: "Delete this review?" } %>
+  <% end %>
+</article>

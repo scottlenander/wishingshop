@@ -1,0 +1,19 @@
+<%# Write a review, or why you can't. %>
+<div class="reviews-compose" id="write-review">
+  <% if !authenticated? %>
+    <p><%= link_to "Log in to write a review", new_product_review_path(product) %></p>
+  <% elsif @my_review %>
+    <h3 class="reviews-compose__title">Your review</h3>
+    <p><%= star_rating(@my_review.rating) %></p>
+    <div class="admin-table__actions reviews-compose__actions">
+      <%= link_to "Edit", edit_product_review_path(product, @my_review), class: "btn btn--secondary", aria: { label: "Edit your review" } %>
+      <%= button_to "Delete", product_review_path(product, @my_review), method: :delete, class: "btn btn--danger",
+                    aria: { label: "Delete your review" }, data: { turbo_confirm: "Delete your review?" } %>
+    </div>
+  <% elsif @can_review %>
+    <h3 class="reviews-compose__title">Write a review</h3>
+    <%= render "reviews/form", product: product, review: @new_review %>
+  <% else %>
+    <p class="reviews-compose__note">Only customers who bought this can review it.</p>
+  <% end %>
+</div>

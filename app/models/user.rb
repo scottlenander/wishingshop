@@ -4,6 +4,7 @@ class User < ApplicationRecord
   has_many :orders, dependent: :destroy
   has_one :cart, dependent: :destroy
   has_many :addresses, dependent: :destroy
+  has_many :reviews, dependent: :destroy
   has_one :billing_address, -> { billing }, class_name: "Address", inverse_of: :user
   has_many :shipping_addresses, -> { shipping.order(:nickname) }, class_name: "Address", inverse_of: :user
   has_many :subscribers, dependent: :destroy
@@ -18,6 +19,11 @@ class User < ApplicationRecord
   scope :standard, -> { where(admin: false) }
 
   def full_name = "#{first_name} #{last_name}"
+
+  # Has ordered this product (including orders from before checkout existed).
+  def purchased?(product)
+    orders.joins(:order_items).exists?(order_items: { product_id: product.id })
+  end
 
   # A user's subscriptions always use their account email.
   after_update :sync_subscriber_emails, if: :saved_change_to_email_address?

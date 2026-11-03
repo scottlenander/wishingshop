@@ -9,7 +9,7 @@
       <div class="products-show__description"><%= @product.description %></div>
     <% end %>
 
-    <%= render "inventory", product: @product %>
+    <%= render "products/inventory", product: @product %>
 
     <% if admin? %>
       <div class="products-show__actions">
@@ -20,3 +20,5 @@
     <% end %>
   </section>
 <% end %>
+
+<%= render "reviews/section", product: @product %>

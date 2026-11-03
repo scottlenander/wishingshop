@@ -1,0 +1,8 @@
+<% content_for :title, "Edit your review" %>
+
+<h1>Edit your review of <%= @product.name %></h1>
+
+<div class="form-card reviews-edit">
+  <%= render "reviews/form", product: @product, review: @review %>
+</div>
+<%= link_to "Cancel", product_path(@product, anchor: "reviews"), class: "admin-page__cancel" %>

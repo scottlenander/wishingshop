@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_02_212816) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_03_160226) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -172,6 +172,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_212816) do
     t.index ["sku"], name: "index_products_on_sku", unique: true
   end
 
+  create_table "reviews", force: :cascade do |t|
+    t.integer "user_id", null: false
+    t.integer "product_id", null: false
+    t.integer "rating", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id", "created_at"], name: "index_reviews_on_product_id_and_created_at"
+    t.index ["product_id", "user_id"], name: "index_reviews_on_product_id_and_user_id", unique: true
+    t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.integer "user_id", null: false
     t.string "ip_address"
@@ -215,6 +227,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_02_212816) do
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
   add_foreign_key "orders", "users"
+  add_foreign_key "reviews", "products"
+  add_foreign_key "reviews", "users"
   add_foreign_key "sessions", "users"
   add_foreign_key "subscribers", "products"
   add_foreign_key "subscribers", "users"

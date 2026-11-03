@@ -12,6 +12,7 @@ class Product < ApplicationRecord
   has_rich_text :description
   has_many :cart_items, dependent: :destroy
   has_many :order_items, dependent: :nullify
+  has_many :reviews, dependent: :destroy
   has_many :featured_products, dependent: :destroy
   has_many :announcement_products, dependent: :destroy
 
@@ -50,6 +51,27 @@ class Product < ApplicationRecord
   end
 
   def for_sale? = price_cents.to_i.positive?
+
+  # Average (to 0.1), count, and how many reviews gave each star level.
+  RatingSummary = Data.define(:average, :count, :breakdown) do
+    def any? = count.positive?
+  end
+
+  # Average rating (to 0.1) and review count for many products in one query,
+  # e.g. for the product cards: { product_id => [4.3, 12] }. Unrated products
+  # aren't in the hash.
+  def self.ratings_for(product_ids)
+    Review.where(product_id: product_ids).group(:product_id)
+          .pluck(:product_id, Arel.sql("AVG(rating)"), Arel.sql("COUNT(*)"))
+          .to_h { |id, average, count| [ id, [ average.to_f.round(1), count ] ] }
+  end
+
+  def rating_summary
+    counts = reviews.group(:rating).count
+    total = counts.values.sum
+    average = total.zero? ? nil : (counts.sum { |stars, n| stars * n }.to_f / total).round(1)
+    RatingSummary.new(average: average, count: total, breakdown: 5.downto(1).to_h { |stars| [ stars, counts.fetch(stars, 0) ] })
+  end
 
   # "Price must be a dollar amount", not "Price cents ...".
   def self.human_attribute_name(attribute, options = {})

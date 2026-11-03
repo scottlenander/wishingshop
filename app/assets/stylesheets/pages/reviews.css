@@ -1,0 +1,264 @@
+/*
+ * Product reviews (reviews/_section and friends), shown below the product
+ * on products/show. Summary and "write a review" on the left, list on the right.
+ */
+
+.reviews {
+  margin-top: var(--space-8);
+}
+
+.reviews__title {
+  font-size: var(--font-size-xl);
+}
+
+.reviews__layout {
+  display: grid;
+  grid-template-columns: minmax(240px, 1fr) minmax(0, 2fr);
+  gap: var(--space-6);
+  align-items: start;
+}
+
+.reviews__side {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.reviews__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reviews__empty {
+  color: var(--color-text-muted);
+}
+
+/* "Show more": the frame holds the button, then the next page of reviews. */
+.reviews__more {
+  display: block;
+  margin-top: var(--space-4);
+}
+
+.reviews__more-link {
+  width: 100%;
+}
+
+/* Stars for a rating (★★★★☆). */
+.reviews-stars {
+  color: var(--color-accent);
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.05em;
+  line-height: 1;
+}
+
+/* ---------- Summary ---------- */
+
+.reviews-summary,
+.reviews-compose {
+  padding: var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.reviews-summary p {
+  margin: 0;
+}
+
+.reviews-summary__average {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-lg);
+}
+
+.reviews-summary__count {
+  margin-top: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.reviews-summary__breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.reviews-summary__row {
+  display: grid;
+  grid-template-columns: 4rem 1fr 2rem;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.reviews-summary__bar {
+  height: 0.6rem;
+  overflow: hidden;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.reviews-summary__fill {
+  display: block;
+  height: 100%;
+  background: var(--color-accent);
+}
+
+.reviews-summary__n {
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+/* ---------- Write a review ---------- */
+
+.reviews-compose p {
+  margin: 0;
+}
+
+.reviews-compose__title {
+  margin: 0 0 var(--space-3);
+  font-size: var(--font-size-base);
+}
+
+.reviews-compose__note {
+  color: var(--color-text-muted);
+}
+
+.reviews-compose__actions {
+  justify-content: flex-start;
+  margin-top: var(--space-3);
+}
+
+.reviews-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.reviews-form__rating {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.reviews-form__rating legend {
+  margin-bottom: var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+/*
+ * Star picker: five real radio buttons (1 to 5, in order) with their inputs
+ * hidden and their labels drawn as stars. A star fills when it's picked or
+ * any star after it is picked, and while hovering up to the hovered star.
+ */
+.reviews-stars-input {
+  display: inline-flex;
+  gap: var(--space-1);
+}
+
+.reviews-stars-input input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reviews-stars-input label {
+  cursor: pointer;
+  color: var(--color-border);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.reviews-stars-input label::before {
+  /* Decorative: the empty alt text keeps the name "4 stars", not "★ 4 stars". */
+  content: "★" / "";
+}
+
+.reviews-stars-input input:checked + label,
+.reviews-stars-input label:has(~ input:checked),
+.reviews-stars-input:hover label {
+  color: var(--color-accent);
+}
+
+/* While hovering, only up to the hovered star. */
+.reviews-stars-input:hover label:hover ~ label {
+  color: var(--color-border);
+}
+
+.reviews-stars-input input:focus-visible + label {
+  outline: 3px solid var(--color-link);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.reviews-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.reviews-edit {
+  max-width: 640px;
+}
+
+/* ---------- One review ---------- */
+
+.reviews-item {
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.reviews-item__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.reviews-item__badge {
+  padding: 0 var(--space-2);
+  background: var(--color-success-bg);
+  color: var(--color-success);
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.reviews-item__date {
+  margin: var(--space-1) 0 var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.reviews-item__body p {
+  margin: 0 0 var(--space-2);
+}
+
+.reviews-item__delete {
+  margin-top: var(--space-2);
+}
+
+@media (max-width: 800px) {
+  .reviews__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .reviews-stars-input label {
+    transition: color var(--transition);
+  }
+}

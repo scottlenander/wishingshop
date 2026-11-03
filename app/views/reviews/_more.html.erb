@@ -1,0 +1,5 @@
+<%# "Show more reviews". Inside this Turbo Frame the link loads the next page in
+    place; each page brings its own frame for the page after it. %>
+<%= turbo_frame_tag "reviews_from_#{offset}", class: "reviews__more" do %>
+  <%= link_to "Show more reviews (#{remaining} more)", product_reviews_path(product, offset: offset), class: "btn btn--secondary reviews__more-link" %>
+<% end %>

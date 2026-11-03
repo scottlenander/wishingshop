@@ -124,6 +124,7 @@ test.describe('as Bob', () => {
       await mainPage.goto()
       await products.card(PRODUCT).link.click()
       await item.addToCartButton.click()
+      await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
       await mainPage.cartLink.click()
       await cart.checkoutButton.click()
 
@@ -162,6 +163,8 @@ test.describe('as Bob', () => {
       await mainPage.goto()
       await products.card(PRODUCT).link.click()
       await item.addToCartButton.click()
+      // Wait for the add to finish, or checkout may still see an empty cart.
+      await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
       await checkout.goto()
 
       await expect(checkout.billing.line1Input).toHaveValue(TEST_ADDRESS.line1)

@@ -93,6 +93,18 @@ Payment is fake (no money is taken). Only the card type and last 4 digits are sa
 
 Use any future expiry (e.g. `12/30`) and any 3-digit code.
 
+### Reviews
+
+Product pages show reviews: a 1 to 5 star rating and some text.
+
+- **Who can review:** only signed-in users who have ordered the product, once each. Reviews show a "Verified purchase" badge and the reviewer's first name and last initial.
+- **Editing:** authors can edit or delete their own review; admins can delete any review.
+- **Product cards** on the products page show the average stars and review count (e.g. 4.0 (8)), or "Not yet rated", for everyone, signed in or not.
+- **On the page:** an average with a 5-to-1 star breakdown, the 3 newest reviews, and **Show more reviews**, which loads the next 10 without leaving the page.
+- **Seeded:** 8 reviewer accounts (`reviewer1@example.com` … `reviewer8@example.com`, password `password`) with past orders. The **T-Shirt** has 8 reviews (average 4.0) and the **Denim Jacket** 3.
+  - Alice has bought the **Graphic Tee** but not reviewed it, so she can write one.
+  - Bob hasn't bought it, so he sees why he can't.
+
 ### Homepage
 
 The top of the products page has an **announcements carousel** and a **featured product** (side by side on desktop, stacked on phones).
@@ -170,7 +182,7 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as checking out a cart, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as checking out a cart, writing a review, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
 - `tests/auth.setup.ts`: signs in as admin and Alice once per run and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form.
 
