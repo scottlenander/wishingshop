@@ -184,7 +184,19 @@ Browser tests in `e2e/` that click through the app the way a user would. They're
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
 - `tests/regression/`: longer flows, such as checking out a cart, writing a review, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
-- `tests/auth.setup.ts`: signs in as admin, Alice and Bob once per run and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form.
+- `tests/auth.setup.ts`: signs in once per run as admin and each test account, and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form, as admin and Alice.
+- **One account per spec:** each regression spec that changes a standard user's data (cart, addresses, subscriptions, reviews) has its own account, such as `e2e-purchase@example.com` or `e2e-checkout@example.com`. So specs running in parallel never share data. They're listed in `E2E_USERS` in `db/seeds.rb` and `USERS` in `e2e/libs/constants.ts`, and only seeded on the e2e server. Admin is shared, since admin specs only change the products they claim.
+- `libs/testData.ts`: quick set-up and clean-up through test-only routes (`/e2e/...`), e.g. emptying a cart, setting stock or removing a test's leftover announcements. The routes are never drawn in production, and return 404 unless the server runs with `E2E=1`, which only `bin/e2e-server` sets. Every change they make is still done through the UI in at least one test:
+
+  | Shortcut | Also tested in the UI by |
+  |---|---|
+  | Empty cart | `checkoutEdgeCases` (Remove buttons) |
+  | Delete addresses | `checkoutEdgeCases` (My addresses) |
+  | Remove subscriptions | `outOfStock` (My subscriptions) |
+  | Delete reviews | `reviews` |
+  | Set stock | `outOfStock` (admin product form) |
+  | Delete announcements | `announcements` |
+  | Remove featured picks | `featuredProduct` |
 
 Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched. It also raises the login rate limit (`LOGIN_RATE_LIMIT`, normally 10 per 3 minutes), so test runs aren't locked out.
 

@@ -3,8 +3,10 @@ import { MainPage } from '../../pageObjects/mainPage'
 import { AUTH_FILES } from '../../libs/auth'
 import { FeaturedProducts } from '../../pageObjects/admin/featuredProducts'
 import { PRODUCTS } from '../../libs/constants'
+import { TestData } from '../../libs/testData'
 
 const PRODUCT = PRODUCTS.LEATHER_BELT.name
+const PRODUCT_SKU = PRODUCTS.LEATHER_BELT.sku
 // Read-only: only used to try an overlapping pick, which is refused.
 const OTHER_PRODUCT = PRODUCTS.T_SHIRT.name
 
@@ -14,7 +16,7 @@ test.describe.configure({ mode: 'serial' })
 // Starts signed in (see tests/auth.setup.ts).
 test.use({ storageState: AUTH_FILES.admin })
 
-test('admin features a product on the homepage, then removes it', async ({ page }) => {
+test('admin features a product on the homepage, then removes it', async ({ page, request }) => {
   const mainPage = new MainPage(page)
   const featuredProducts = new FeaturedProducts(page)
   const { featured, products } = mainPage
@@ -26,12 +28,7 @@ test('admin features a product on the homepage, then removes it', async ({ page 
   })
 
   await test.step('Remove picks left by an earlier run', async () => {
-    await mainPage.featuredLink.click()
-    await expect(featuredProducts.header).toBeVisible()
-    while ((await featuredProducts.removeButton(PRODUCT).count()) > 0) {
-      await featuredProducts.remove(PRODUCT)
-      await expect(mainPage.notice).toHaveText('Featured pick removed.')
-    }
+    await new TestData(request).deleteFeaturedPicks(PRODUCT_SKU)
   })
 
   await test.step('Feature the product from its page', async () => {

@@ -14,6 +14,17 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
+  # Playwright test-data shortcuts (E2e::DataController). Never drawn in
+  # production; elsewhere they return 404 unless bin/e2e-server sets E2E=1.
+  unless Rails.env.production?
+    namespace :e2e do
+      post "users/reset", to: "data#reset_user"
+      post "products/stock", to: "data#set_stock"
+      post "announcements/delete", to: "data#delete_announcements"
+      post "featured_products/delete", to: "data#delete_featured_products"
+    end
+  end
+
   # App routes
   root "products#index"
   resources :products do

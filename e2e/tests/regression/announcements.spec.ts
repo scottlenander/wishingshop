@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { AUTH_FILES } from '../../libs/auth'
 import { Announcements } from '../../pageObjects/admin/announcements'
+import { TestData } from '../../libs/testData'
 
 // Every announcement this test creates starts with this, so leftovers are easy to clean up.
 const TITLE_PREFIX = 'E2E announcement'
@@ -9,7 +10,7 @@ const TITLE_PREFIX = 'E2E announcement'
 // Starts signed in (see tests/auth.setup.ts).
 test.use({ storageState: AUTH_FILES.admin })
 
-test('admin adds an announcement to the homepage carousel', async ({ page }) => {
+test('admin adds an announcement to the homepage carousel', async ({ page, request }) => {
   const mainPage = new MainPage(page)
   const announcements = new Announcements(page)
   const { carousel } = mainPage
@@ -24,15 +25,12 @@ test('admin adds an announcement to the homepage carousel', async ({ page }) => 
   })
 
   await test.step('Remove announcements left by an earlier run', async () => {
-    await mainPage.announcementsLink.click()
-    await expect(announcements.header).toBeVisible()
-    while ((await announcements.row(TITLE_PREFIX).count()) > 0) {
-      await announcements.delete(TITLE_PREFIX)
-      await expect(mainPage.notice).toHaveText('Announcement deleted.')
-    }
+    await new TestData(request).deleteAnnouncements(TITLE_PREFIX)
   })
 
   await test.step('Create a sale announcement', async () => {
+    await mainPage.announcementsLink.click()
+    await expect(announcements.header).toBeVisible()
     await announcements.newLink.click()
     await announcements.kindSelect.selectOption({ label: 'Sale' })
     await announcements.titleInput.fill(title)

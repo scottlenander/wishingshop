@@ -12,8 +12,11 @@ import { USERS } from '../libs/constants'
 
 const ACCOUNTS = [
   { role: 'admin', user: USERS.admin, file: AUTH_FILES.admin },
-  { role: 'alice', user: USERS.alice, file: AUTH_FILES.alice },
-  { role: 'bob', user: USERS.bob, file: AUTH_FILES.bob },
+  { role: 'purchase', user: USERS.purchase, file: AUTH_FILES.purchase },
+  { role: 'out-of-stock', user: USERS.outOfStock, file: AUTH_FILES.outOfStock },
+  { role: 'reviews', user: USERS.reviews, file: AUTH_FILES.reviews },
+  { role: 'reviews-nonbuyer', user: USERS.reviewsNonBuyer, file: AUTH_FILES.reviewsNonBuyer },
+  { role: 'checkout', user: USERS.checkout, file: AUTH_FILES.checkout },
 ] as const
 
 // A saved session is reused only if the server still knows it AND it belongs to

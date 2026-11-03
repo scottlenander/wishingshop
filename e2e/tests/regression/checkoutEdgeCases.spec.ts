@@ -14,14 +14,17 @@ import {
   futureExpiry,
 } from '../../libs/constants'
 import { AUTH_FILES } from '../../libs/auth'
+import { TestData } from '../../libs/testData'
 
-// All tests here use Bob's cart and addresses, so they run one after the other.
+const CUSTOMER = USERS.checkout
+
+// All tests here use the checkout account's cart and addresses, so they run one after the other.
 test.describe.configure({ mode: 'serial' })
 
-test.describe('as Bob', () => {
-  test.use({ storageState: AUTH_FILES.bob })
+test.describe('as a signed-in customer', () => {
+  test.use({ storageState: AUTH_FILES.checkout })
 
-  test('a declined card places no order and saves nothing', async ({ page }) => {
+  test('a declined card places no order and saves nothing', async ({ page, request }) => {
     const PRODUCT = PRODUCTS.CHINOS.name
     const mainPage = new MainPage(page)
     const cart = new Cart(page)
@@ -32,8 +35,7 @@ test.describe('as Bob', () => {
     let stockBefore = ''
 
     await test.step('Start with no saved addresses and an empty cart', async () => {
-      await myAddresses.deleteAll()
-      await cart.empty()
+      await new TestData(request).resetUser(CUSTOMER.email, ['cart', 'addresses'])
     })
 
     await test.step('Add 1 to the cart', async () => {
@@ -102,7 +104,7 @@ test.describe('as Bob', () => {
     })
   })
 
-  test('saves billing and a nicknamed shipping address at checkout', async ({ page, browser }) => {
+  test('saves billing and a nicknamed shipping address at checkout', async ({ page, request }) => {
     const PRODUCT = PRODUCTS.LINEN_PANTS.name
     const NICKNAME = 'Work'
     const mainPage = new MainPage(page)
@@ -113,20 +115,10 @@ test.describe('as Bob', () => {
     const { products } = mainPage
     const { item } = products
 
-    await test.step('Admin restocks it, since every run buys one', async () => {
-      const adminContext = await browser.newContext({ storageState: AUTH_FILES.admin })
-      const adminProducts = new MainPage(await adminContext.newPage()).products
-      await adminProducts.open(PRODUCT)
-      await adminProducts.item.editLink.click()
-      await adminProducts.form.inventoryInput.fill('10')
-      await adminProducts.form.saveButton.click()
-      await expect(adminProducts.item.inStock).toHaveText('10 in stock')
-      await adminContext.close()
-    })
-
-    await test.step('Start with no saved addresses and an empty cart', async () => {
-      await myAddresses.deleteAll()
-      await cart.empty()
+    await test.step('Start with stock (every run buys one), no saved addresses and an empty cart', async () => {
+      const testData = new TestData(request)
+      await testData.setStock(PRODUCTS.LINEN_PANTS.sku, 10)
+      await testData.resetUser(CUSTOMER.email, ['cart', 'addresses'])
     })
 
     await test.step('Check out to a new shipping address and save both', async () => {
@@ -138,7 +130,7 @@ test.describe('as Bob', () => {
 
       // Nothing saved: the name is filled in and saving is offered.
       await expect(checkout.billing.nameInput).toHaveValue(
-        `${USERS.bob.firstName} ${USERS.bob.lastName}`,
+        `${CUSTOMER.firstName} ${CUSTOMER.lastName}`,
       )
       await expect(checkout.billing.line1Input).toHaveValue('')
       await expect(checkout.saveBillingCheckbox).toBeChecked()
@@ -184,6 +176,7 @@ test.describe('as Bob', () => {
       await expect(checkout.newShipping.root).toBeVisible()
     })
 
+    // Through the UI, so removing cart items and deleting addresses stay tested.
     await test.step('Clean up', async () => {
       await cart.empty()
       await myAddresses.deleteAll()
@@ -191,7 +184,7 @@ test.describe('as Bob', () => {
   })
 })
 
-test('a visitor cart is kept through logging in at checkout', async ({ browser }) => {
+test('a visitor cart is kept through logging in at checkout', async ({ browser, request }) => {
   // A fresh browser with no saved session: a visitor.
   const context = await browser.newContext()
   const page = await context.newPage()
@@ -200,8 +193,14 @@ test('a visitor cart is kept through logging in at checkout', async ({ browser }
   const loginPage = new LoginPage(page)
   const cart = new Cart(page)
   const checkout = new Checkout(page)
+  const testData = new TestData(request)
   const { products } = mainPage
   const { item } = products
+
+  await test.step("Start with the customer's saved cart empty", async () => {
+    // Otherwise items left from an earlier run would be merged in at login.
+    await testData.resetUser(CUSTOMER.email, ['cart'])
+  })
 
   await test.step('Add to the cart as a visitor', async () => {
     await mainPage.goto()
@@ -217,19 +216,19 @@ test('a visitor cart is kept through logging in at checkout', async ({ browser }
     await cart.checkoutButton.click()
     await expect(loginPage.emailInput).toBeVisible()
 
-    await loginPage.emailInput.fill(USERS.bob.email)
-    await loginPage.passwordInput.fill(USERS.bob.password)
+    await loginPage.emailInput.fill(CUSTOMER.email)
+    await loginPage.passwordInput.fill(CUSTOMER.password)
     await loginPage.signInButton.click()
   })
 
   await test.step('After logging in, checkout has the item', async () => {
     await expect(checkout.header).toBeVisible()
     await expect(checkout.summaryItems.filter({ hasText: `1 × ${PRODUCT}` })).toHaveCount(1)
-    await expect(mainPage.greeting).toHaveText(`Hi, ${USERS.bob.firstName}!`)
+    await expect(mainPage.greeting).toHaveText(`Hi, ${CUSTOMER.firstName}!`)
   })
 
-  await test.step("Clean up Bob's cart", async () => {
-    await cart.empty()
+  await test.step("Clean up the customer's cart", async () => {
+    await testData.resetUser(CUSTOMER.email, ['cart'])
     await context.close()
   })
 })

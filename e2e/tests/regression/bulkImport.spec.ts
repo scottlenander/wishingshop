@@ -3,6 +3,7 @@ import { MainPage } from '../../pageObjects/mainPage'
 import { AUTH_FILES } from '../../libs/auth'
 import { ProductImport } from '../../pageObjects/admin/productImport'
 import { PRODUCTS } from '../../libs/constants'
+import { TestData } from '../../libs/testData'
 
 // Existing product this test restocks. Only this test changes it.
 const EXISTING = PRODUCTS.BEANIE
@@ -13,7 +14,7 @@ test.describe.configure({ mode: 'serial' })
 // Starts signed in (see tests/auth.setup.ts).
 test.use({ storageState: AUTH_FILES.admin })
 
-test('admin bulk imports new products and updates stock', async ({ page }) => {
+test('admin bulk imports new products and updates stock', async ({ page, request }) => {
   const mainPage = new MainPage(page)
   const productImport = new ProductImport(page)
   const { products } = mainPage
@@ -22,19 +23,17 @@ test('admin bulk imports new products and updates stock', async ({ page }) => {
   // Unique per run, so the new product is always a "create".
   const runId = Date.now()
   const newProduct = { name: `Import Jacket ${runId}`, sku: `IMPORT-JACKET-${runId}` }
-  let newStock = 0
+  // Set to 20 first, so the import always changes it.
+  const newStock = 33
 
   await test.step('Start signed in as admin', async () => {
     await mainPage.goto()
     await expect(mainPage.logoutButton).toBeVisible()
   })
 
-  await test.step('Pick a stock value different from the current one', async () => {
-    // So the existing product is always an "update", even on a rerun.
-    await products.open(EXISTING.name)
-    const status = (await item.stockStatus.textContent()) ?? ''
-    const current = Number.parseInt(status, 10) || 0
-    newStock = current === 33 ? 34 : 33
+  await test.step('Start the existing product at 20 in stock', async () => {
+    // So it's always an "update", even on a rerun.
+    await new TestData(request).setStock(EXISTING.sku, 20)
   })
 
   await test.step("A file with errors shows them and can't be applied", async () => {
