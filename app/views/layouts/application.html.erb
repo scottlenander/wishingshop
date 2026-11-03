@@ -25,9 +25,6 @@
   </head>
 
   <body>
-    <%= tag.div(flash[:notice], class: "notice") if flash[:notice] %>
-    <%= tag.div(flash[:alert], class: "alert") if flash[:alert] %>
-
     <nav class="layouts-application__nav">
       <%= link_to root_path, class: "layouts-application__brand" do %>
         <%# Magic wand with stars. Decorative: the link's name is "WishingShop". %>
@@ -68,6 +65,10 @@
     </nav>
 
     <main class="layouts-application__main">
+      <%# In the page flow, above the content, so they never cover a button.
+          The roles make screen readers announce them. %>
+      <%= tag.div(flash[:notice], class: "notice", role: "status") if flash[:notice] %>
+      <%= tag.div(flash[:alert], class: "alert", role: "alert") if flash[:alert] %>
       <%= yield %>
     </main>
   </body>
