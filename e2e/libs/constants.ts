@@ -73,8 +73,9 @@ export const PRODUCTS = {
     name: 'Graphic Tee',
     sku: 'GRAPHIC-TEE',
     seededStock: 'in',
-    changes: false,
-    usedBy: [],
+    // Alice has a seeded order of it (no review): she writes, edits and deletes one.
+    changes: true,
+    usedBy: ['regression/reviews.spec.ts'],
   },
   HOODIE: {
     name: 'Hoodie',
@@ -142,16 +143,21 @@ export const PRODUCTS = {
     name: 'T-Shirt',
     sku: 'T-SHIRT',
     seededStock: 'in',
-    // Read-only, so it can be shared.
+    // Read-only, so it can be shared. Has the 8 seeded reviews.
     changes: false,
-    usedBy: ['smoke/standardUserPath.spec.ts', 'smoke/adminUserPath.spec.ts'],
+    usedBy: [
+      'smoke/standardUserPath.spec.ts',
+      'smoke/adminUserPath.spec.ts',
+      'regression/reviews.spec.ts',
+    ],
   },
   WOOL_SWEATER: {
     name: 'Wool Sweater',
     sku: 'WOOL-SWEATER',
     seededStock: 'in',
+    // Read-only: no reviews, so its card says "Not yet rated".
     changes: false,
-    usedBy: [],
+    usedBy: ['regression/reviews.spec.ts'],
   },
 } as const satisfies Record<string, SeededProduct>
 
@@ -208,3 +214,9 @@ export function futureExpiry(): string {
   const year = (new Date().getFullYear() + 2) % 100
   return `12/${String(year).padStart(2, '0')}`
 }
+
+// Seeded reviews (db/seeds.rb): 8 on the T-Shirt (newest first), averaging 4.0.
+export const SEEDED_REVIEWS = {
+  tShirtCount: 8,
+  tShirtAverage: '4.0',
+} as const

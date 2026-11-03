@@ -18,6 +18,7 @@ Rails.application.routes.draw do
   root "products#index"
   resources :products do
     resources :subscribers, only: [ :create ]
+    resources :reviews, only: %i[ index new create edit update destroy ]
   end
   resource :cart, only: :show
   resources :cart_items, only: %i[ create update destroy ]

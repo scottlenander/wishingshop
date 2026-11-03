@@ -103,9 +103,53 @@ ANNOUNCEMENTS.each do |attrs|
                        products: Product.where(name: attrs[:products]))
 end
 
+# Reviews. Only buyers can review, so each reviewer gets a past order first.
+# 8 reviewer accounts review the T-Shirt (enough to show "Show more"), the
+# first 3 also review the Denim Jacket. Alice has bought the Graphic Tee but
+# hasn't reviewed it (the Playwright review test writes one).
+def seed_past_order(user, product, placed_at)
+  return if user.purchased?(product)
+
+  user.orders.create!(
+    placed_at: placed_at, shipping_method: "standard", subtotal_cents: product.price_cents,
+    shipping_cents: 499, total_cents: product.price_cents + 499, card_brand: "Visa", card_last4: "4242",
+    ship_name: user.full_name, ship_line1: "1 Seed Street", ship_city: "Springfield", ship_state: "IL", ship_postal_code: "62701",
+    order_items: [ OrderItem.new(product: product, product_name: product.name, sku: product.sku,
+                                 unit_price_cents: product.price_cents, quantity: 1) ]
+  )
+end
+
+REVIEW_RATINGS = {
+  "T-Shirt" => [ 5, 4, 5, 3, 4, 5, 2, 4 ],
+  "Denim Jacket" => [ 4, 5, 3 ]
+}.freeze
+
+reviewers = (1..8).map do |n|
+  User.find_or_initialize_by(email_address: "reviewer#{n}@example.com").tap do |user|
+    user.update!(first_name: Faker::Name.first_name, last_name: Faker::Name.last_name,
+                 password: PASSWORD, password_confirmation: PASSWORD) if user.new_record?
+  end
+end
+
+REVIEW_RATINGS.each do |product_name, ratings|
+  product = Product.find_by!(name: product_name)
+  ratings.each_with_index do |rating, index|
+    user = reviewers[index]
+    reviewed_at = (index * 4 + 2).days.ago
+    seed_past_order(user, product, reviewed_at - 5.days)
+    next if product.reviews.exists?(user: user)
+
+    product.reviews.create!(user: user, rating: rating, body: Faker::Lorem.paragraph(sentence_count: 3),
+                            created_at: reviewed_at, updated_at: reviewed_at)
+  end
+end
+
+seed_past_order(alice, Product.find_by!(name: "Graphic Tee"), 10.days.ago)
+
 puts <<~SUMMARY
 
-  Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers, #{Announcement.count} announcements.
+  Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers, #{Announcement.count} announcements, #{Review.count} reviews.
+  Reviewers: reviewer1@example.com ... reviewer8@example.com (password: "#{PASSWORD}"). The T-Shirt has 8 reviews.
 
   Logins (password: "#{PASSWORD}")
   #{USERS.map { |u| "  #{u[:email_address].ljust(20)} #{"#{u[:first_name]} #{u[:last_name]}".ljust(16)} #{u[:admin] ? "admin" : "user"}" }.join("\n")}

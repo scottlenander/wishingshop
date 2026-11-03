@@ -1,0 +1,31 @@
+<%= form_with model: [ product, review ], class: "reviews-form" do |form| %>
+  <% if review.errors.any? %>
+    <div class="error" role="alert">
+      <% review.errors.full_messages.each do |message| %>
+        <p><%= message %></p>
+      <% end %>
+    </div>
+  <% end %>
+
+  <%# Real radio buttons (keyboard and screen readers work), drawn as stars in CSS. %>
+  <fieldset class="reviews-form__rating">
+    <legend>Rating</legend>
+    <div class="reviews-stars-input">
+      <% 1.upto(5) do |n| %>
+        <%= form.radio_button :rating, n, id: "review_rating_#{n}", required: true %>
+        <label for="review_rating_<%= n %>" title="<%= pluralize(n, "star") %>">
+          <span class="reviews-visually-hidden"><%= pluralize(n, "star") %></span>
+        </label>
+      <% end %>
+    </div>
+  </fieldset>
+
+  <div>
+    <%= form.label :body, "Your review" %>
+    <%= form.text_area :body, rows: 4, required: true, minlength: Review::BODY_LENGTH.min, maxlength: Review::BODY_LENGTH.max,
+                              placeholder: "What did you like or dislike?" %>
+    <p class="admin-form__hint">At least <%= Review::BODY_LENGTH.min %> characters.</p>
+  </div>
+
+  <%= form.submit review.persisted? ? "Update review" : "Post review" %>
+<% end %>

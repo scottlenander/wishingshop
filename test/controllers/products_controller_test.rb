@@ -31,7 +31,8 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:one)
 
     get product_path(@product)
-    assert_select "a", text: "Edit", count: 0
+    assert_select ".products-show__actions", count: 0
+    assert_select ".products-show__info a", text: "Edit", count: 0
     assert_select "a", text: "Users", count: 0
   end
 
@@ -144,5 +145,51 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
     get admin_users_path
     assert_select "title", text: "Users · WishingShop"
+  end
+
+  test "the product page shows the 3 newest reviews, a summary and show more" do
+    4.times do |i|
+      user = User.create!(email_address: "x#{i}@example.com", password: "password", first_name: "X#{i}", last_name: "Y")
+      user.orders.create!(order_items: [ OrderItem.new(product: @product, product_name: "T-Shirt", quantity: 1) ])
+      @product.reviews.create!(user: user, rating: 5, body: "Newer review #{i} text.", created_at: i.hours.ago)
+    end
+
+    get product_path(@product)
+    assert_select ".reviews-item", 3
+    assert_select ".reviews-item:first-child .reviews-item__body", text: /Newer review 0/
+    assert_select ".reviews-summary__count", text: "5 reviews"
+    assert_select ".reviews-summary__average strong", text: "4.8 out of 5"
+    assert_select "[role=meter][aria-label='5 stars: 4 reviews']"
+    assert_select "turbo-frame#reviews_from_3 a", text: "Show more reviews (2 more)"
+  end
+
+  test "what each user sees in the review box" do
+    get product_path(@product)
+    assert_select "#write-review a", text: "Log in to write a review"
+
+    sign_in_as users(:admin)
+    get product_path(@product)
+    assert_select "#write-review", text: /Only customers who bought this can review it/
+
+    sign_in_as users(:two)
+    get product_path(@product)
+    assert_select "#write-review form.reviews-form"
+    assert_select "#write-review input[type=radio][name='review[rating]']", 5
+
+    sign_in_as users(:one)
+    get product_path(@product)
+    assert_select "#write-review h3", text: "Your review"
+    assert_select "#write-review a", text: "Edit"
+  end
+
+  test "product cards show the rating, or not yet rated, to visitors too" do
+    get products_path
+
+    tshirt = css_select(".products-index__card").find { |card| card.text.include?("T-Shirt") }
+    assert_equal 1, tshirt.css("[role=img][aria-label='Rated 4.0 out of 5 from 1 review']").size
+    assert_includes tshirt.text, "4.0 (1)"
+
+    hoodie = css_select(".products-index__card").find { |card| card.text.include?("Hoodie") }
+    assert_includes hoodie.css(".products-index__card-unrated").text, "Not yet rated"
   end
 end

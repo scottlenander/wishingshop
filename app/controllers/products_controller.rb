@@ -1,15 +1,19 @@
 class ProductsController < ApplicationController
+  include ReviewSection
+
   allow_unauthenticated_access only: %i[ index show ]
   before_action :require_admin, except: %i[ index show ]
   before_action :set_product, only: %i[ show edit update destroy ]
 
   def index
-    @products = Product.with_attached_featured_image
+    @products = Product.with_attached_featured_image.to_a
+    @ratings = Product.ratings_for(@products.map(&:id))
     @announcements = Announcement.live.includes(image_attachment: :blob, products: { featured_image_attachment: :blob })
     @featured, @featured_source = FeaturedProduct.product_for
   end
 
   def show
+    load_review_section(@product)
   end
 
   def new

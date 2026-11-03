@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test'
+import { Reviews } from './reviews'
 
 // Product list on the home page (products/index).
 export class Products {
@@ -32,11 +33,16 @@ export class IndexCard {
   readonly root: Locator
   readonly image: Locator
   readonly link: Locator
+  // Stars named "Rated 4.0 out of 5 from 8 reviews", or "Not yet rated".
+  readonly rating: Locator
+  readonly notRated: Locator
 
   constructor(root: Locator) {
     this.root = root
     this.image = root.locator('img')
     this.link = root.getByRole('link')
+    this.rating = root.getByRole('img', { name: /^Rated / })
+    this.notRated = root.getByText('Not yet rated')
   }
 }
 
@@ -61,6 +67,7 @@ export class Item {
   readonly editLink: Locator
   readonly featureLink: Locator
   readonly deleteButton: Locator
+  readonly reviews: Reviews
 
   constructor(page: Page) {
     this.root = page.locator('.products-show__product')
@@ -94,6 +101,9 @@ export class Item {
     this.editLink = this.root.getByRole('link', { name: 'Edit' })
     this.featureLink = this.root.getByRole('link', { name: 'Feature this product' })
     this.deleteButton = this.root.getByRole('button', { name: 'Delete' })
+
+    // Below the product card.
+    this.reviews = new Reviews(page)
   }
 }
 

@@ -1,0 +1,25 @@
+<div class="reviews-summary">
+  <% if summary.any? %>
+    <p class="reviews-summary__average">
+      <%= star_rating(summary.average) %>
+      <strong><%= summary.average %> out of 5</strong>
+    </p>
+    <p class="reviews-summary__count"><%= pluralize(summary.count, "review") %></p>
+
+    <ul class="reviews-summary__breakdown">
+      <% summary.breakdown.each do |stars, count| %>
+        <% percent = (100.0 * count / summary.count).round %>
+        <li class="reviews-summary__row">
+          <span class="reviews-summary__label"><%= pluralize(stars, "star") %></span>
+          <span class="reviews-summary__bar" role="meter" aria-valuemin="0" aria-valuemax="<%= summary.count %>" aria-valuenow="<%= count %>"
+                aria-label="<%= pluralize(stars, "star") %>: <%= pluralize(count, "review") %>">
+            <span class="reviews-summary__fill" style="width: <%= percent %>%"></span>
+          </span>
+          <span class="reviews-summary__n"><%= count %></span>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="reviews-summary__count">No reviews yet</p>
+  <% end %>
+</div>
