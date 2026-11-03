@@ -240,6 +240,14 @@ export const USERS = {
     lastName: 'Checkout',
     usedBy: ['regression/checkoutEdgeCases.spec.ts'],
   },
+  // Deactivated and restored, so it signs in through the form (no saved session).
+  deactivate: {
+    email: 'e2e-deactivate@example.com',
+    password: 'password',
+    firstName: 'Dana',
+    lastName: 'Deactivate',
+    usedBy: ['regression/deactivateUser.spec.ts'],
+  },
 } as const satisfies Record<string, SeededUser>
 
 // Fake payment cards (app/models/payment/fake_gateway.rb). Any future expiry and

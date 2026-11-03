@@ -13,7 +13,7 @@ cd "$(dirname "$0")/.."
 
 export RAILS_ENV=development
 export DATABASE_URL="sqlite3:storage/e2e.sqlite3"
-PORT="${PORT:-3100}"
+export PORT="${PORT:-3100}"
 # Seeds the per-spec test accounts and turns on the test-data routes (/e2e/...).
 export E2E=1
 # A run logs in many accounts; the normal limit is 10 per 3 minutes.

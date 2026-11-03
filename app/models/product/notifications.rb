@@ -11,7 +11,10 @@ module Product::Notifications
   end
 
   def notify_subscribers
-    subscribers.each do |subscriber|
+    # Deactivated users get no emails; visitor sign-ups have no user.
+    subscribers.includes(:user).each do |subscriber|
+      next if subscriber.user&.deactivated?
+
       ProductMailer.with(product: self, subscriber: subscriber).in_stock.deliver_later
     end
   end

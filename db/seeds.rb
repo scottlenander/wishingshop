@@ -154,7 +154,8 @@ E2E_USERS = [
   { email_address: "e2e-out-of-stock@example.com",     first_name: "Sam",   last_name: "Subscriber" },
   { email_address: "e2e-reviews@example.com",          first_name: "Rita",  last_name: "Reviewer" },
   { email_address: "e2e-reviews-nonbuyer@example.com", first_name: "Nina",  last_name: "Nonbuyer" },
-  { email_address: "e2e-checkout@example.com",         first_name: "Chris", last_name: "Checkout" }
+  { email_address: "e2e-checkout@example.com",         first_name: "Chris", last_name: "Checkout" },
+  { email_address: "e2e-deactivate@example.com",       first_name: "Dana",  last_name: "Deactivate" }
 ]
 
 if ENV["E2E"] == "1"

@@ -14,6 +14,14 @@ class ProductTest < ActiveSupport::TestCase
     end
   end
 
+  test "deactivated users get no back-in-stock email" do
+    users(:one).deactivate!
+
+    assert_no_emails do
+      products(:hoodie).update!(inventory_count: 5)
+    end
+  end
+
   test "take_stock! lowers stock" do
     Product.take_stock!(products(:tshirt).id, 3)
     assert_equal 12, products(:tshirt).reload.inventory_count

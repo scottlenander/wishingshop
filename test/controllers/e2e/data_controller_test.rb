@@ -54,6 +54,15 @@ class E2e::DataControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "set_user_active deactivates and reactivates" do
+    post e2e_users_active_path, params: { email: @user.email_address, active: false }, as: :json
+    assert_response :no_content
+    assert @user.reload.deactivated?
+
+    post e2e_users_active_path, params: { email: @user.email_address, active: true }, as: :json
+    assert_not @user.reload.deactivated?
+  end
+
   test "set_stock updates the product and emails its subscriber on a restock" do
     assert_enqueued_emails 1 do
       post e2e_products_stock_path, params: { sku: "HOODIE", inventory_count: 5 }, as: :json

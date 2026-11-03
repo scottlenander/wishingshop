@@ -63,10 +63,58 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
-  test "deletes a user" do
+  test "deactivating keeps the user, their orders and reviews, and logs them out" do
+    sign_in_as @user
     sign_in_as users(:admin)
-    assert_difference("User.count", -1) { delete admin_user_path(@user) }
+
+    assert_no_difference -> { User.count } do
+      assert_no_difference -> { @user.orders.count } do
+        assert_no_difference -> { @user.reviews.count } do
+          delete admin_user_path(@user)
+        end
+      end
+    end
+
     assert_redirected_to admin_users_path
+    assert @user.reload.deactivated?
+    assert_empty @user.sessions
+  end
+
+  test "deactivated users are listed separately with Restore" do
+    users(:two).deactivate!
+    sign_in_as users(:admin)
+    get admin_users_path
+
+    assert_select ".admin-users__deactivated td", text: "two@example.com"
+    assert_select ".admin-users__deactivated button", text: "Restore"
+    assert_select "table:not(.admin-users__deactivated) td", text: "two@example.com", count: 0
+  end
+
+  test "restores a deactivated user" do
+    @user.deactivate!
+    sign_in_as users(:admin)
+    patch restore_admin_user_path(@user)
+
+    assert_redirected_to admin_users_path
+    assert_not @user.reload.deactivated?
+  end
+
+  test "a deactivated user's email can't be used for a new user" do
+    users(:two).deactivate!
+    sign_in_as users(:admin)
+    assert_no_difference("User.count") do
+      post admin_users_path, params: { user: { first_name: "Tom", last_name: "Twin", email_address: "two@example.com", password: "secret123", password_confirmation: "secret123" } }
+    end
+
+    assert_response :unprocessable_entity
+    assert_select "p.error", text: "Email address belongs to a deactivated user. Restore them from the Users page instead"
+  end
+
+  test "standard users can't restore" do
+    users(:two).deactivate!
+    sign_in_as @user
+    patch restore_admin_user_path(users(:two))
+    assert users(:two).reload.deactivated?
   end
 
   test "first and last name are required" do

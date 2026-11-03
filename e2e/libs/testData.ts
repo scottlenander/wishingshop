@@ -24,6 +24,11 @@ export class TestData {
     await this.post('users/reset', { email, only })
   }
 
+  // Deactivates or reactivates a test account, as the admin Users page does.
+  async setUserActive(email: string, active: boolean) {
+    await this.post('users/active', { email, active })
+  }
+
   // Sets a product's stock. Going from 0 to more emails its subscribers.
   async setStock(sku: string, inventoryCount: number) {
     await this.post('products/stock', { sku, inventory_count: inventoryCount })

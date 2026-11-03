@@ -24,6 +24,14 @@ class E2e::DataController < ActionController::API
     head :no_content
   end
 
+  # Deactivates (`active: false`) or reactivates a user, as Deactivate and
+  # Restore on the admin Users page do.
+  def set_user_active
+    user = User.find_by!(email_address: params.require(:email))
+    ActiveModel::Type::Boolean.new.cast(params.fetch(:active)) ? user.reactivate! : user.deactivate!
+    head :no_content
+  end
+
   # Sets a product's stock. Goes through the model, so going from 0 to more
   # emails its subscribers, as an admin edit would.
   def set_stock

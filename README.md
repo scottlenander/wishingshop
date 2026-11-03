@@ -57,7 +57,7 @@ Admins can create, edit and delete products (including stock), and have six extr
 - **Featured** (`/admin/featured_products`): pick the homepage featured product for a time window. Picks can't overlap. Admins can also click **Feature this product** on any product page.
 - **Import** (`/admin/product_import/new`): bulk add or update products from a CSV. See [Bulk import](#bulk-import).
 - **Orders** (`/admin/orders`): every purchase by every user.
-- **Users** (`/admin/users`): add, edit and delete standard users. Admin accounts aren't listed.
+- **Users** (`/admin/users`): add, edit and deactivate standard users. Admin accounts aren't listed. See [Deactivated users](#deactivated-users).
 - **Subscribers** (`/admin/subscribers`): add, edit, move and remove back-in-stock subscribers.
 
 Signed-in users (standard or admin) can:
@@ -66,6 +66,15 @@ Signed-in users (standard or admin) can:
 - **Subscribe** to an out-of-stock product with **Notify me**, which uses their account email. They can unsubscribe from the product page or **My subscriptions** (`/subscriptions`).
 
 Visitors can browse products, add them to a cart, and subscribe to out-of-stock items by typing an email.
+
+### Deactivated users
+
+Users are never deleted. **Deactivate** on the admin Users page:
+
+- logs them out and stops them logging in, and stops their back-in-stock emails;
+- keeps their orders (marked "Deactivated" on the admin Orders page), reviews and email address. The email can't be used for a new user.
+
+To undo it, an admin clicks **Restore** in the page's Deactivated list, or the user resets their password. Logging in with the right password tells them to use **Forgot password?**, and the reset email says it will reactivate the account.
 
 ### Shopping and checkout
 
@@ -182,7 +191,7 @@ bin/rails test test/models/user_test.rb          # one file
 Browser tests in `e2e/` that click through the app the way a user would. They're separate from Rails and only run when called.
 
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
-- `tests/regression/`: longer flows, such as checking out a cart, writing a review, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
+- `tests/regression/`: longer flows, such as checking out a cart, writing a review, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, deactivating and restoring a user (and reactivating by password reset), or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
 - `tests/auth.setup.ts`: signs in once per run as admin and each test account, and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form, as admin and Alice.
 - **One account per spec:** each regression spec that changes a standard user's data (cart, addresses, subscriptions, reviews) has its own account, such as `e2e-purchase@example.com` or `e2e-checkout@example.com`. So specs running in parallel never share data. They're listed in `E2E_USERS` in `db/seeds.rb` and `USERS` in `e2e/libs/constants.ts`, and only seeded on the e2e server. Admin is shared, since admin specs only change the products they claim.
@@ -197,6 +206,7 @@ Browser tests in `e2e/` that click through the app the way a user would. They're
   | Set stock | `outOfStock` (admin product form) |
   | Delete announcements | `announcements` |
   | Remove featured picks | `featuredProduct` |
+  | Deactivate or restore a user | `deactivateUser` (admin Users page) |
 
 Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched. It also raises the login rate limit (`LOGIN_RATE_LIMIT`, normally 10 per 3 minutes), so test runs aren't locked out.
 

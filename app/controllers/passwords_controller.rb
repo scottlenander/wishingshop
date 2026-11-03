@@ -18,9 +18,10 @@ class PasswordsController < ApplicationController
   end
 
   def update
-    if @user.update(params.permit(:password, :password_confirmation))
+    reactivating = @user.deactivated?
+    if @user.update(params.permit(:password, :password_confirmation).merge(deactivated_at: nil))
       @user.sessions.destroy_all
-      redirect_to new_session_path, notice: "Password has been reset."
+      redirect_to new_session_path, notice: reactivating ? "Password has been reset and your account is active again." : "Password has been reset."
     else
       redirect_to edit_password_path(params[:token]), alert: "Passwords did not match."
     end

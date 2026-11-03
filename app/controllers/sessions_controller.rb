@@ -7,7 +7,11 @@ class SessionsController < ApplicationController
   end
 
   def create
-    if user = User.authenticate_by(params.permit(:email_address, :password))
+    user = User.authenticate_by(params.permit(:email_address, :password))
+    if user&.deactivated?
+      # Only said after the right password, so the form never reveals which accounts exist.
+      redirect_to new_session_path, alert: "This account is deactivated. Use “Forgot password?” to reset your password and reactivate it."
+    elsif user
       start_new_session_for user
       merge_visitor_cart_into(user)
       redirect_to after_authentication_url

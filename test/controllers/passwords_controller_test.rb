@@ -49,6 +49,30 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     assert_notice "Password has been reset"
   end
 
+  test "resetting the password reactivates a deactivated user" do
+    @user.deactivate!
+    put password_path(@user.password_reset_token), params: { password: "newpass123", password_confirmation: "newpass123" }
+
+    assert_not @user.reload.deactivated?
+    follow_redirect!
+    assert_notice "your account is active again"
+
+    post session_path, params: { email_address: @user.email_address, password: "newpass123" }
+    assert cookies[:session_id].present?
+  end
+
+  test "a failed reset leaves the user deactivated" do
+    @user.deactivate!
+    put password_path(@user.password_reset_token), params: { password: "no", password_confirmation: "match" }
+    assert @user.reload.deactivated?
+  end
+
+  test "deactivated users can request a reset" do
+    @user.deactivate!
+    post passwords_path, params: { email_address: @user.email_address }
+    assert_enqueued_email_with PasswordsMailer, :reset, args: [ @user ]
+  end
+
   test "update with non matching passwords" do
     token = @user.password_reset_token
     assert_no_changes -> { @user.reload.password_digest } do

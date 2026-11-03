@@ -23,7 +23,8 @@
           <td><%= user.created_at.to_date.to_fs(:long) %></td>
           <td class="admin-table__actions">
             <%= link_to "Edit", edit_admin_user_path(user), class: "btn btn--secondary" %>
-            <%= button_to "Delete", admin_user_path(user), method: :delete, class: "btn btn--danger", data: { turbo_confirm: "Delete #{user.email_address}?" } %>
+            <%= button_to "Deactivate", admin_user_path(user), method: :delete, class: "btn btn--danger",
+                          data: { turbo_confirm: "Deactivate #{user.email_address}? They won't be able to log in. Their orders and reviews are kept." } %>
           </td>
         </tr>
       <% end %>
@@ -31,4 +32,32 @@
   </table>
 <% else %>
   <p class="admin-page__empty">No standard users yet.</p>
+<% end %>
+
+<% if @deactivated_users.any? %>
+  <h2 class="admin-page__subheading">Deactivated</h2>
+  <p class="admin-page__note">They can't log in until restored, or until they reset their password. Their email can't be used for a new account.</p>
+  <table class="admin-table admin-users__deactivated">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Deactivated</th>
+        <th class="admin-table__actions-heading">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @deactivated_users.each do |user| %>
+        <tr id="<%= dom_id(user) %>">
+          <td><%= user.full_name %></td>
+          <td><%= user.email_address %></td>
+          <td><%= user.deactivated_at.to_date.to_fs(:long) %></td>
+          <td class="admin-table__actions">
+            <%= button_to "Restore", restore_admin_user_path(user), method: :patch, class: "btn btn--secondary",
+                          aria: { label: "Restore #{user.email_address}" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 <% end %>

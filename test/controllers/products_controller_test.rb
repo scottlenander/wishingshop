@@ -192,4 +192,12 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     hoodie = css_select(".products-index__card").find { |card| card.text.include?("Hoodie") }
     assert_includes hoodie.css(".products-index__card-unrated").text, "Not yet rated"
   end
+
+  test "a deactivated user's reviews still show" do
+    users(:one).deactivate!
+    get product_path(products(:tshirt))
+
+    assert_select ".reviews-item", text: /Soft and fits well/
+    assert_select ".reviews-item", text: /Olive O\./
+  end
 end

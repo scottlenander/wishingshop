@@ -1,10 +1,13 @@
 # Admins manage standard users here. Admin accounts (including your own) are
 # out of reach: every lookup goes through User.standard, so they 404.
+# Users are never deleted: Deactivate keeps their orders and reviews, and
+# Restore (or the user resetting their password) undoes it.
 class Admin::UsersController < Admin::BaseController
-  before_action :set_user, only: %i[ edit update destroy ]
+  before_action :set_user, only: %i[ edit update destroy restore ]
 
   def index
-    @users = User.standard.order(:last_name, :first_name)
+    @users = User.standard.active.order(:last_name, :first_name)
+    @deactivated_users = User.standard.deactivated.order(deactivated_at: :desc)
   end
 
   def new
@@ -32,8 +35,13 @@ class Admin::UsersController < Admin::BaseController
   end
 
   def destroy
-    @user.destroy
-    redirect_to admin_users_path, notice: "User deleted."
+    @user.deactivate!
+    redirect_to admin_users_path, notice: "#{@user.email_address} deactivated. Their orders and reviews are kept."
+  end
+
+  def restore
+    @user.reactivate!
+    redirect_to admin_users_path, notice: "#{@user.email_address} restored."
   end
 
   private

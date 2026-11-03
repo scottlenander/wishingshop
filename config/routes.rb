@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   unless Rails.env.production?
     namespace :e2e do
       post "users/reset", to: "data#reset_user"
+      post "users/active", to: "data#set_user_active"
       post "products/stock", to: "data#set_stock"
       post "announcements/delete", to: "data#delete_announcements"
       post "featured_products/delete", to: "data#delete_featured_products"
@@ -40,7 +41,9 @@ Rails.application.routes.draw do
   resource :unsubscribe, only: [ :show ]
 
   namespace :admin do
-    resources :users, except: :show
+    resources :users, except: :show do
+      patch :restore, on: :member
+    end
     resources :subscribers, except: :show
     resources :orders, only: [ :index ]
     resources :announcements, except: :show
