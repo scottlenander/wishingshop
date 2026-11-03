@@ -1,0 +1,87 @@
+name: E2E
+
+# Playwright end-to-end tests (e2e/), on pull requests only. Make the
+# "Playwright (Chromium)" check required before merging in the branch rules.
+# No path filters: a required check that's skipped never reports, which blocks merging.
+# Chromium only for now; other browsers are a planned addition.
+on:
+  pull_request:
+
+# A newer push to the same pull request cancels the older run.
+concurrency:
+  group: e2e-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  playwright:
+    name: Playwright (Chromium)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: e2e
+
+    steps:
+      - name: Install packages
+        # libvips makes the product image thumbnails.
+        working-directory: .
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - name: Set up Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+
+      - name: Install test dependencies
+        run: npm ci
+
+      - name: Lint, typecheck and check formatting
+        run: npm run lint && npm run typecheck && npm run format:check
+
+      # Browsers are cached per Playwright version; system libraries are always installed.
+      - name: Get Playwright version
+        id: playwright
+        run: echo "version=$(node -p "require('@playwright/test/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Playwright browsers
+        id: browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}-chromium
+
+      - name: Install Chromium
+        if: steps.browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Chromium's system libraries
+        if: steps.browsers.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      # Starts bin/e2e-server itself (fresh seeded database on port 3100).
+      - name: Run Playwright tests
+        run: npx playwright test --project=chromium
+
+      - name: Keep the report, traces and screenshots from a failed run
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
+          if-no-files-found: ignore

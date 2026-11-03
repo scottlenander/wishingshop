@@ -218,6 +218,8 @@ Playwright starts the app automatically with `bin/e2e-server`, which resets and 
 
 When a test fails, its trace, screenshot and video are kept in the HTML report (`npm run report`), so the failure can be replayed step by step.
 
+**In CI:** `.github/workflows/e2e.yml` runs lint, typecheck, the format check and the whole suite on Chromium for every pull request, as the **Playwright (Chromium)** check. A newer push to the same pull request cancels the older run. If it fails, the report, traces and screenshots are attached to the run as `playwright-report` for 7 days. In CI, tests use one worker and retry up to twice, and a test that only passes on a retry is reported as flaky. To try it locally the same way: `CI=1 npx playwright test`.
+
 First-time setup:
 
 ```bash
