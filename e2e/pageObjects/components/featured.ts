@@ -9,6 +9,9 @@ export class Featured {
   readonly description: Locator
   readonly stockStatus: Locator
   readonly pickedNote: Locator
+  // Stars named "Rated 4.0 out of 5 from 8 reviews", or "Not yet rated".
+  readonly rating: Locator
+  readonly notRated: Locator
   readonly link: Locator
 
   constructor(page: Page) {
@@ -21,5 +24,7 @@ export class Featured {
     // Only shown for admin picks, not the daily random pick.
     this.pickedNote = this.root.getByText('Picked by our team')
     this.link = this.root.getByRole('link', { name: /^View / })
+    this.rating = this.root.getByRole('img', { name: /^Rated / })
+    this.notRated = this.root.getByText('Not yet rated')
   }
 }

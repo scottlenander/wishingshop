@@ -4,6 +4,8 @@ class Review < ApplicationRecord
   PAGE_SIZE = 10
   FIRST_PAGE = 3
   BODY_LENGTH = 10..2000
+  # How the list on the product page can be ordered; the first is the default.
+  SORTS = { "newest" => "Newest", "highest" => "Highest rated", "lowest" => "Lowest rated" }.freeze
 
   belongs_to :user
   belongs_to :product
@@ -15,6 +17,16 @@ class Review < ApplicationRecord
   validate :one_per_product, :purchased_by_author, on: :create
 
   scope :newest_first, -> { order(created_at: :desc, id: :desc) }
+  # Ties go newest first, so paging through "Show more" never repeats or skips one.
+  scope :sorted, ->(sort) {
+    case sort
+    when "highest" then order(rating: :desc).newest_first
+    when "lowest" then order(rating: :asc).newest_first
+    else newest_first
+    end
+  }
+  # Only reviews with this many stars; nil means all.
+  scope :with_stars, ->(stars) { stars ? where(rating: stars) : all }
 
   def self.human_attribute_name(attribute, options = {})
     attribute.to_s == "body" ? "Review" : super

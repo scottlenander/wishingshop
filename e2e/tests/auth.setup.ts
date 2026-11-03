@@ -7,12 +7,19 @@ import { AUTH_FILES } from '../libs/auth'
 import { USERS } from '../libs/constants'
 
 // Signs in once per account and saves the session for the other tests, so a run
-// only logs in a few times (the sign-in page allows 10 logins per 3 minutes).
+// only logs in a few times. bin/e2e-server raises the login rate limit (normally
+// 10 per 3 minutes); restart a reused server after changing it.
 
 const ACCOUNTS = [
   { role: 'admin', user: USERS.admin, file: AUTH_FILES.admin },
-  { role: 'alice', user: USERS.alice, file: AUTH_FILES.alice },
-  { role: 'bob', user: USERS.bob, file: AUTH_FILES.bob },
+  { role: 'purchase', user: USERS.purchase, file: AUTH_FILES.purchase },
+  { role: 'out-of-stock', user: USERS.outOfStock, file: AUTH_FILES.outOfStock },
+  { role: 'reviews', user: USERS.reviews, file: AUTH_FILES.reviews },
+  { role: 'reviews-nonbuyer', user: USERS.reviewsNonBuyer, file: AUTH_FILES.reviewsNonBuyer },
+  { role: 'checkout', user: USERS.checkout, file: AUTH_FILES.checkout },
+  { role: 'review-moderation', user: USERS.reviewModeration, file: AUTH_FILES.reviewModeration },
+  { role: 'access', user: USERS.access, file: AUTH_FILES.access },
+  { role: 'a11y', user: USERS.a11y, file: AUTH_FILES.a11y },
 ] as const
 
 // A saved session is reused only if the server still knows it AND it belongs to

@@ -1,0 +1,11 @@
+<%# Stars and review count on a product card (the grid and the featured card),
+    or "Not yet rated". Needs the [average, count] pair from Product.ratings_for. %>
+<% average, count = rating %>
+<p class="products-index__card-rating">
+  <% if average %>
+    <%= star_rating(average, label: "Rated #{average} out of 5 from #{pluralize(count, "review")}") %>
+    <span class="products-index__card-rating-text" aria-hidden="true"><%= average %> (<%= count %>)</span>
+  <% else %>
+    <span class="products-index__card-unrated">Not yet rated</span>
+  <% end %>
+</p>

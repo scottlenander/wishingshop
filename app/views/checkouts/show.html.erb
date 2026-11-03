@@ -103,6 +103,9 @@
         <%= form.label :card_name %>
         <%= form.text_field :card_name, required: true, autocomplete: "cc-name" %>
       </div>
+      <% if @checkout.errors.any? %>
+        <p class="admin-form__hint checkout__card-again">For your security, enter your card number and security code again.</p>
+      <% end %>
       <div>
         <%= form.label :card_number %>
         <%= form.text_field :card_number, required: true, inputmode: "numeric", autocomplete: "cc-number", placeholder: "1234 1234 1234 1234" %>

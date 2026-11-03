@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 import { Reviews } from './reviews'
 
 // Product list on the home page (products/index).
@@ -25,6 +25,13 @@ export class Products {
         .locator('.products-index__card')
         .filter({ has: this.page.getByRole('link', { name, exact: true }) }),
     )
+  }
+
+  // Goes to the home page and opens a product from its card.
+  async open(name: string) {
+    await this.page.goto('/')
+    await this.card(name).link.click()
+    await expect(this.item.title).toHaveText(name)
   }
 }
 
@@ -53,6 +60,9 @@ export class Item {
   readonly image: Locator
   readonly title: Locator
   readonly description: Locator
+  // Under the title: "4.0 out of 5 · 8 reviews", a link down to the reviews, or "Not yet rated".
+  readonly ratingLink: Locator
+  readonly notRated: Locator
   readonly stockStatus: Locator
   readonly inStock: Locator
   readonly outOfStock: Locator
@@ -77,6 +87,8 @@ export class Item {
     this.description = this.root.locator('.products-show__description')
 
     // Stock: one of inStock ("12 in stock") or outOfStock is shown.
+    this.ratingLink = this.root.getByRole('link', { name: /out of 5 · \d+ reviews?$/ })
+    this.notRated = this.root.locator('.products-show__rating').getByText('Not yet rated')
     this.stockStatus = this.root.locator('.products-inventory__status')
     this.inStock = this.root.locator('.products-inventory__status--in-stock')
     this.outOfStock = this.root.locator('.products-inventory__status--out-of-stock')
@@ -105,6 +117,12 @@ export class Item {
     // Below the product card.
     this.reviews = new Reviews(page)
   }
+
+  // Admins only: deletes the product, accepting the confirm dialog.
+  async deleteProduct() {
+    this.root.page().once('dialog', (dialog) => void dialog.accept())
+    await this.deleteButton.click()
+  }
 }
 
 // New/edit product form (products/new, products/edit). Admins only.
@@ -114,6 +132,7 @@ export class ProductForm {
   readonly nameInput: Locator
   readonly skuInput: Locator
   readonly imageInput: Locator
+  readonly priceInput: Locator
   readonly inventoryInput: Locator
   readonly saveButton: Locator
   readonly cancelLink: Locator
@@ -124,6 +143,7 @@ export class ProductForm {
     this.nameInput = this.root.getByLabel('Name')
     this.skuInput = this.root.getByLabel('SKU')
     this.imageInput = this.root.getByLabel('Featured image')
+    this.priceInput = this.root.getByLabel('Price ($)')
     this.inventoryInput = this.root.getByLabel('Inventory count')
     // "Create Product" on new, "Update Product" on edit.
     this.saveButton = this.root.getByRole('button', { name: /^(Create|Update) Product$/ })

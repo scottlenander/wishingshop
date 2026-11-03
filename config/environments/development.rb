@@ -38,7 +38,8 @@ Rails.application.configure do
   config.action_mailer.perform_caching = false
 
   # Set localhost to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  # Email links point at the running server (bin/e2e-server uses 3100).
+  config.action_mailer.default_url_options = { host: "localhost", port: Integer(ENV.fetch("PORT", 3000)) }
 
   # Open sent emails in the browser at /letter_opener instead of delivering them.
   config.action_mailer.delivery_method = :letter_opener_web

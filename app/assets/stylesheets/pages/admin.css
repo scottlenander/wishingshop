@@ -20,8 +20,25 @@
 }
 
 .admin-page__empty,
+.admin-page__note,
 .admin-form__hint {
   color: var(--color-text-muted);
+}
+
+/* A second section on the page, e.g. "Deactivated" under Users. */
+.admin-page__subheading {
+  margin: var(--space-8) 0 var(--space-2);
+}
+
+/* Small grey tag after a name, e.g. "Deactivated" on admin orders. */
+.admin-page__tag {
+  display: inline-block;
+  margin-left: var(--space-1);
+  padding: 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
 }
 
 .admin-form__hint {

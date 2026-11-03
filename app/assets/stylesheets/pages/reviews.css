@@ -34,6 +34,38 @@
   color: var(--color-text-muted);
 }
 
+/* Sort links and the star filter note, above the list. */
+.reviews__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+  margin-bottom: var(--space-4);
+  font-size: var(--font-size-sm);
+}
+
+.reviews__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+
+.reviews__sort-label {
+  color: var(--color-text-muted);
+}
+
+.reviews__sort-link--current {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.reviews__filter {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
 /* "Show more": the frame holds the button, then the next page of reviews. */
 .reviews__more {
   display: block;
@@ -95,6 +127,17 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--font-size-sm);
+}
+
+/* A star level with reviews: click to show only those. */
+.reviews-summary__label--link {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reviews-summary__label--link[aria-current="true"] {
+  font-weight: 700;
+  color: var(--color-text);
 }
 
 .reviews-summary__bar {

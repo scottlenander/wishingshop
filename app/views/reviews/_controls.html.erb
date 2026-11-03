@@ -1,0 +1,19 @@
+<%# Sort links and, when filtered by stars, how to see them all again. Plain
+    links (no JavaScript needed); the star filter is picked from the summary bars. %>
+<div class="reviews__controls">
+  <nav class="reviews__sort" aria-label="Sort reviews">
+    <span class="reviews__sort-label" aria-hidden="true">Sort:</span>
+    <% Review::SORTS.each do |key, label| %>
+      <%= link_to label, product_path(product, **review_list_params(sort: key, stars: @review_stars), anchor: "reviews"),
+                  class: ["reviews__sort-link", { "reviews__sort-link--current": key == @review_sort }],
+                  aria: { current: ("true" if key == @review_sort) } %>
+    <% end %>
+  </nav>
+
+  <% if @review_stars %>
+    <p class="reviews__filter">
+      Showing <%= pluralize(@review_total, "#{@review_stars}-star review") %>.
+      <%= link_to "Show all reviews", product_path(product, **review_list_params(sort: @review_sort, stars: nil), anchor: "reviews") %>
+    </p>
+  <% end %>
+</div>

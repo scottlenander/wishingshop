@@ -146,6 +146,39 @@ end
 
 seed_past_order(alice, Product.find_by!(name: "Graphic Tee"), 10.days.ago)
 
+# Playwright accounts, one per spec, so specs never share a cart, addresses,
+# subscriptions or reviews. Only seeded on the e2e server (bin/e2e-server sets
+# E2E=1). Keep in step with USERS in e2e/libs/constants.ts.
+E2E_USERS = [
+  { email_address: "e2e-purchase@example.com",         first_name: "Pat",   last_name: "Purchase" },
+  { email_address: "e2e-out-of-stock@example.com",     first_name: "Sam",   last_name: "Subscriber" },
+  { email_address: "e2e-reviews@example.com",          first_name: "Rita",  last_name: "Reviewer" },
+  { email_address: "e2e-reviews-nonbuyer@example.com", first_name: "Nina",  last_name: "Nonbuyer" },
+  { email_address: "e2e-checkout@example.com",         first_name: "Chris", last_name: "Checkout" },
+  { email_address: "e2e-deactivate@example.com",       first_name: "Dana",  last_name: "Deactivate" },
+  { email_address: "e2e-review-moderation@example.com", first_name: "Mo",    last_name: "Moderated" },
+  { email_address: "e2e-access@example.com",           first_name: "Ace",   last_name: "Access" },
+  { email_address: "e2e-a11y@example.com",             first_name: "Ally",  last_name: "Checker" }
+]
+
+if ENV["E2E"] == "1"
+  E2E_USERS.each do |attrs|
+    User.find_or_initialize_by(email_address: attrs[:email_address])
+        .update!(first_name: attrs[:first_name], last_name: attrs[:last_name], admin: false,
+                 password: PASSWORD, password_confirmation: PASSWORD)
+  end
+
+  # purchase.spec: checkout fills in a saved billing address.
+  purchaser = User.find_by!(email_address: "e2e-purchase@example.com")
+  (purchaser.billing_address || purchaser.addresses.build(kind: :billing))
+    .update!(name: "Pat Purchase", line1: "42 Oak Avenue", city: "Springfield", state: "IL", postal_code: "62702")
+
+  # reviews.spec: has bought the Graphic Tee, so can review it.
+  seed_past_order(User.find_by!(email_address: "e2e-reviews@example.com"), Product.find_by!(name: "Graphic Tee"), 10.days.ago)
+  # reviewModeration.spec: has bought the Flannel Shirt; reviews it so an admin can delete it.
+  seed_past_order(User.find_by!(email_address: "e2e-review-moderation@example.com"), Product.find_by!(name: "Flannel Shirt"), 10.days.ago)
+end
+
 puts <<~SUMMARY
 
   Seeded #{User.count} users, #{Product.count} products, #{Subscriber.count} subscribers, #{Announcement.count} announcements, #{Review.count} reviews.
@@ -159,3 +192,5 @@ puts <<~SUMMARY
 
   Restock one of these, then check http://localhost:3000/letter_opener
 SUMMARY
+
+puts "Playwright accounts: #{E2E_USERS.map { |u| u[:email_address] }.join(", ")}" if ENV["E2E"] == "1"

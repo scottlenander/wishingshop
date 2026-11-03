@@ -1,31 +1,32 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { PRODUCTS, SEEDED_REVIEWS } from '../../libs/constants'
+import { PRODUCTS, SEEDED_REVIEWS, USERS } from '../../libs/constants'
 import { AUTH_FILES } from '../../libs/auth'
+import { TestData } from '../../libs/testData'
 
-// Alice has a seeded order of this, with no review yet.
+// The reviews account has a seeded order of this.
 const REVIEWED = PRODUCTS.GRAPHIC_TEE.name
+const BUYER = USERS.reviews
 // Has the 8 seeded reviews; only read here.
 const SEEDED = PRODUCTS.T_SHIRT.name
 // No reviews; only read here.
 const UNRATED = PRODUCTS.WOOL_SWEATER.name
 
-test.describe('Alice, who bought it', () => {
-  // This test writes and deletes Alice's review, so its steps run in order.
+test.describe('a buyer', () => {
+  // This test writes and deletes the buyer's review, so its steps run in order.
   test.describe.configure({ mode: 'serial' })
-  test.use({ storageState: AUTH_FILES.alice })
+  test.use({ storageState: AUTH_FILES.reviews })
 
-  test('writes, edits and deletes a review', async ({ page }) => {
+  test('writes, edits and deletes a review', async ({ page, request }) => {
     const mainPage = new MainPage(page)
     const { products } = mainPage
     const { reviews } = products.item
     const text = `Bold print and comfy fit. Test run ${Date.now()}.`
     let countBefore = 0
 
-    await test.step('Open the product, removing any review from an earlier run', async () => {
-      await mainPage.goto()
-      await products.card(REVIEWED).link.click()
-      await reviews.deleteMine()
+    await test.step('Open the product, with no review from an earlier run', async () => {
+      await new TestData(request).resetUser(BUYER.email, ['reviews'])
+      await products.open(REVIEWED)
       await expect(reviews.submitButton).toBeVisible()
       countBefore = await reviews.items.count()
     })
@@ -47,7 +48,7 @@ test.describe('Alice, who bought it', () => {
 
       const mine = reviews.items.first()
       await expect(mine).toContainText(text)
-      await expect(mine).toContainText('Alice C.')
+      await expect(mine).toContainText(`${BUYER.firstName} ${BUYER.lastName[0]}.`)
       await expect(mine).toContainText('Verified purchase')
       await expect(reviews.stars(mine)).toHaveAccessibleName('4 out of 5 stars')
       await expect(reviews.items).toHaveCount(Math.min(countBefore + 1, 3))
@@ -70,21 +71,20 @@ test.describe('Alice, who bought it', () => {
   })
 })
 
-test.describe('Bob, who has not bought it', () => {
-  test.use({ storageState: AUTH_FILES.bob })
+test.describe('a signed-in user who has not bought it', () => {
+  test.use({ storageState: AUTH_FILES.reviewsNonBuyer })
 
-  test("sees why he can't review", async ({ page }) => {
+  test("sees why they can't review", async ({ page }) => {
     const mainPage = new MainPage(page)
     const { reviews } = mainPage.products.item
 
-    await mainPage.goto()
-    await mainPage.products.card(REVIEWED).link.click()
+    await mainPage.products.open(REVIEWED)
     await expect(reviews.notEligibleMessage).toBeVisible()
     await expect(reviews.submitButton).toHaveCount(0)
   })
 })
 
-test('a visitor reads reviews and loads more', async ({ page }) => {
+test('a visitor reads, sorts and filters reviews', async ({ page }) => {
   const mainPage = new MainPage(page)
   const { reviews } = mainPage.products.item
 
@@ -121,5 +121,44 @@ test('a visitor reads reviews and loads more', async ({ page }) => {
     await expect(reviews.items).toHaveCount(SEEDED_REVIEWS.tShirtCount)
     await expect(reviews.showMoreButton).toHaveCount(0)
     expect(page.url(), 'stays on the product page').toBe(url)
+  })
+
+  await test.step('The rating under the title jumps to the reviews', async () => {
+    const { item } = mainPage.products
+    // The stars are drawn for sighted users only, so the name is just the text.
+    await expect(item.ratingLink).toHaveAccessibleName(
+      `${SEEDED_REVIEWS.tShirtAverage} out of 5 · ${SEEDED_REVIEWS.tShirtCount} reviews`,
+    )
+    await item.ratingLink.click()
+    await expect(page).toHaveURL(/#reviews$/)
+  })
+
+  await test.step('Sort by highest and lowest rated', async () => {
+    await reviews.sortLink('Highest rated').click()
+    await expect(reviews.sortLink('Highest rated')).toHaveAttribute('aria-current', 'true')
+    await expect(reviews.stars(reviews.items.first())).toHaveAccessibleName('5 out of 5 stars')
+
+    await reviews.sortLink('Lowest rated').click()
+    await expect(reviews.stars(reviews.items.first())).toHaveAccessibleName(
+      `${SEEDED_REVIEWS.tShirtLowestStars} out of 5 stars`,
+    )
+  })
+
+  await test.step('Pick a star level from the summary to see only those', async () => {
+    await reviews.sortLink('Newest').click()
+    await reviews.filterLink(5).click()
+
+    const count = SEEDED_REVIEWS.tShirtFiveStarCount
+    await expect(reviews.filterNote).toContainText(`Showing ${count} 5-star reviews.`)
+    await expect(reviews.items).toHaveCount(count)
+    for (const review of await reviews.items.all()) {
+      await expect(reviews.stars(review)).toHaveAccessibleName('5 out of 5 stars')
+    }
+    await expect(reviews.showMoreButton).toHaveCount(0)
+
+    await reviews.showAllLink.click()
+    await expect(reviews.filterNote).toHaveCount(0)
+    await expect(reviews.items).toHaveCount(3)
+    await expect(reviews.showMoreButton).toBeVisible()
   })
 })

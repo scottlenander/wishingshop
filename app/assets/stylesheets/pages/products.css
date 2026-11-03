@@ -121,6 +121,33 @@
   margin-bottom: 0;
 }
 
+/* Stars and "4.0 out of 5 · 8 reviews" under the title, linking to the reviews. */
+.products-show__rating {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* Only the text is underlined, not the drawn stars. */
+.products-show__rating .products-show__rating-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+}
+
+.products-show__rating-text {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.products-show__rating .reviews-stars {
+  font-size: var(--font-size-base);
+}
+
+.products-show__unrated {
+  color: var(--color-text-muted);
+}
+
 .products-show__description {
   width: 100%;
   padding-bottom: var(--space-4);
@@ -289,6 +316,12 @@ input.products-inventory__quantity {
   margin: calc(-1 * var(--space-3)) 0 0;
   padding: 0 var(--space-4) var(--space-4);
   font-size: var(--font-size-sm);
+}
+
+/* The featured card has its own spacing, unlike the grid cards. */
+.products-featured .products-index__card-rating {
+  margin: 0;
+  padding: 0;
 }
 
 .products-index__card-rating .reviews-stars {

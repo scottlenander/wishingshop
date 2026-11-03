@@ -49,27 +49,32 @@ class CheckoutsControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1999 * 2 + 1999, order.total_cents
   end
 
-  test "errors show the form again with everything kept, so only the wrong field needs fixing" do
+  test "errors show the form again with everything kept except the card number and CVC" do
     sign_in_as users(:one)
 
     post checkout_path, params: { checkout: VALID.merge(card_expiry: "13/40") }
     assert_response :unprocessable_entity
     assert_select ".checkout__errors li", text: "Expiry (MM/YY) must look like MM/YY"
-    assert_select "input[name='checkout[card_number]'][value='4242 4242 4242 4242']"
+    assert_select "input[name='checkout[card_name]'][value='Olive One']"
     assert_select "input[name='checkout[card_expiry]'][value='13/40']"
-    assert_select "input[name='checkout[card_cvc]'][value='123']"
     assert_select "input[name='checkout[bill_line1]'][value='1 Main St']"
+    # Never sent back to the browser.
+    assert_select "input[name='checkout[card_number]']:not([value])"
+    assert_select "input[name='checkout[card_cvc]']:not([value])"
+    assert_select ".checkout__card-again", text: "For your security, enter your card number and security code again."
     # Only the wrong field is marked.
     assert_select ".field_with_errors input[name='checkout[card_expiry]']"
     assert_select ".field_with_errors input[name='checkout[card_number]']", count: 0
   end
 
-  test "a declined card keeps the card details" do
+  test "a declined card asks for the card number and CVC again" do
     sign_in_as users(:one)
 
     post checkout_path, params: { checkout: VALID.merge(card_number: "4000 0000 0000 0002") }
     assert_select ".checkout__errors li", text: /declined/
-    assert_select "input[name='checkout[card_number]'][value='4000 0000 0000 0002']"
+    assert_select "input[name='checkout[card_number]']:not([value])"
+    assert_select "input[name='checkout[card_cvc]']:not([value])"
+    assert_select "input[name='checkout[card_expiry]'][value='12/40']"
   end
 
   test "the expiry field formats itself" do

@@ -30,25 +30,27 @@ export class MainPage {
   constructor(page: Page) {
     this.page = page
 
-    // Header nav
-    this.homeLink = page.getByRole('link', { name: 'WishingShop' })
-    this.logoutButton = page.getByRole('button', { name: 'Log out' })
-    this.myOrdersLink = page.getByRole('link', { name: 'My orders' }) // signed in
-    this.mySubscriptionsLink = page.getByRole('link', { name: 'My subscriptions' }) // signed in
-    this.myAddressesLink = page.getByRole('link', { name: 'My addresses' }) // signed in
-    // exact: otherwise "My orders" also matches.
-    this.ordersLink = page.getByRole('link', { name: 'Orders', exact: true }) // admins only
-    this.importLink = page.getByRole('link', { name: 'Import' }) // admins only
-    this.announcementsLink = page.getByRole('link', { name: 'Announcements' }) // admins only
-    this.featuredLink = page.getByRole('link', { name: 'Featured', exact: true }) // admins only
-    this.usersLink = page.getByRole('link', { name: 'Users' }) // admins only
-    this.subscribersLink = page.getByRole('link', { name: 'Subscribers' }) // admins only
+    // Header nav. Scoped to the nav with exact names, so product cards on the
+    // page (e.g. "Import Jacket") never match.
+    const nav = page.getByRole('navigation')
+    const navLink = (name: string) => nav.getByRole('link', { name, exact: true })
+    this.homeLink = nav.getByRole('link', { name: 'WishingShop' })
+    this.logoutButton = nav.getByRole('button', { name: 'Log out' })
+    this.myOrdersLink = navLink('My orders') // signed in
+    this.mySubscriptionsLink = navLink('My subscriptions') // signed in
+    this.myAddressesLink = navLink('My addresses') // signed in
+    this.ordersLink = navLink('Orders') // admins only
+    this.importLink = navLink('Import') // admins only
+    this.announcementsLink = navLink('Announcements') // admins only
+    this.featuredLink = navLink('Featured') // admins only
+    this.usersLink = navLink('Users') // admins only
+    this.subscribersLink = navLink('Subscribers') // admins only
 
     // Right end of the nav: "Login" when signed out; "Hi, Alice!" and Log out when signed in.
-    this.loginLink = page.getByRole('navigation').getByRole('link', { name: 'Login' })
+    this.loginLink = navLink('Login')
     this.greeting = page.locator('.layouts-application__greeting')
     // Named "Cart, 2 items"; the badge shows the count when there are items.
-    this.cartLink = page.getByRole('navigation').getByRole('link', { name: /^Cart, / })
+    this.cartLink = nav.getByRole('link', { name: /^Cart, / })
     this.cartCount = page.locator('.layouts-application__cart-count')
 
     // Flash messages

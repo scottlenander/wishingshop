@@ -64,6 +64,16 @@ class Checkout
     @card ||= Payment::Card.new(name: card_name, number: card_number, expiry: card_expiry, cvc: card_cvc)
   end
 
+  # Run before showing the form again after an error, so the full card number
+  # and security code are never sent back to the browser. The name and expiry
+  # are kept. With a real payment provider, card fields should be the
+  # provider's hosted fields, so card details never reach this server at all.
+  def clear_card_secrets
+    self.card_number = nil
+    self.card_cvc = nil
+    @card = nil
+  end
+
   def saved_shipping_addresses = user.shipping_addresses
   def new_shipping? = shipping_choice == NEW_ADDRESS
 

@@ -94,4 +94,23 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-frame#reviews_from_13 .reviews-item", 2
     assert_select "turbo-frame#reviews_from_15", count: 0
   end
+
+  test "show more keeps the sort and star filter" do
+    add_reviews(14) # rating 3 each; the fixture is a 4
+    @product.reviews.find_by(body: "Review number 0 is here.").update_columns(rating: 5)
+
+    get product_reviews_path(@product, offset: 0, sort: "highest")
+    assert_select ".reviews-item:first-child .reviews-item__body", text: /Review number 0/
+    assert_select "turbo-frame#reviews_from_10 a[href=?]", product_reviews_path(@product, offset: 10, sort: "highest")
+
+    get product_reviews_path(@product, offset: 3, stars: 3)
+    assert_select "turbo-frame#reviews_from_3 .reviews-item", 10
+    # 13 three-star reviews: 3 shown first, 10 here, 0 left.
+    assert_select "turbo-frame#reviews_from_13", count: 0
+  end
+
+  test "the no-JavaScript page links back with the same sort and filter" do
+    get product_reviews_path(@product, offset: 3, sort: "lowest", stars: 4)
+    assert_select "a[href=?]", product_path(@product, sort: "lowest", stars: 4, anchor: "reviews"), text: "Back to T-Shirt"
+  end
 end

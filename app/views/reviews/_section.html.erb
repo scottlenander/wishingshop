@@ -1,21 +1,28 @@
 <%# The reviews part of the product page. Needs @reviews, @rating_summary,
-    @my_review, @can_review and @new_review (see ReviewSection). %>
+    @review_total, @review_sort, @review_stars, @my_review, @can_review and
+    @new_review (see ReviewSection). %>
 <section id="reviews" class="reviews" aria-labelledby="reviews-title">
   <h2 id="reviews-title" class="reviews__title">Reviews</h2>
 
   <div class="reviews__layout">
     <div class="reviews__side">
-      <%= render "reviews/summary", summary: @rating_summary %>
+      <%= render "reviews/summary", summary: @rating_summary, product: product %>
       <%= render "reviews/compose", product: product %>
     </div>
 
     <div class="reviews__main">
-      <% if @reviews.any? %>
-        <div class="reviews__list">
-          <%= render partial: "reviews/review", collection: @reviews, locals: { product: product } %>
-        </div>
-        <% remaining = @rating_summary.count - @reviews.size %>
-        <%= render "reviews/more", product: product, offset: @reviews.size, remaining: remaining if remaining.positive? %>
+      <% if @rating_summary.any? %>
+        <%= render "reviews/controls", product: product %>
+
+        <% if @reviews.any? %>
+          <div class="reviews__list">
+            <%= render partial: "reviews/review", collection: @reviews, locals: { product: product } %>
+          </div>
+          <% remaining = @review_total - @reviews.size %>
+          <%= render "reviews/more", product: product, offset: @reviews.size, remaining: remaining if remaining.positive? %>
+        <% else %>
+          <p class="reviews__empty">No <%= @review_stars %>-star reviews yet.</p>
+        <% end %>
       <% else %>
         <p class="reviews__empty">No reviews yet.<%= " Be the first to review it." if @can_review && !@my_review %></p>
       <% end %>

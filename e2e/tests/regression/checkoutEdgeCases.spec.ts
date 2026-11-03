@@ -14,14 +14,17 @@ import {
   futureExpiry,
 } from '../../libs/constants'
 import { AUTH_FILES } from '../../libs/auth'
+import { TestData } from '../../libs/testData'
 
-// All tests here use Bob's cart and addresses, so they run one after the other.
+const CUSTOMER = USERS.checkout
+
+// All tests here use the checkout account's cart and addresses, so they run one after the other.
 test.describe.configure({ mode: 'serial' })
 
-test.describe('as Bob', () => {
-  test.use({ storageState: AUTH_FILES.bob })
+test.describe('as a signed-in customer', () => {
+  test.use({ storageState: AUTH_FILES.checkout })
 
-  test('a declined card places no order and saves nothing', async ({ page }) => {
+  test('a declined card places no order and saves nothing', async ({ page, request }) => {
     const PRODUCT = PRODUCTS.CHINOS.name
     const mainPage = new MainPage(page)
     const cart = new Cart(page)
@@ -32,13 +35,11 @@ test.describe('as Bob', () => {
     let stockBefore = ''
 
     await test.step('Start with no saved addresses and an empty cart', async () => {
-      await myAddresses.deleteAll()
-      await cart.empty()
+      await new TestData(request).resetUser(CUSTOMER.email, ['cart', 'addresses'])
     })
 
     await test.step('Add 1 to the cart', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       stockBefore = (await item.inStock.textContent()) ?? ''
       await item.addToCartButton.click()
       await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
@@ -54,21 +55,25 @@ test.describe('as Bob', () => {
       await checkout.placeOrderButton.click()
 
       await expect(checkout.errors).toContainText('Your card was declined.')
-      // Everything is kept, so a different card can be tried without retyping the rest.
+      // The addresses and expiry are kept, so only the card number and CVC need typing again.
       await expect(checkout.billing.line1Input).toHaveValue(TEST_ADDRESS.line1)
-      await expect(checkout.cardNumberInput).toHaveValue(TEST_CARDS.declined)
       await expect(checkout.cardExpiryInput).toHaveValue(futureExpiry())
-      await expect(checkout.cardCvcInput).toHaveValue('123')
+      // The full card number and CVC are never sent back to the browser.
+      await expect(checkout.cardNumberInput).toHaveValue('')
+      await expect(checkout.cardCvcInput).toHaveValue('')
+      await expect(checkout.cardAgainNote).toHaveText(
+        'For your security, enter your card number and security code again.',
+      )
     })
 
-    await test.step('Only the wrong card field needs fixing', async () => {
-      await checkout.cardExpiryInput.fill('13/30')
+    await test.step('A wrong expiry is marked, and kept for fixing', async () => {
+      await checkout.fillCard({ number: TEST_CARDS.declined, expiry: '13/30' })
       await checkout.placeOrderButton.click()
 
       await expect(checkout.errors).toContainText('Expiry (MM/YY) must look like MM/YY')
       await expect(checkout.fieldError(checkout.cardExpiryInput)).toBeVisible()
-      await expect(checkout.cardNumberInput).toHaveValue(TEST_CARDS.declined)
-      await expect(checkout.cardCvcInput).toHaveValue('123')
+      await expect(checkout.cardExpiryInput).toHaveValue('13/30')
+      await expect(checkout.cardNumberInput).toHaveValue('')
     })
 
     await test.step('The expiry adds the slash while typing', async () => {
@@ -91,8 +96,7 @@ test.describe('as Bob', () => {
     })
 
     await test.step('Nothing changed: stock, cart, saved addresses', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       await expect(item.inStock).toHaveText(stockBefore)
 
       await myAddresses.goto()
@@ -104,7 +108,7 @@ test.describe('as Bob', () => {
     })
   })
 
-  test('saves billing and a nicknamed shipping address at checkout', async ({ page }) => {
+  test('saves billing and a nicknamed shipping address at checkout', async ({ page, request }) => {
     const PRODUCT = PRODUCTS.LINEN_PANTS.name
     const NICKNAME = 'Work'
     const mainPage = new MainPage(page)
@@ -115,14 +119,14 @@ test.describe('as Bob', () => {
     const { products } = mainPage
     const { item } = products
 
-    await test.step('Start with no saved addresses and an empty cart', async () => {
-      await myAddresses.deleteAll()
-      await cart.empty()
+    await test.step('Start with stock (every run buys one), no saved addresses and an empty cart', async () => {
+      const testData = new TestData(request)
+      await testData.setStock(PRODUCTS.LINEN_PANTS.sku, 10)
+      await testData.resetUser(CUSTOMER.email, ['cart', 'addresses'])
     })
 
     await test.step('Check out to a new shipping address and save both', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       await item.addToCartButton.click()
       await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
       await mainPage.cartLink.click()
@@ -130,7 +134,7 @@ test.describe('as Bob', () => {
 
       // Nothing saved: the name is filled in and saving is offered.
       await expect(checkout.billing.nameInput).toHaveValue(
-        `${USERS.bob.firstName} ${USERS.bob.lastName}`,
+        `${CUSTOMER.firstName} ${CUSTOMER.lastName}`,
       )
       await expect(checkout.billing.line1Input).toHaveValue('')
       await expect(checkout.saveBillingCheckbox).toBeChecked()
@@ -160,8 +164,7 @@ test.describe('as Bob', () => {
     })
 
     await test.step('Next checkout fills billing and offers the saved shipping address', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       await item.addToCartButton.click()
       // Wait for the add to finish, or checkout may still see an empty cart.
       await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
@@ -177,6 +180,7 @@ test.describe('as Bob', () => {
       await expect(checkout.newShipping.root).toBeVisible()
     })
 
+    // Through the UI, so removing cart items and deleting addresses stay tested.
     await test.step('Clean up', async () => {
       await cart.empty()
       await myAddresses.deleteAll()
@@ -184,7 +188,7 @@ test.describe('as Bob', () => {
   })
 })
 
-test('a visitor cart is kept through logging in at checkout', async ({ browser }) => {
+test('a visitor cart is kept through logging in at checkout', async ({ browser, request }) => {
   // A fresh browser with no saved session: a visitor.
   const context = await browser.newContext()
   const page = await context.newPage()
@@ -193,8 +197,14 @@ test('a visitor cart is kept through logging in at checkout', async ({ browser }
   const loginPage = new LoginPage(page)
   const cart = new Cart(page)
   const checkout = new Checkout(page)
+  const testData = new TestData(request)
   const { products } = mainPage
   const { item } = products
+
+  await test.step("Start with the customer's saved cart empty", async () => {
+    // Otherwise items left from an earlier run would be merged in at login.
+    await testData.resetUser(CUSTOMER.email, ['cart'])
+  })
 
   await test.step('Add to the cart as a visitor', async () => {
     await mainPage.goto()
@@ -210,19 +220,19 @@ test('a visitor cart is kept through logging in at checkout', async ({ browser }
     await cart.checkoutButton.click()
     await expect(loginPage.emailInput).toBeVisible()
 
-    await loginPage.emailInput.fill(USERS.bob.email)
-    await loginPage.passwordInput.fill(USERS.bob.password)
+    await loginPage.emailInput.fill(CUSTOMER.email)
+    await loginPage.passwordInput.fill(CUSTOMER.password)
     await loginPage.signInButton.click()
   })
 
   await test.step('After logging in, checkout has the item', async () => {
     await expect(checkout.header).toBeVisible()
     await expect(checkout.summaryItems.filter({ hasText: `1 × ${PRODUCT}` })).toHaveCount(1)
-    await expect(mainPage.greeting).toHaveText(`Hi, ${USERS.bob.firstName}!`)
+    await expect(mainPage.greeting).toHaveText(`Hi, ${CUSTOMER.firstName}!`)
   })
 
-  await test.step("Clean up Bob's cart", async () => {
-    await cart.empty()
+  await test.step("Clean up the customer's cart", async () => {
+    await testData.resetUser(CUSTOMER.email, ['cart'])
     await context.close()
   })
 })
