@@ -35,8 +35,7 @@ test('admin features a product on the homepage, then removes it', async ({ page 
   })
 
   await test.step('Feature the product from its page', async () => {
-    await mainPage.goto()
-    await products.card(PRODUCT).link.click()
+    await products.open(PRODUCT)
     await item.featureLink.click()
 
     // The shortcut pre-selects the product; keep the default window (now to 7 days).

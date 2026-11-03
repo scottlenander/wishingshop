@@ -31,8 +31,7 @@ test('admin bulk imports new products and updates stock', async ({ page }) => {
 
   await test.step('Pick a stock value different from the current one', async () => {
     // So the existing product is always an "update", even on a rerun.
-    await mainPage.goto()
-    await products.card(EXISTING.name).link.click()
+    await products.open(EXISTING.name)
     const status = (await item.stockStatus.textContent()) ?? ''
     const current = Number.parseInt(status, 10) || 0
     newStock = current === 33 ? 34 : 33
@@ -77,8 +76,7 @@ test('admin bulk imports new products and updates stock', async ({ page }) => {
     await expect(item.title).toHaveText(newProduct.name)
     await expect(item.inStock).toHaveText('12 in stock')
 
-    await mainPage.goto()
-    await products.card(EXISTING.name).link.click()
+    await products.open(EXISTING.name)
     await expect(item.inStock).toHaveText(`${newStock} in stock`)
   })
 })

@@ -37,8 +37,7 @@ test.describe('as Bob', () => {
     })
 
     await test.step('Add 1 to the cart', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       stockBefore = (await item.inStock.textContent()) ?? ''
       await item.addToCartButton.click()
       await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
@@ -91,8 +90,7 @@ test.describe('as Bob', () => {
     })
 
     await test.step('Nothing changed: stock, cart, saved addresses', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       await expect(item.inStock).toHaveText(stockBefore)
 
       await myAddresses.goto()
@@ -104,7 +102,7 @@ test.describe('as Bob', () => {
     })
   })
 
-  test('saves billing and a nicknamed shipping address at checkout', async ({ page }) => {
+  test('saves billing and a nicknamed shipping address at checkout', async ({ page, browser }) => {
     const PRODUCT = PRODUCTS.LINEN_PANTS.name
     const NICKNAME = 'Work'
     const mainPage = new MainPage(page)
@@ -115,14 +113,24 @@ test.describe('as Bob', () => {
     const { products } = mainPage
     const { item } = products
 
+    await test.step('Admin restocks it, since every run buys one', async () => {
+      const adminContext = await browser.newContext({ storageState: AUTH_FILES.admin })
+      const adminProducts = new MainPage(await adminContext.newPage()).products
+      await adminProducts.open(PRODUCT)
+      await adminProducts.item.editLink.click()
+      await adminProducts.form.inventoryInput.fill('10')
+      await adminProducts.form.saveButton.click()
+      await expect(adminProducts.item.inStock).toHaveText('10 in stock')
+      await adminContext.close()
+    })
+
     await test.step('Start with no saved addresses and an empty cart', async () => {
       await myAddresses.deleteAll()
       await cart.empty()
     })
 
     await test.step('Check out to a new shipping address and save both', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       await item.addToCartButton.click()
       await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)
       await mainPage.cartLink.click()
@@ -160,8 +168,7 @@ test.describe('as Bob', () => {
     })
 
     await test.step('Next checkout fills billing and offers the saved shipping address', async () => {
-      await mainPage.goto()
-      await products.card(PRODUCT).link.click()
+      await products.open(PRODUCT)
       await item.addToCartButton.click()
       // Wait for the add to finish, or checkout may still see an empty cart.
       await expect(mainPage.notice).toHaveText(`Added 1 × ${PRODUCT} to your cart.`)

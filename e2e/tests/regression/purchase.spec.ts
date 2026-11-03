@@ -35,8 +35,7 @@ test('standard user checks out a cart and sees the order', async ({ page, browse
   let orderNumber = ''
 
   await test.step('Admin sets the starting stock to 10', async () => {
-    await adminMainPage.goto()
-    await adminProducts.card(PRODUCT).link.click()
+    await adminProducts.open(PRODUCT)
     await adminProducts.item.editLink.click()
     await adminProducts.form.inventoryInput.fill('10')
     await adminProducts.form.saveButton.click()
@@ -50,8 +49,7 @@ test('standard user checks out a cart and sees the order', async ({ page, browse
   })
 
   await test.step('Add 2 to the cart from the product page', async () => {
-    await mainPage.goto()
-    await products.card(PRODUCT).link.click()
+    await products.open(PRODUCT)
     await expect(item.price).toHaveText('$14.99')
 
     await item.quantityInput.fill('2')
@@ -109,8 +107,7 @@ test('standard user checks out a cart and sees the order', async ({ page, browse
   })
 
   await test.step('Stock dropped and the order is in My orders', async () => {
-    await mainPage.goto()
-    await products.card(PRODUCT).link.click()
+    await products.open(PRODUCT)
     await expect(item.inStock, { message: 'Stock should drop by 3' }).toHaveText('7 in stock')
 
     await mainPage.myOrdersLink.click()

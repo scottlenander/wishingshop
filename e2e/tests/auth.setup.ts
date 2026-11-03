@@ -7,7 +7,8 @@ import { AUTH_FILES } from '../libs/auth'
 import { USERS } from '../libs/constants'
 
 // Signs in once per account and saves the session for the other tests, so a run
-// only logs in a few times (the sign-in page allows 10 logins per 3 minutes).
+// only logs in a few times. bin/e2e-server raises the login rate limit (normally
+// 10 per 3 minutes); restart a reused server after changing it.
 
 const ACCOUNTS = [
   { role: 'admin', user: USERS.admin, file: AUTH_FILES.admin },

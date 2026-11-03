@@ -21,10 +21,14 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
-  reporter: 'html',
+  // In CI, also annotate failures on the GitHub run; the HTML report is uploaded as a file.
+  reporter: process.env.CI ? [['github'], ['html', { open: 'never' }]] : 'html',
   use: {
     baseURL: BASE_URL,
-    trace: 'on-first-retry',
+    // Kept only for failed tests, so a failure can be replayed in the report.
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
   },
 
   /* Configure projects for major browsers */

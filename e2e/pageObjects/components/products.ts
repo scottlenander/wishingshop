@@ -1,4 +1,4 @@
-import type { Locator, Page } from '@playwright/test'
+import { expect, type Locator, type Page } from '@playwright/test'
 import { Reviews } from './reviews'
 
 // Product list on the home page (products/index).
@@ -25,6 +25,13 @@ export class Products {
         .locator('.products-index__card')
         .filter({ has: this.page.getByRole('link', { name, exact: true }) }),
     )
+  }
+
+  // Goes to the home page and opens a product from its card.
+  async open(name: string) {
+    await this.page.goto('/')
+    await this.card(name).link.click()
+    await expect(this.item.title).toHaveText(name)
   }
 }
 

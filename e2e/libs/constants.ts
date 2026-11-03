@@ -97,7 +97,7 @@ export const PRODUCTS = {
     name: 'Linen Pants',
     sku: 'LINEN-PANTS',
     seededStock: 'in',
-    // Bob buys 1 per run while saving addresses at checkout.
+    // Restocked to 10 by admin, then Bob buys 1 while saving addresses at checkout.
     changes: true,
     usedBy: ['regression/checkoutEdgeCases.spec.ts'],
   },

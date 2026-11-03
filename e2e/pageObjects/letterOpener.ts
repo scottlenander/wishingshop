@@ -1,4 +1,4 @@
-import type { FrameLocator, Locator, Page } from '@playwright/test'
+import { expect, type FrameLocator, type Locator, type Page } from '@playwright/test'
 
 // Development inbox from the letter_opener_web gem (/letter_opener).
 // Sent emails are listed on the left. The selected one shows in an iframe (#mail)
@@ -25,5 +25,13 @@ export class LetterOpener {
   // List entry whose headers (from, to, subject) contain the given text, e.g. a recipient.
   letter(text: string): Locator {
     return this.letters.filter({ hasText: text }).getByRole('link')
+  }
+
+  // Emails are sent in the background, so refresh until `count` matching ones are listed.
+  async waitForLetters(text: string, count: number) {
+    await expect(async () => {
+      await this.refreshButton.click()
+      await expect(this.letter(text)).toHaveCount(count, { timeout: 1_000 })
+    }).toPass({ timeout: 15_000 })
   }
 }

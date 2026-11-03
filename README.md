@@ -184,9 +184,11 @@ Browser tests in `e2e/` that click through the app the way a user would. They're
 - `tests/smoke/`: quick checks of the main standard-user and admin flows.
 - `tests/regression/`: longer flows, such as checking out a cart, writing a review, a declined card, a visitor's cart surviving login, bulk importing products, featuring a product, adding an announcement, or subscribing to an out-of-stock item and receiving the email.
 - `pageObjects/`: shared locators for each page, used by all tests.
-- `tests/auth.setup.ts`: signs in as admin and Alice once per run and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form.
+- `tests/auth.setup.ts`: signs in as admin, Alice and Bob once per run and saves the sessions (git-ignored, in `playwright/.auth/`). Regression tests start already signed in with `test.use({ storageState: AUTH_FILES.admin })`; the smoke tests still sign in through the form.
 
-Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched.
+Playwright starts the app automatically with `bin/e2e-server`, which resets and seeds a separate database (`storage/e2e.sqlite3`) on port 3100. Your development data isn't touched. It also raises the login rate limit (`LOGIN_RATE_LIMIT`, normally 10 per 3 minutes), so test runs aren't locked out.
+
+When a test fails, its trace, screenshot and video are kept in the HTML report (`npm run report`), so the failure can be replayed step by step.
 
 First-time setup:
 

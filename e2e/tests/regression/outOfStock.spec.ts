@@ -34,8 +34,7 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
 
   await test.step('Admin makes sure the item starts out of stock', async () => {
     // Lets the test be re-run against the same server without reseeding.
-    await adminMainPage.goto()
-    await adminProducts.card(PRODUCT).link.click()
+    await adminProducts.open(PRODUCT)
     await adminProducts.item.editLink.click()
     await adminProducts.form.inventoryInput.fill('0')
     await adminProducts.form.saveButton.click()
@@ -53,6 +52,8 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
 
   await test.step('Subscribe to the back-in-stock email', async () => {
     // A previous run may have left Alice subscribed; start from not subscribed.
+    // Wait for either button first, so the check below sees the loaded page.
+    await expect(item.notifyButton.or(item.unsubscribeButton)).toBeVisible()
     if (await item.unsubscribeButton.isVisible()) {
       await item.unsubscribeButton.click()
       await expect(item.notifyButton).toBeVisible()
@@ -83,13 +84,7 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({ pa
 
   await test.step('Subscriber receives the email', async () => {
     await letterOpener.goto()
-    // The email is sent in the background, so reload until it arrives.
-    await expect(async () => {
-      await letterOpener.refreshButton.click()
-      await expect(letterOpener.letter(subscriberEmail)).toHaveCount(lettersBefore + 1, {
-        timeout: 1_000,
-      })
-    }).toPass({ timeout: 15_000 })
+    await letterOpener.waitForLetters(subscriberEmail, lettersBefore + 1)
 
     // Newest email is listed first.
     await letterOpener.letter(subscriberEmail).first().click()

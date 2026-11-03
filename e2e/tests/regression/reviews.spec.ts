@@ -23,8 +23,7 @@ test.describe('Alice, who bought it', () => {
     let countBefore = 0
 
     await test.step('Open the product, removing any review from an earlier run', async () => {
-      await mainPage.goto()
-      await products.card(REVIEWED).link.click()
+      await products.open(REVIEWED)
       await reviews.deleteMine()
       await expect(reviews.submitButton).toBeVisible()
       countBefore = await reviews.items.count()
@@ -77,8 +76,7 @@ test.describe('Bob, who has not bought it', () => {
     const mainPage = new MainPage(page)
     const { reviews } = mainPage.products.item
 
-    await mainPage.goto()
-    await mainPage.products.card(REVIEWED).link.click()
+    await mainPage.products.open(REVIEWED)
     await expect(reviews.notEligibleMessage).toBeVisible()
     await expect(reviews.submitButton).toHaveCount(0)
   })
