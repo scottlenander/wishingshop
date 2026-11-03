@@ -1,7 +1,7 @@
 <% if @announcements.any? || @featured %>
   <%= tag.section class: ["products-index__hero", { "products-index__hero--single": @announcements.none? || @featured.nil? }] do %>
     <%= render "announcements", announcements: @announcements if @announcements.any? %>
-    <%= render "featured", product: @featured, source: @featured_source if @featured %>
+    <%= render "featured", product: @featured, source: @featured_source, rating: @ratings[@featured.id] if @featured %>
   <% end %>
 <% end %>
 
@@ -18,15 +18,7 @@
         <div class="products-index__card-placeholder"></div>
       <% end %>
       <%= link_to product.name, product_path(product.id), class: "products-index__card-link" %>
-      <% average, count = @ratings[product.id] %>
-      <p class="products-index__card-rating">
-        <% if average %>
-          <%= star_rating(average, label: "Rated #{average} out of 5 from #{pluralize(count, "review")}") %>
-          <span class="products-index__card-rating-text" aria-hidden="true"><%= average %> (<%= count %>)</span>
-        <% else %>
-          <span class="products-index__card-unrated">Not yet rated</span>
-        <% end %>
-      </p>
+      <%= render "card_rating", rating: @ratings[product.id] %>
       <% if product.for_sale? %>
         <p class="products-index__card-price"><%= format_price(product.price_cents) %></p>
       <% end %>

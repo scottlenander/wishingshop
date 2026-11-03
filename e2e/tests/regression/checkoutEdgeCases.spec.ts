@@ -55,21 +55,25 @@ test.describe('as a signed-in customer', () => {
       await checkout.placeOrderButton.click()
 
       await expect(checkout.errors).toContainText('Your card was declined.')
-      // Everything is kept, so a different card can be tried without retyping the rest.
+      // The addresses and expiry are kept, so only the card number and CVC need typing again.
       await expect(checkout.billing.line1Input).toHaveValue(TEST_ADDRESS.line1)
-      await expect(checkout.cardNumberInput).toHaveValue(TEST_CARDS.declined)
       await expect(checkout.cardExpiryInput).toHaveValue(futureExpiry())
-      await expect(checkout.cardCvcInput).toHaveValue('123')
+      // The full card number and CVC are never sent back to the browser.
+      await expect(checkout.cardNumberInput).toHaveValue('')
+      await expect(checkout.cardCvcInput).toHaveValue('')
+      await expect(checkout.cardAgainNote).toHaveText(
+        'For your security, enter your card number and security code again.',
+      )
     })
 
-    await test.step('Only the wrong card field needs fixing', async () => {
-      await checkout.cardExpiryInput.fill('13/30')
+    await test.step('A wrong expiry is marked, and kept for fixing', async () => {
+      await checkout.fillCard({ number: TEST_CARDS.declined, expiry: '13/30' })
       await checkout.placeOrderButton.click()
 
       await expect(checkout.errors).toContainText('Expiry (MM/YY) must look like MM/YY')
       await expect(checkout.fieldError(checkout.cardExpiryInput)).toBeVisible()
-      await expect(checkout.cardNumberInput).toHaveValue(TEST_CARDS.declined)
-      await expect(checkout.cardCvcInput).toHaveValue('123')
+      await expect(checkout.cardExpiryInput).toHaveValue('13/30')
+      await expect(checkout.cardNumberInput).toHaveValue('')
     })
 
     await test.step('The expiry adds the slash while typing', async () => {

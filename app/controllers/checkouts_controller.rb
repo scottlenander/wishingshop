@@ -12,6 +12,7 @@ class CheckoutsController < ApplicationController
     if (order = @checkout.place!)
       redirect_to order_path(order), notice: "Thanks! Your order #{order.number} is placed."
     else
+      @checkout.clear_card_secrets
       render :show, status: :unprocessable_entity
     end
   end

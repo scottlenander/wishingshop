@@ -10,7 +10,15 @@
       <% summary.breakdown.each do |stars, count| %>
         <% percent = (100.0 * count / summary.count).round %>
         <li class="reviews-summary__row">
-          <span class="reviews-summary__label"><%= pluralize(stars, "star") %></span>
+          <%# Each level with reviews is a link that shows only those reviews. %>
+          <% if count.positive? %>
+            <%= link_to pluralize(stars, "star"), product_path(product, **review_list_params(sort: @review_sort, stars: stars), anchor: "reviews"),
+                        class: "reviews-summary__label reviews-summary__label--link",
+                        aria: { label: "#{pluralize(stars, "star")}: show only these #{pluralize(count, "review")}",
+                                current: ("true" if @review_stars == stars) } %>
+          <% else %>
+            <span class="reviews-summary__label"><%= pluralize(stars, "star") %></span>
+          <% end %>
           <span class="reviews-summary__bar" role="meter" aria-valuemin="0" aria-valuemax="<%= summary.count %>" aria-valuenow="<%= count %>"
                 aria-label="<%= pluralize(stars, "star") %>: <%= pluralize(count, "review") %>">
             <span class="reviews-summary__fill" style="width: <%= percent %>%"></span>

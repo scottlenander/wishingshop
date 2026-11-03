@@ -4,8 +4,21 @@
   <%= image_tag @product.featured_image, alt: @product.name, class: "products-show__image" if @product.featured_image.attached? %>
 
   <section class="products-show__info">
+    <h1 class="products-show__title"><%= @product.name %></h1>
+
+    <%# Not cached: reviews change without touching the product. %>
+    <p class="products-show__rating">
+      <% if @rating_summary.any? %>
+        <%= link_to "#reviews", class: "products-show__rating-link" do %>
+          <span aria-hidden="true"><%= star_rating(@rating_summary.average) %></span>
+          <span class="products-show__rating-text"><%= @rating_summary.average %> out of 5 · <%= pluralize(@rating_summary.count, "review") %></span>
+        <% end %>
+      <% else %>
+        <span class="products-show__unrated">Not yet rated</span>
+      <% end %>
+    </p>
+
     <% cache @product do %>
-      <h1 class="products-show__title"><%= @product.name %></h1>
       <div class="products-show__description"><%= @product.description %></div>
     <% end %>
 

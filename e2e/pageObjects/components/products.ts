@@ -60,6 +60,9 @@ export class Item {
   readonly image: Locator
   readonly title: Locator
   readonly description: Locator
+  // Under the title: "4.0 out of 5 · 8 reviews", a link down to the reviews, or "Not yet rated".
+  readonly ratingLink: Locator
+  readonly notRated: Locator
   readonly stockStatus: Locator
   readonly inStock: Locator
   readonly outOfStock: Locator
@@ -84,6 +87,8 @@ export class Item {
     this.description = this.root.locator('.products-show__description')
 
     // Stock: one of inStock ("12 in stock") or outOfStock is shown.
+    this.ratingLink = this.root.getByRole('link', { name: /out of 5 · \d+ reviews?$/ })
+    this.notRated = this.root.locator('.products-show__rating').getByText('Not yet rated')
     this.stockStatus = this.root.locator('.products-inventory__status')
     this.inStock = this.root.locator('.products-inventory__status--in-stock')
     this.outOfStock = this.root.locator('.products-inventory__status--out-of-stock')

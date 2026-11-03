@@ -322,8 +322,11 @@ export function futureExpiry(): string {
   return `12/${String(year).padStart(2, '0')}`
 }
 
-// Seeded reviews (db/seeds.rb): 8 on the T-Shirt (newest first), averaging 4.0.
+// Seeded reviews (db/seeds.rb): 8 on the T-Shirt, rated 5, 4, 5, 3, 4, 5, 2, 4
+// (newest first), averaging 4.0.
 export const SEEDED_REVIEWS = {
   tShirtCount: 8,
   tShirtAverage: '4.0',
+  tShirtFiveStarCount: 3,
+  tShirtLowestStars: 2,
 } as const

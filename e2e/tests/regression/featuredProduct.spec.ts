@@ -48,6 +48,8 @@ test('admin features a product on the homepage, then removes it', async ({ page,
     await expect(featured.title).toHaveText(PRODUCT)
     await expect(featured.pickedNote).toBeVisible()
     await expect(featured.stockStatus).toBeVisible()
+    // The Leather Belt has no reviews.
+    await expect(featured.notRated).toBeVisible()
 
     await featured.link.click()
     await expect(item.title).toHaveText(PRODUCT)

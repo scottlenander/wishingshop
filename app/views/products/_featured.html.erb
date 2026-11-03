@@ -9,6 +9,7 @@
   <% end %>
 
   <h2 id="featured-product-title" class="products-featured__title"><%= product.name %></h2>
+  <%= render "products/card_rating", rating: rating %>
 
   <% if (summary = product.description&.to_plain_text.presence) %>
     <p class="products-featured__description"><%= truncate(summary, length: 120, separator: " ") %></p>

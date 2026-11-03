@@ -200,4 +200,67 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".reviews-item", text: /Soft and fits well/
     assert_select ".reviews-item", text: /Olive O\./
   end
+
+  def add_rated_reviews(*ratings)
+    ratings.each_with_index do |rating, i|
+      user = User.create!(email_address: "rated#{i}@example.com", password: "password", first_name: "Rated#{i}", last_name: "User")
+      user.orders.create!(order_items: [ OrderItem.new(product: @product, product_name: "T-Shirt", quantity: 1) ])
+      @product.reviews.create!(user: user, rating: rating, body: "A #{rating} star review #{i}.", created_at: (i + 1).hours.ago)
+    end
+  end
+
+  test "the product page shows the rating under the title, linking to the reviews" do
+    get product_path(@product)
+    assert_select ".products-show__rating a[href='#reviews']", text: /4.0 out of 5 · 1 review/
+
+    get product_path(products(:hoodie))
+    assert_select ".products-show__rating", text: "Not yet rated"
+  end
+
+  test "the featured card shows its rating" do
+    FeaturedProduct.create!(product: @product, starts_at: 1.hour.ago, ends_at: 1.hour.from_now)
+    get products_path
+    assert_select ".products-featured [role=img][aria-label=?]", "Rated 4.0 out of 5 from 1 review"
+
+    FeaturedProduct.delete_all
+    FeaturedProduct.create!(product: products(:hoodie), starts_at: 1.hour.ago, ends_at: 1.hour.from_now)
+    get products_path
+    assert_select ".products-featured .products-index__card-unrated", text: "Not yet rated"
+  end
+
+  test "reviews can be sorted by stars" do
+    add_rated_reviews(2, 5)
+
+    get product_path(@product, sort: "highest")
+    assert_select ".reviews-item:first-child [role=img][aria-label=?]", "5 out of 5 stars"
+    assert_select ".reviews__sort a[aria-current=true]", text: "Highest rated"
+
+    get product_path(@product, sort: "lowest")
+    assert_select ".reviews-item:first-child [role=img][aria-label=?]", "2 out of 5 stars"
+  end
+
+  test "the star bars filter the list, and Show all clears it" do
+    add_rated_reviews(5, 5, 2)
+
+    get product_path(@product)
+    assert_select "a.reviews-summary__label[aria-label=?][href=?]", "5 stars: show only these 2 reviews",
+                  product_path(@product, stars: 5, anchor: "reviews")
+    assert_select ".reviews-summary__row span.reviews-summary__label", text: "3 stars" # no reviews: not a link
+
+    get product_path(@product, stars: 5, sort: "lowest")
+    assert_select ".reviews-item", 2
+    assert_select ".reviews__filter", text: /Showing 2 5-star reviews/
+    assert_select ".reviews__filter a[href=?]", product_path(@product, sort: "lowest", anchor: "reviews"), text: "Show all reviews"
+    assert_select ".reviews__sort a[href=?]", product_path(@product, sort: "highest", stars: 5, anchor: "reviews")
+  end
+
+  test "a star level with no reviews, or bad params, still shows a sensible page" do
+    get product_path(@product, stars: 1)
+    assert_select ".reviews__empty", text: "No 1-star reviews yet."
+
+    get product_path(@product, stars: 9, sort: "sideways")
+    assert_select ".reviews-item", 1
+    assert_select ".reviews__filter", count: 0
+    assert_select ".reviews__sort a[aria-current=true]", text: "Newest"
+  end
 end

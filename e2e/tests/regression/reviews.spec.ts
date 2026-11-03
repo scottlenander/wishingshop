@@ -84,7 +84,7 @@ test.describe('a signed-in user who has not bought it', () => {
   })
 })
 
-test('a visitor reads reviews and loads more', async ({ page }) => {
+test('a visitor reads, sorts and filters reviews', async ({ page }) => {
   const mainPage = new MainPage(page)
   const { reviews } = mainPage.products.item
 
@@ -121,5 +121,44 @@ test('a visitor reads reviews and loads more', async ({ page }) => {
     await expect(reviews.items).toHaveCount(SEEDED_REVIEWS.tShirtCount)
     await expect(reviews.showMoreButton).toHaveCount(0)
     expect(page.url(), 'stays on the product page').toBe(url)
+  })
+
+  await test.step('The rating under the title jumps to the reviews', async () => {
+    const { item } = mainPage.products
+    // The stars are drawn for sighted users only, so the name is just the text.
+    await expect(item.ratingLink).toHaveAccessibleName(
+      `${SEEDED_REVIEWS.tShirtAverage} out of 5 · ${SEEDED_REVIEWS.tShirtCount} reviews`,
+    )
+    await item.ratingLink.click()
+    await expect(page).toHaveURL(/#reviews$/)
+  })
+
+  await test.step('Sort by highest and lowest rated', async () => {
+    await reviews.sortLink('Highest rated').click()
+    await expect(reviews.sortLink('Highest rated')).toHaveAttribute('aria-current', 'true')
+    await expect(reviews.stars(reviews.items.first())).toHaveAccessibleName('5 out of 5 stars')
+
+    await reviews.sortLink('Lowest rated').click()
+    await expect(reviews.stars(reviews.items.first())).toHaveAccessibleName(
+      `${SEEDED_REVIEWS.tShirtLowestStars} out of 5 stars`,
+    )
+  })
+
+  await test.step('Pick a star level from the summary to see only those', async () => {
+    await reviews.sortLink('Newest').click()
+    await reviews.filterLink(5).click()
+
+    const count = SEEDED_REVIEWS.tShirtFiveStarCount
+    await expect(reviews.filterNote).toContainText(`Showing ${count} 5-star reviews.`)
+    await expect(reviews.items).toHaveCount(count)
+    for (const review of await reviews.items.all()) {
+      await expect(reviews.stars(review)).toHaveAccessibleName('5 out of 5 stars')
+    }
+    await expect(reviews.showMoreButton).toHaveCount(0)
+
+    await reviews.showAllLink.click()
+    await expect(reviews.filterNote).toHaveCount(0)
+    await expect(reviews.items).toHaveCount(3)
+    await expect(reviews.showMoreButton).toBeVisible()
   })
 })

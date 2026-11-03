@@ -55,6 +55,7 @@ export class Checkout {
   readonly cardNumberInput: Locator
   readonly cardExpiryInput: Locator
   readonly cardCvcInput: Locator
+  readonly cardAgainNote: Locator
 
   // Summary
   readonly summaryItems: Locator
@@ -84,6 +85,8 @@ export class Checkout {
     this.cardNumberInput = page.getByLabel('Card number')
     this.cardExpiryInput = page.getByLabel('Expiry (MM/YY)')
     this.cardCvcInput = page.getByLabel('Security code (CVC)')
+    // After an error: the card number and CVC are cleared and must be typed again.
+    this.cardAgainNote = page.locator('.checkout__card-again')
 
     this.summaryItems = page.locator('.checkout__items li')
     this.shippingCost = page.locator('[data-checkout-target="shipping"]')

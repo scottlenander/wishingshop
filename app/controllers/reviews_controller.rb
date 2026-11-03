@@ -10,10 +10,11 @@ class ReviewsController < ApplicationController
   # "Show more reviews": the next page after `offset`. In a Turbo Frame this is
   # added to the list on the product page; otherwise it's a page of its own.
   def index
+    load_review_list_options
     @offset = [ params[:offset].to_i, 0 ].max
-    @reviews = @product.reviews.newest_first.includes(:user).offset(@offset).limit(Review::PAGE_SIZE).to_a
+    @reviews = review_list(@product).offset(@offset).limit(Review::PAGE_SIZE).to_a
     @next_offset = @offset + @reviews.size
-    @remaining = @product.reviews.count - @next_offset
+    @remaining = @product.reviews.with_stars(@review_stars).count - @next_offset
   end
 
   # Visitors are sent to log in first, then come back here and on to the form.

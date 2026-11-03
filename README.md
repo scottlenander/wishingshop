@@ -93,7 +93,7 @@ Every product has a price (seeded from $14.99 to $119.99).
 | Two-day | $9.99 | 2 business days |
 | Same-day | $19.99 | Today, order by 2pm |
 
-Payment is fake (no money is taken). Only the card type and last 4 digits are saved, and card details are filtered out of the logs.
+Payment is fake (no money is taken). Only the card type and last 4 digits are saved, and card details are filtered out of the logs. If checkout fails (e.g. a declined card), everything is kept except the card number and security code, which are never sent back to the browser and must be entered again. With a real payment provider, the card fields should be the provider's hosted fields (e.g. Stripe Elements), so card details never reach this server.
 
 | Test card | Result |
 |---|---|
@@ -108,8 +108,11 @@ Product pages show reviews: a 1 to 5 star rating and some text.
 
 - **Who can review:** only signed-in users who have ordered the product, once each. Reviews show a "Verified purchase" badge and the reviewer's first name and last initial.
 - **Editing:** authors can edit or delete their own review; admins can delete any review.
-- **Product cards** on the products page show the average stars and review count (e.g. 4.0 (8)), or "Not yet rated", for everyone, signed in or not.
-- **On the page:** an average with a 5-to-1 star breakdown, the 3 newest reviews, and **Show more reviews**, which loads the next 10 without leaving the page.
+- **Product cards** on the products page, including the homepage featured card, show the average stars and review count (e.g. 4.0 (8)), or "Not yet rated", for everyone, signed in or not.
+- **On the page:**
+  - Under the title: the average and count, linking down to the reviews.
+  - An average with a 5-to-1 star breakdown, the 3 newest reviews, and **Show more reviews**, which loads the next 10 without leaving the page.
+  - **Sort** by Newest, Highest rated or Lowest rated. Click a star level in the breakdown (e.g. **5 stars**) to see only those reviews, and **Show all reviews** to go back. Show more keeps the sort and filter, and they're in the URL (`?sort=highest&stars=5`), so they can be shared.
 - **Seeded:** 8 reviewer accounts (`reviewer1@example.com` … `reviewer8@example.com`, password `password`) with past orders. The **T-Shirt** has 8 reviews (average 4.0) and the **Denim Jacket** 3.
   - Alice has bought the **Graphic Tee** but not reviewed it, so she can write one.
   - Bob hasn't bought it, so he sees why he can't.

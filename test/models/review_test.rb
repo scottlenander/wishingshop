@@ -65,4 +65,20 @@ class ReviewTest < ActiveSupport::TestCase
     ratings = Product.ratings_for([ products(:tshirt).id, products(:hoodie).id ])
     assert_equal({ products(:tshirt).id => [ 3.0, 2 ] }, ratings)
   end
+
+  test "sorted orders by stars, newest first among equals, and with_stars filters" do
+    product = products(:tshirt)
+    old_five = Review.new(product: product, user: users(:two), rating: 5, body: "Old five star review.", created_at: 5.days.ago)
+    old_five.save!(validate: false)
+    new_five = Review.new(product: product, user: users(:admin), rating: 5, body: "New five star review.", created_at: 1.hour.ago)
+    new_five.save!(validate: false)
+    four = reviews(:one_tshirt)
+
+    assert_equal [ new_five, old_five, four ], product.reviews.sorted("highest").to_a
+    assert_equal [ four, new_five, old_five ], product.reviews.sorted("lowest").to_a
+    assert_equal [ new_five, four, old_five ], product.reviews.sorted("newest").to_a
+    assert_equal [ new_five, four, old_five ], product.reviews.sorted("anything else").to_a
+    assert_equal [ new_five, old_five ], product.reviews.with_stars(5).sorted("newest").to_a
+    assert_equal 3, product.reviews.with_stars(nil).count
+  end
 end
