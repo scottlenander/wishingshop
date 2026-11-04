@@ -3,20 +3,22 @@ require "csv"
 # Bulk create/update of products from a CSV. Used by the admin import page and
 # the products:import rake task.
 #
-#   sku,name,description,price,inventory_count,image_url
-#   HOODIE,,,25,
-#   WINTER-COAT,Winter Coat,Warm wool coat.,40,https://example.com/coat.png
+#   sku,name,category,description,price,inventory_count,image_url
+#   HOODIE,,,,,25,
+#   WINTER-COAT,Winter Coat,Jackets,Warm wool coat.,129.00,40,https://example.com/coat.png
 #
 # Rows are matched by SKU: known SKUs update that product, new SKUs create one.
 # For existing products a blank cell keeps the current value, and
 # inventory_count sets the stock (it isn't added to it). price is in dollars (19.99).
+# category is a label or key from Product::CATEGORY_LABELS ("Jackets" or
+# "jackets"), and is required for new products.
 #
 #   import = Product::Import.new(csv_text)
 #   import.rows      # preview: action, changes and errors per row
 #   import.valid?    # no errors anywhere
 #   import.apply!    # save everything in one transaction; false on failure
 class Product::Import
-  HEADERS = %w[ sku name description price inventory_count image_url ].freeze
+  HEADERS = %w[ sku name category description price inventory_count image_url ].freeze
   MAX_BYTES = 1.megabyte
   MAX_ROWS = 1_000
 
@@ -150,6 +152,16 @@ class Product::Import
         product.name = name
       end
 
+      if (category = values["category"])
+        key = category_key(category)
+        if key.nil?
+          row.errors << "Category must be one of: #{Product::CATEGORY_LABELS.values.join(", ")} (got #{category.inspect})."
+        elsif key != product.category
+          row.changes << change_text("Category", (product.category_label if product.category), Product::CATEGORY_LABELS[key])
+          product.category = key
+        end
+      end
+
       if (description = values["description"])
         current = product.description&.to_plain_text.to_s.strip
         if description != current
@@ -190,6 +202,12 @@ class Product::Import
           row.errors << "Image URL must start with http:// or https://."
         end
       end
+    end
+
+    # "Jackets", "jackets" or " JACKETS " -> "jackets"; nil if it isn't one.
+    def category_key(text)
+      wanted = text.downcase
+      Product::CATEGORY_LABELS.find { |key, label| [ key, label.downcase ].include?(wanted) }&.first
     end
 
     def parse_price(text)

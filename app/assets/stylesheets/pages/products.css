@@ -12,6 +12,23 @@
   font-weight: 600;
 }
 
+/* One section per category (Tops, Bottoms...), each with its own grid. */
+.products-index__category {
+  margin-top: var(--space-6);
+  /* Leaves room for the sticky header when jumping to #category-tops. */
+  scroll-margin-top: calc(var(--header-height) + var(--space-4));
+}
+
+.products-index__category-title {
+  margin: 0;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.products-index__category .products-index__grid {
+  margin-top: var(--space-4);
+}
+
 /* A responsive grid of cards: as many ~220px columns as fit. */
 .products-index__grid {
   display: grid;
@@ -115,6 +132,15 @@
 
 .products-show__product--no-image .products-show__info {
   position: static;
+}
+
+/* The category above the title, linking back to its section. */
+.products-show__category {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .products-show__title {

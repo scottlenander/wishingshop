@@ -52,9 +52,9 @@ test('admin bulk imports new products and updates stock', async ({ page, request
     await expect(productImport.header).toBeVisible()
 
     const csv = [
-      'sku,name,description,inventory_count,image_url',
-      `${EXISTING.sku},,,${newStock},`,
-      `${newProduct.sku},${newProduct.name},Made by the import test.,12,`,
+      'sku,name,category,description,inventory_count,image_url',
+      `${EXISTING.sku},,,,${newStock},`,
+      `${newProduct.sku},${newProduct.name},Jackets,Made by the import test.,12,`,
     ].join('\n')
     await productImport.upload(csv)
 

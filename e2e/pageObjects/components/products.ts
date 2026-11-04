@@ -6,6 +6,8 @@ export class Products {
   readonly page: Page
   readonly header: Locator
   readonly grid: Locator
+  // Headings of the category sections, in page order ("Tops", "Bottoms"...).
+  readonly categoryTitles: Locator
   readonly newProductLink: Locator
   readonly item: Item
   readonly form: ProductForm
@@ -13,7 +15,9 @@ export class Products {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'Products' })
+    // One grid per category section; card() looks across all of them.
     this.grid = page.locator('.products-index__grid')
+    this.categoryTitles = page.locator('.products-index__category-title')
     this.newProductLink = page.getByRole('link', { name: 'New product' }) // admins only
     this.item = new Item(page)
     this.form = new ProductForm(page)
@@ -25,6 +29,11 @@ export class Products {
         .locator('.products-index__card')
         .filter({ has: this.page.getByRole('link', { name, exact: true }) }),
     )
+  }
+
+  // A category section, found by its heading, e.g. category('Tops').
+  category(label: string): Locator {
+    return this.page.getByRole('region', { name: label, exact: true })
   }
 
   // Goes to the home page and opens a product from its card.
@@ -59,6 +68,8 @@ export class Item {
   readonly backLink: Locator
   readonly image: Locator
   readonly title: Locator
+  // Above the title, e.g. "Tops", linking to that section of the products page.
+  readonly categoryLink: Locator
   readonly description: Locator
   // Under the title: "4.0 out of 5 · 8 reviews", a link down to the reviews, or "Not yet rated".
   readonly ratingLink: Locator
@@ -84,6 +95,7 @@ export class Item {
     this.backLink = page.getByRole('link', { name: 'Back' })
     this.image = this.root.getByRole('img')
     this.title = this.root.getByRole('heading', { level: 1 })
+    this.categoryLink = this.root.getByRole('link', { name: /^Category: / })
     this.description = this.root.locator('.products-show__description')
 
     // Stock: one of inStock ("12 in stock") or outOfStock is shown.
@@ -130,6 +142,7 @@ export class ProductForm {
   readonly root: Locator
   readonly error: Locator
   readonly nameInput: Locator
+  readonly categorySelect: Locator
   readonly skuInput: Locator
   readonly imageInput: Locator
   readonly priceInput: Locator
@@ -141,6 +154,7 @@ export class ProductForm {
     this.root = page.locator('.products-form')
     this.error = this.root.locator('.error')
     this.nameInput = this.root.getByLabel('Name')
+    this.categorySelect = this.root.getByLabel('Category')
     this.skuInput = this.root.getByLabel('SKU')
     this.imageInput = this.root.getByLabel('Featured image')
     this.priceInput = this.root.getByLabel('Price ($)')

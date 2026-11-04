@@ -4,6 +4,7 @@ A practice online clothing store, built to try out development and testing. It s
 
 ## Features
 
+- **Categories:** products are grouped into Tops, Bottoms, Accessories, Jackets and Hats on the products page.
 - **Shopping and checkout:** a cart for everyone (visitors too), checkout with saved billing and shipping addresses, three shipping speeds, a fake card payment, and order history.
 - **Reviews:** customers who bought a product can rate it 1 to 5 stars and write a review. Products show their average rating, and reviews can be sorted and filtered by stars.
 - **Back-in-stock emails:** anyone can ask to be emailed when an out-of-stock product returns. Restocking sends the emails automatically.
@@ -53,7 +54,16 @@ All accounts use the password `password`.
 
 ### Products, reviews and subscribers
 
-- **Products:** 20 clothing items with cartoon images and generated descriptions, priced from $14.99 to $119.99. Stock is between 1 and 50, except for 3 items that are out of stock.
+- **Products:** 20 clothing items with cartoon images and generated descriptions, priced from $14.99 to $119.99. Stock is between 1 and 50, except for 3 items that are out of stock. Each is in one category:
+
+  | Category | Products |
+  |---|---|
+  | Tops | T-Shirt, Graphic Tee, Polo Shirt, Oxford Shirt, Flannel Shirt, Hoodie, Wool Sweater, Cardigan |
+  | Bottoms | Chinos, Sweatpants, Linen Pants, Cargo Shorts |
+  | Accessories | Scarf, Leather Belt |
+  | Jackets | Denim Jacket, Bomber Jacket, Rain Coat, Puffer Vest |
+  | Hats | Beanie, Baseball Cap |
+
 - **Reviews:** the **T-Shirt** has 8 reviews (average 4.0), enough to try **Show more**, sorting and filtering. The **Denim Jacket** has 3.
 - **Subscribers:** each out-of-stock product has one, to try the back-in-stock email:
 
@@ -88,6 +98,7 @@ The top of the products page has an **announcements carousel** and a **featured 
 
 - **Carousel:** shows the live announcements. It moves every 6 seconds and pauses on hover, on focus, or with the Pause button. It doesn't move at all for visitors who prefer reduced motion. Sales announcements are text only: they don't change prices.
 - **Featured product:** the admin's current pick, marked "Picked by our team". Without one, a random in-stock product is shown. It's the same for everyone all day and changes each day (UTC).
+- **Categories:** below that, products are grouped into sections by category, in a fixed order (Tops, Bottoms, Accessories, Jackets, Hats), sorted by name within each. Empty categories aren't shown. A product's page shows its category above the name, linking back to that section.
 - **Product cards** show each product's price and average rating, e.g. ★★★★☆ 4.0 (8), or "Not yet rated".
 
 ### Cart and checkout
@@ -139,7 +150,7 @@ To try it:
 
 ## Admin
 
-Admins can create, edit and delete products, including their price and stock. A **Feature this product** button on each product page makes it the homepage featured pick. Six extra pages appear in the header:
+Admins can create, edit and delete products, including their category, price and stock. Every product needs a category. The list is fixed in `Product::CATEGORY_LABELS` (`app/models/product.rb`); adding one is a one-line change there. A **Feature this product** button on each product page makes it the homepage featured pick. Six extra pages appear in the header:
 
 | Page | What it's for |
 |---|---|
@@ -163,15 +174,16 @@ Users are never deleted. **Deactivate** on the Users page:
 Create and update many products at once from a CSV file. Rows are matched by **SKU**: a known SKU updates that product, and a new SKU creates one.
 
 ```csv
-sku,name,description,price,inventory_count,image_url
-HOODIE,,,,25,
-WINTER-COAT,Winter Coat,A warm wool coat.,129.00,30,https://example.com/coat.png
+sku,name,category,description,price,inventory_count,image_url
+HOODIE,,,,,25,
+WINTER-COAT,Winter Coat,Jackets,A warm wool coat.,129.00,30,https://example.com/coat.png
 ```
 
 | Column | Meaning |
 |---|---|
 | `sku` | Required. Letters, numbers and dashes. Existing products have SKUs made from their names (e.g. `T-SHIRT`). |
 | `name` | Required for new products. |
+| `category` | Required for new products. One of Tops, Bottoms, Accessories, Jackets or Hats (any capitalization). |
 | `description` | Plain text. |
 | `price` | Dollars, like `19.99`. A product priced 0 isn't for sale. |
 | `inventory_count` | Sets the stock to this number (it doesn't add to it). |
@@ -242,6 +254,7 @@ When a test fails, its trace, screenshot and video are kept in the HTML report (
   - **Shopping:** checking out a cart, a declined card, a visitor's cart surviving login, and cart quantities kept within stock.
   - **Reviews:** writing, editing and deleting a review; sorting and filtering; an admin deleting someone else's review.
   - **Stock emails:** subscribing to an out-of-stock item (signed in, or as a visitor by email), receiving the email, and unsubscribing from My subscriptions or from the email's link.
+  - **Browsing:** products grouped by category, and a product page linking back to its category.
   - **Admin:** creating, editing and deleting products; adding and editing users; the Orders page; bulk import; featuring a product; announcements.
   - **Accounts:** deactivating and restoring a user, and reactivating by password reset; standard users and visitors kept out of admin and account pages.
 - `tests/accessibility/`: automated WCAG 2.2 AA scans (axe-core) of the visitor, signed-in and admin pages. A failure lists each problem and the element it's on.

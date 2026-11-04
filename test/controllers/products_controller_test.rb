@@ -51,7 +51,7 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     sign_in_as users(:admin)
 
     assert_difference("Product.count", 1) do
-      post products_path, params: { product: { name: "Socks", inventory_count: 3 } }
+      post products_path, params: { product: { name: "Socks", category: "accessories", inventory_count: 3 } }
     end
     assert_difference("Product.count", -1) { delete product_path(Product.last) }
   end
@@ -262,5 +262,36 @@ class ProductsControllerTest < ActionDispatch::IntegrationTest
     assert_select ".reviews-item", 1
     assert_select ".reviews__filter", count: 0
     assert_select ".reviews__sort a[aria-current=true]", text: "Newest"
+  end
+
+  test "the products page shows a section per category, in order" do
+    Product.create!(name: "Beanie", category: "hats", inventory_count: 2)
+    Product.create!(name: "Chinos", category: "bottoms", inventory_count: 2)
+    get products_path
+
+    assert_select ".products-index__category-title", count: 3
+    assert_equal %w[ Tops Bottoms Hats ], css_select(".products-index__category-title").map(&:text)
+    assert_select "section#category-tops[aria-labelledby=category-tops-title] .products-index__card-link", text: "T-Shirt"
+    assert_select "section#category-hats .products-index__card-link", text: "Beanie"
+    assert_select "section#category-accessories", count: 0 # empty categories are left out
+  end
+
+  test "the product page shows its category, linking to its section" do
+    get product_path(@product)
+    assert_select ".products-show__category a[href=?]", products_path(anchor: "category-tops"), text: "Tops"
+  end
+
+  test "admins pick a category; leaving it out is an error" do
+    sign_in_as users(:admin)
+
+    assert_no_difference("Product.count") do
+      post products_path, params: { product: { name: "Socks", inventory_count: 3 } }
+    end
+    assert_response :unprocessable_entity
+    assert_select ".products-form .error", text: "Category can't be blank"
+    assert_select "select[name='product[category]'][required] option", text: "Choose a category"
+
+    patch product_path(@product), params: { product: { category: "jackets" } }
+    assert_equal "jackets", @product.reload.category
   end
 end
