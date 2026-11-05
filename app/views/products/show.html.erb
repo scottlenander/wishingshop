@@ -4,6 +4,13 @@
   <%= image_tag @product.featured_image, alt: @product.name, class: "products-show__image" if @product.featured_image.attached? %>
 
   <section class="products-show__info">
+    <%# Links back to this category's section on the products page. %>
+    <% if @product.category %>
+      <p class="products-show__category">
+        <%= link_to @product.category_label, products_path(anchor: "category-#{@product.category}"),
+                    aria: { label: "Category: #{@product.category_label}" } %>
+      </p>
+    <% end %>
     <h1 class="products-show__title"><%= @product.name %></h1>
 
     <%# Not cached: reviews change without touching the product. %>

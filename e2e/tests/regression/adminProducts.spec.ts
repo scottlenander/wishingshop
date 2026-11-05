@@ -18,12 +18,23 @@ test('admin creates, edits and deletes a product', async ({ page }) => {
   const name = `E2E Product ${runId}`
   const sku = `E2E-PRODUCT-${runId}`
 
-  await test.step('A product needs a name', async () => {
+  await test.step('A new product starts with no category, and one is required', async () => {
     await mainPage.goto()
     await products.newProductLink.click()
+    await expect(form.categorySelect).toHaveValue('')
+    // The browser stops a blank required select; the server's own check is in the Rails tests.
+    expect(
+      await form.categorySelect.evaluate((el: HTMLSelectElement) => el.validity.valueMissing),
+    ).toBe(true)
+  })
+
+  await test.step('A product needs a name', async () => {
+    await form.categorySelect.selectOption({ label: 'Hats' })
     await form.skuInput.fill(sku)
     await form.saveButton.click()
     await expect(form.error).toHaveText("Name can't be blank")
+    // The chosen category is kept.
+    await expect(form.categorySelect).toHaveValue('hats')
   })
 
   await test.step('SKUs must be unique', async () => {
@@ -41,24 +52,28 @@ test('admin creates, edits and deletes a product', async ({ page }) => {
     await form.saveButton.click()
 
     await expect(item.title).toHaveText(name)
+    await expect(item.categoryLink).toHaveText('Hats')
     await expect(item.price).toHaveText('$12.50')
     await expect(item.inStock).toHaveText('7 in stock')
   })
 
-  await test.step("It's on the products page, not yet rated", async () => {
+  await test.step("It's on the products page under Hats, not yet rated", async () => {
     await mainPage.goto()
-    await expect(products.card(name).link).toBeVisible()
+    await expect(products.category('Hats').getByRole('link', { name, exact: true })).toBeVisible()
     await expect(products.card(name).notRated).toBeVisible()
   })
 
-  await test.step('Edit the price and sell out', async () => {
+  await test.step('Edit the price and category, and sell out', async () => {
     await products.open(name)
     await item.editLink.click()
+    await expect(form.categorySelect).toHaveValue('hats')
+    await form.categorySelect.selectOption({ label: 'Accessories' })
     await form.priceInput.fill('15')
     await form.inventoryInput.fill('0')
     await form.saveButton.click()
 
     await expect(item.price).toHaveText('$15.00')
+    await expect(item.categoryLink).toHaveText('Accessories')
     await expect(item.outOfStock).toBeVisible()
   })
 

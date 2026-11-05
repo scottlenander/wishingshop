@@ -19,7 +19,7 @@ class CartTest < ActiveSupport::TestCase
 
   test "can't add out-of-stock, unpriced or zero quantities" do
     assert_raises(ArgumentError) { @cart.add(products(:hoodie), 1) }
-    assert_raises(ArgumentError) { @cart.add(Product.create!(name: "Free", inventory_count: 5), 1) }
+    assert_raises(ArgumentError) { @cart.add(Product.create!(category: "accessories", name: "Free", inventory_count: 5), 1) }
     assert_raises(ArgumentError) { @cart.add(@tshirt, 0) }
   end
 

@@ -9,19 +9,14 @@
 
 <%= link_to "New product", new_product_path, class: "products-index__action" if admin? %>
 
-<div id="products" class="products-index__grid">
-  <% @products.each do |product| %>
-    <div class="products-index__card">
-      <% if product.featured_image.attached? %>
-        <%= image_tag product.featured_image.variant(:thumb), alt: "", loading: "lazy", class: "products-index__card-image" %>
-      <% else %>
-        <div class="products-index__card-placeholder"></div>
-      <% end %>
-      <%= link_to product.name, product_path(product.id), class: "products-index__card-link" %>
-      <%= render "card_rating", rating: @ratings[product.id] %>
-      <% if product.for_sale? %>
-        <p class="products-index__card-price"><%= format_price(product.price_cents) %></p>
-      <% end %>
-    </div>
+<%# One section per category, in Product::CATEGORY_LABELS order. %>
+<div id="products" class="products-index__categories">
+  <% @product_groups.each do |key, label, products| %>
+    <section class="products-index__category" id="category-<%= key %>" aria-labelledby="category-<%= key %>-title">
+      <h2 id="category-<%= key %>-title" class="products-index__category-title"><%= label %></h2>
+      <div class="products-index__grid">
+        <%= render partial: "card", collection: products, as: :product %>
+      </div>
+    </section>
   <% end %>
 </div>

@@ -39,7 +39,7 @@ class ProductTest < ActiveSupport::TestCase
   end
 
   test "price is read and written in dollars and stored in cents" do
-    product = Product.new(name: "Cap")
+    product = Product.new(category: "accessories", name: "Cap")
     product.price = "19.99"
     assert_equal 1999, product.price_cents
     assert_equal BigDecimal("19.99"), product.price
@@ -49,14 +49,14 @@ class ProductTest < ActiveSupport::TestCase
   end
 
   test "an invalid price is an error" do
-    product = Product.new(name: "Cap", price: "lots")
+    product = Product.new(category: "accessories", name: "Cap", price: "lots")
     assert_not product.valid?
     assert_includes product.errors.full_messages, "Price must be a dollar amount like 19.99"
   end
 
   test "only priced products are for sale" do
     assert products(:tshirt).for_sale?
-    assert_not Product.new(name: "Free", price_cents: 0).for_sale?
+    assert_not Product.new(category: "accessories", name: "Free", price_cents: 0).for_sale?
   end
 
   test "deleting a product keeps its order history" do
@@ -70,16 +70,48 @@ class ProductTest < ActiveSupport::TestCase
   end
 
   test "SKU is upper-cased and stripped" do
-    product = Product.create!(name: "Cap", sku: " cap-1 ")
+    product = Product.create!(category: "accessories", name: "Cap", sku: " cap-1 ")
     assert_equal "CAP-1", product.sku
   end
 
   test "SKU defaults from the name" do
-    assert_equal "BASEBALL-CAP", Product.create!(name: "Baseball Cap").sku
+    assert_equal "BASEBALL-CAP", Product.create!(category: "accessories", name: "Baseball Cap").sku
   end
 
   test "SKU must be unique and use letters, numbers and dashes" do
-    assert_not Product.new(name: "Copy", sku: "T-SHIRT").valid?
-    assert_not Product.new(name: "Bad", sku: "BAD SKU").valid?
+    assert_not Product.new(category: "accessories", name: "Copy", sku: "T-SHIRT").valid?
+    assert_not Product.new(category: "accessories", name: "Bad", sku: "BAD SKU").valid?
+  end
+
+  test "a category is required and must be one of the list" do
+    product = Product.new(name: "Hat", sku: "HAT")
+    assert_not product.valid?
+    assert_includes product.errors.full_messages, "Category can't be blank"
+
+    product.category = "shoes"
+    assert_not product.valid?
+    assert_includes product.errors.full_messages, "Category must be one of: Tops, Bottoms, Accessories, Jackets, Hats"
+
+    product.category = "hats"
+    assert product.valid?
+    assert_equal "Hats", product.category_label
+  end
+
+  test "grouped_by_category follows the category order, sorts by name and skips empty groups" do
+    cap = Product.create!(name: "cap", category: "hats")
+    belt = Product.create!(name: "Belt", category: "accessories")
+    groups = Product.grouped_by_category([ cap, products(:tshirt), belt, products(:hoodie) ])
+
+    assert_equal [ [ "tops", "Tops", [ products(:hoodie), products(:tshirt) ] ],
+                   [ "accessories", "Accessories", [ belt ] ],
+                   [ "hats", "Hats", [ cap ] ] ], groups
+  end
+
+  test "products saved before categories existed are grouped last, under Other" do
+    products(:hoodie).update_column(:category, nil)
+    groups = Product.grouped_by_category([ products(:hoodie), products(:tshirt) ])
+
+    assert_equal [ [ "tops", "Tops", [ products(:tshirt) ] ], [ "other", "Other", [ products(:hoodie) ] ] ], groups
+    assert_equal "Other", products(:hoodie).category_label
   end
 end

@@ -34,7 +34,7 @@ class FeaturedProductTest < ActiveSupport::TestCase
   end
 
   test "the random pick is the same all day and can change the next day" do
-    5.times { |i| Product.create!(name: "Sock #{i}", inventory_count: 3) }
+    5.times { |i| Product.create!(category: "accessories", name: "Sock #{i}", inventory_count: 3) }
 
     travel_to Time.zone.parse("2026-11-02 08:00") do
       morning = FeaturedProduct.product_for.first
@@ -47,7 +47,7 @@ class FeaturedProductTest < ActiveSupport::TestCase
   end
 
   test "the random pick prefers products with an image" do
-    with_image = Product.create!(name: "Pictured", inventory_count: 2)
+    with_image = Product.create!(category: "accessories", name: "Pictured", inventory_count: 2)
     with_image.featured_image.attach(io: File.open(file_fixture("pixel.png")), filename: "pixel.png", content_type: "image/png")
 
     assert_equal with_image, FeaturedProduct.random_for(Date.current)

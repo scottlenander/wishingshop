@@ -9,6 +9,11 @@
   </div>
 
   <div class="products-form__field">
+    <%= form.label :category %>
+    <%= form.select :category, Product::CATEGORY_LABELS.invert, { prompt: "Choose a category" }, required: true %>
+  </div>
+
+  <div class="products-form__field">
     <%= form.label :sku, "SKU" %>
     <%= form.text_field :sku, placeholder: "Leave blank to create from the name", autocapitalize: "characters" %>
   </div>

@@ -140,7 +140,7 @@ export const PRODUCTS = {
     seededStock: 'in',
     // Stock set to 10, then the purchase account checks out 3.
     changes: true,
-    usedBy: ['regression/purchase.spec.ts'],
+    usedBy: ['regression/purchase.spec.ts', 'regression/categories.spec.ts'],
   },
   SWEATPANTS: {
     name: 'Sweatpants',
@@ -160,6 +160,7 @@ export const PRODUCTS = {
       'smoke/standardUserPath.spec.ts',
       'smoke/adminUserPath.spec.ts',
       'regression/reviews.spec.ts',
+      'regression/categories.spec.ts',
     ],
   },
   WOOL_SWEATER: {

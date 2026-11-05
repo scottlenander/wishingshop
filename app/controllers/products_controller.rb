@@ -7,6 +7,7 @@ class ProductsController < ApplicationController
 
   def index
     @products = Product.with_attached_featured_image.to_a
+    @product_groups = Product.grouped_by_category(@products)
     @ratings = Product.ratings_for(@products.map(&:id))
     @announcements = Announcement.live.includes(image_attachment: :blob, products: { featured_image_attachment: :blob })
     @featured, @featured_source = FeaturedProduct.product_for
@@ -51,6 +52,6 @@ class ProductsController < ApplicationController
     end
 
     def product_params
-        params.expect(product: [ :name, :sku, :price, :description, :featured_image, :inventory_count ])
+        params.expect(product: [ :name, :sku, :category, :price, :description, :featured_image, :inventory_count ])
     end
 end

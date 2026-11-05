@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_03_191835) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_234146) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -169,6 +169,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_03_191835) do
     t.integer "inventory_count", default: 0
     t.string "sku", null: false
     t.integer "price_cents", default: 0, null: false
+    t.string "category"
+    t.index ["category"], name: "index_products_on_category"
     t.index ["sku"], name: "index_products_on_sku", unique: true
   end
 

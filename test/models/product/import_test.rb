@@ -3,7 +3,8 @@ require "test_helper"
 class Product::ImportTest < ActiveSupport::TestCase
   include ActionMailer::TestHelper
 
-  HEADER = "sku,name,description,price,inventory_count,image_url\n"
+  # category is last here, so rows that leave it out end early.
+  HEADER = "sku,name,description,price,inventory_count,image_url,category\n"
 
   # Stands in for real downloads.
   class FakeFetcher
@@ -27,7 +28,7 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "creates new products and updates known SKUs" do
-    result = import("t-shirt,,,,40,\nWINTER-COAT,Winter Coat,Warm wool.,,7,\n")
+    result = import("t-shirt,,,,40,\nWINTER-COAT,Winter Coat,Warm wool.,,7,,Jackets\n")
 
     assert result.valid?
     assert_equal({ created: 1, updated: 1, unchanged: 0, failed: 0 }, result.summary)
@@ -93,8 +94,8 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "a failed save rolls back the whole import" do
-    Product.create!(name: "Taken", sku: "TAKEN")
-    result = import("T-SHIRT,,,,99,\nNEW-ONE,Taken,,,1,\n")
+    Product.create!(category: "accessories", name: "Taken", sku: "TAKEN")
+    result = import("T-SHIRT,,,,99,\nNEW-ONE,Taken,,,1,,Hats\n")
     # Make the second row fail on save, after the first has been saved.
     result.rows.last.product.define_singleton_method(:save) { errors.add(:base, "Boom"); false }
 
@@ -121,7 +122,7 @@ class Product::ImportTest < ActiveSupport::TestCase
 
   test "a failed image download saves nothing" do
     fetcher = FakeFetcher.new(fail_for: "https://example.com/missing.png")
-    result = import("T-SHIRT,,,,1,\nCAP,Cap,,,1,https://example.com/missing.png\n", image_fetcher: fetcher)
+    result = import("T-SHIRT,,,,1,\nCAP,Cap,,,1,https://example.com/missing.png,Hats\n", image_fetcher: fetcher)
 
     assert_not result.apply!
     assert_match "Couldn't download image", result.rows.last.errors.join
@@ -129,7 +130,7 @@ class Product::ImportTest < ActiveSupport::TestCase
   end
 
   test "sets prices in dollars" do
-    result = import("T-SHIRT,,,24.50,,\nCAP,Cap,,$9,3,\n")
+    result = import("T-SHIRT,,,24.50,,\nCAP,Cap,,$9,3,,Hats\n")
 
     assert_equal [ "Price: $19.99 → $24.50" ], result.rows.first.changes
     assert_includes result.rows.last.changes, "Price: $9.00"
@@ -141,5 +142,24 @@ class Product::ImportTest < ActiveSupport::TestCase
   test "an invalid price is a row error" do
     result = import("T-SHIRT,,,cheap,,\n")
     assert_match "Price must be a dollar amount", result.rows.first.errors.join
+  end
+
+  test "category: set on new products, changed on existing ones, and kept when blank" do
+    result = import("T-SHIRT,,,,,,jackets\nHAT,Hat,,,1,,HATS\nHOODIE,,,,3,\n")
+
+    assert_equal [ "Category: Tops → Jackets" ], result.rows.first.changes
+    assert_includes result.rows.second.changes, "Category: Hats"
+    assert result.apply!
+    assert_equal "jackets", products(:tshirt).reload.category
+    assert_equal "hats", Product.find_by!(sku: "HAT").category
+    assert_equal "tops", products(:hoodie).reload.category
+  end
+
+  test "category: unknown values are errors, and new products need one" do
+    result = import("T-SHIRT,,,,,,Shoes\nHAT,Hat,,,1,\n")
+
+    assert_equal "Category must be one of: Tops, Bottoms, Accessories, Jackets, Hats (got \"Shoes\").", result.rows.first.errors.join
+    assert_includes result.rows.last.errors, "Category can't be blank"
+    assert_not result.valid?
   end
 end

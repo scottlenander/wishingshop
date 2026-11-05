@@ -40,6 +40,15 @@ PRICES = {
   "Beanie" => 14_99, "Baseball Cap" => 19_99, "Scarf" => 14_99, "Leather Belt" => 29_99
 }.freeze
 
+# Category of each product (Product::CATEGORY_LABELS has the full list).
+CATEGORIES = {
+  "tops" => [ "T-Shirt", "Graphic Tee", "Polo Shirt", "Oxford Shirt", "Flannel Shirt", "Hoodie", "Wool Sweater", "Cardigan" ],
+  "bottoms" => [ "Chinos", "Sweatpants", "Linen Pants", "Cargo Shorts" ],
+  "accessories" => [ "Scarf", "Leather Belt" ],
+  "jackets" => [ "Denim Jacket", "Bomber Jacket", "Rain Coat", "Puffer Vest" ],
+  "hats" => [ "Beanie", "Baseball Cap" ]
+}.flat_map { |category, names| names.map { |name| [ name, category ] } }.to_h.freeze
+
 SUBSCRIBER_EMAILS = %w[ subscriber1@example.com subscriber2@example.com subscriber3@example.com ]
 IMAGE_DIR = Rails.root.join("db/seeds/images")
 
@@ -70,6 +79,7 @@ products = PRODUCT_NAMES.map do |name|
   product.description = "Made from #{Faker::Commerce.material.downcase}. #{Faker::Lorem.paragraph(sentence_count: 3)}"
   product.inventory_count = out_of_stock.include?(name) ? 0 : rng.rand(1..50)
   product.price_cents = PRICES.fetch(name)
+  product.category = CATEGORIES.fetch(name)
 
   image = IMAGE_DIR.join("#{name.parameterize}.png")
   if !product.featured_image.attached? && image.exist?

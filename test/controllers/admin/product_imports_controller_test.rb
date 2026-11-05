@@ -26,7 +26,7 @@ class Admin::ProductImportsControllerTest < ActionDispatch::IntegrationTest
   test "upload shows a preview without saving, then apply saves" do
     sign_in_as users(:admin)
 
-    post admin_product_import_path, params: { file: csv_upload("sku,name,inventory_count\nT-SHIRT,,40\nCAP,Cap,3\n") }
+    post admin_product_import_path, params: { file: csv_upload("sku,name,category,inventory_count\nT-SHIRT,,,40\nCAP,Cap,Hats,3\n") }
     assert_response :success
     assert_select "tr[data-line='2'] td", text: "Update"
     assert_select "tr[data-line='3'] td", text: "Create"
@@ -67,10 +67,10 @@ class Admin::ProductImportsControllerTest < ActionDispatch::IntegrationTest
 
     get template_admin_product_import_path
     assert_equal "text/csv", response.media_type
-    assert_equal "sku,name,description,price,inventory_count,image_url\n", response.body
+    assert_equal "sku,name,category,description,price,inventory_count,image_url\n", response.body
 
     get export_admin_product_import_path
     assert_equal "text/csv", response.media_type
-    assert_includes response.body, "T-SHIRT,T-Shirt,,19.99,15,"
+    assert_includes response.body, "T-SHIRT,T-Shirt,Tops,,19.99,15,"
   end
 end

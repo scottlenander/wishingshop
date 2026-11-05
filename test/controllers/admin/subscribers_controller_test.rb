@@ -39,7 +39,7 @@ class Admin::SubscribersControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "edits email and moves to another product" do
-    other = Product.create!(name: "Socks", inventory_count: 0)
+    other = Product.create!(category: "accessories", name: "Socks", inventory_count: 0)
     sign_in_as users(:admin)
     patch admin_subscriber_path(@subscriber), params: { subscriber: { email: "dave@example.org", product_id: other.id } }
     assert_redirected_to admin_subscribers_path

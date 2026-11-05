@@ -5,6 +5,15 @@ class Product < ApplicationRecord
 
   SKU_FORMAT = /\A[A-Z0-9-]+\z/
 
+  # Every product is in one category, stored as its key ("tops"). This order is
+  # the order of the sections on the products page. To add one, add it here.
+  CATEGORY_LABELS = { "tops" => "Tops", "bottoms" => "Bottoms", "accessories" => "Accessories",
+                      "jackets" => "Jackets", "hats" => "Hats" }.freeze
+  enum :category, CATEGORY_LABELS.keys.index_by(&:itself),
+                  validate: { allow_nil: true, message: "must be one of: #{CATEGORY_LABELS.values.join(", ")}" }
+  # Heading for products saved before categories existed (not in the seeds).
+  UNCATEGORIZED_LABEL = "Other"
+
   has_one_attached :featured_image do |attachable|
     # Smaller copy for the product cards on the index page.
     attachable.variant :thumb, resize_to_limit: [ 600, 600 ]
@@ -22,6 +31,7 @@ class Product < ApplicationRecord
   before_validation :default_sku, on: :create
 
   validates :name, presence: true
+  validates :category, presence: true
   validates :sku, presence: true, uniqueness: true,
                   format: { with: SKU_FORMAT, message: "can only contain letters, numbers and dashes" }
   validates :inventory_count, numericality: { greater_than_or_equal_to: 0 }
@@ -71,6 +81,20 @@ class Product < ApplicationRecord
     total = counts.values.sum
     average = total.zero? ? nil : (counts.sum { |stars, n| stars * n }.to_f / total).round(1)
     RatingSummary.new(average: average, count: total, breakdown: 5.downto(1).to_h { |stars| [ stars, counts.fetch(stars, 0) ] })
+  end
+
+  def category_label = CATEGORY_LABELS.fetch(category, UNCATEGORIZED_LABEL)
+
+  # Products grouped for the products page: [[key, label, products], ...] in
+  # category order, by name within each group. Empty categories are left out;
+  # any product without a category goes last, under "Other".
+  def self.grouped_by_category(products)
+    by_category = products.group_by(&:category)
+    keys = categories.keys + (by_category.key?(nil) ? [ nil ] : [])
+    keys.filter_map do |key|
+      group = by_category[key]
+      [ key || "other", CATEGORY_LABELS.fetch(key, UNCATEGORIZED_LABEL), group.sort_by { |p| p.name.downcase } ] if group
+    end
   end
 
   # "Price must be a dollar amount", not "Price cents ...".
