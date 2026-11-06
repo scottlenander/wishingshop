@@ -45,8 +45,10 @@ module Authentication
       redirect_to new_session_path
     end
 
-    def after_authentication_url
-      session.delete(:return_to_after_authenticating) || root_url
+    # Where to go after logging in or signing up: the page that asked for it
+    # (e.g. checkout), or `fallback`.
+    def after_authentication_url(fallback: root_url)
+      session.delete(:return_to_after_authenticating) || fallback
     end
 
     def start_new_session_for(user)

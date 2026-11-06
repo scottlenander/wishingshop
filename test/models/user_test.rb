@@ -45,12 +45,13 @@ class UserTest < ActiveSupport::TestCase
     assert_includes User.active, user
   end
 
-  test "a deactivated user's email is still taken, with a pointer to Restore" do
+  test "a deactivated user's email is still taken, as its own kind of error" do
     users(:two).deactivate!
     user = User.new(email_address: "two@example.com", password: "secret123", first_name: "Tom", last_name: "Twin")
 
     assert_not user.valid?
-    assert_equal [ "belongs to a deactivated user. Restore them from the Users page instead" ], user.errors[:email_address]
+    assert_equal [ "belongs to a closed account" ], user.errors[:email_address]
+    assert user.errors.of_kind?(:email_address, :deactivated)
   end
 
   test "an active user's email gives the usual error" do
@@ -68,5 +69,34 @@ class UserTest < ActiveSupport::TestCase
 
   test "orders aren't deleted with a user" do
     assert_raises(ActiveRecord::DeleteRestrictionError) { users(:one).destroy }
+  end
+
+  test "passwords need at least 8 characters" do
+    user = users(:one)
+    assert_not user.update(password: "short12", password_confirmation: "short12")
+    assert_includes user.errors.full_messages, "Password is too short (minimum is 8 characters)"
+    assert User.find(user.id).update(first_name: "Olivia"), "saving without a new password still works"
+  end
+
+  test "reactivate keeps the email, or takes a new one that its subscriptions follow" do
+    user = users(:one)
+    user.deactivate!
+    assert user.reactivate
+    assert_equal "one@example.com", user.reload.email_address
+
+    user.deactivate!
+    assert user.reactivate(email: "olive-new@example.com")
+    assert_not user.reload.deactivated?
+    assert_equal "olive-new@example.com", user.email_address
+    assert_equal "olive-new@example.com", subscribers(:one_hoodie).reload.email
+  end
+
+  test "reactivating with a taken email fails and leaves the account closed" do
+    user = users(:one)
+    user.deactivate!
+
+    assert_not user.reactivate(email: "two@example.com")
+    assert_includes user.errors[:email_address], "has already been taken"
+    assert user.reload.deactivated?
   end
 end

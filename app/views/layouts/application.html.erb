@@ -56,9 +56,12 @@
           Cart<% if count.positive? %> <span class="layouts-application__cart-count"><%= count %></span><% end %>
         <% end %>
         <% if authenticated? %>
-          <span class="layouts-application__greeting">Hi, <%= Current.user.first_name %>!</span>
+          <%# The greeting is the way to My account. %>
+          <%= link_to "Hi, #{Current.user.first_name}!", account_path, class: "layouts-application__greeting",
+                      aria: { label: "Hi, #{Current.user.first_name}! My account" } %>
           <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" %>
         <% else %>
+          <%= link_to "Sign up", new_registration_path, class: "layouts-application__signup" %>
           <%= link_to "Login", new_session_path, class: "layouts-application__logout layouts-application__login" %>
         <% end %>
       </div>

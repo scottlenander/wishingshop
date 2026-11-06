@@ -1,0 +1,22 @@
+<% content_for :title, "Reactivate your account" %>
+
+<h1 class="auth__title">Reactivate your account</h1>
+
+<%= form_with url: reactivation_path, class: "form-card auth__form" do |form| %>
+  <p>Welcome back, <%= @user.first_name %>. This account was closed. Your orders and reviews are still here.</p>
+
+  <% if @user.errors.any? %>
+    <p class="error"><%= @user.errors.full_messages.first %></p>
+  <% end %>
+
+  <div>
+    <%= form.label :email_address, "Email" %>
+    <%= form.email_field :email_address, value: @user.email_address, required: true, autocomplete: "email",
+                         aria: { describedby: "reactivation-email-hint" } %>
+    <p id="reactivation-email-hint" class="admin-form__hint">Keep <strong><%= @user.email_address_in_database %></strong>, or type a new email to use from now on.</p>
+  </div>
+
+  <%= form.submit "Reactivate my account", class: "auth__submit" %>
+<% end %>
+
+<p class="auth__links"><%= link_to "Not now", root_path %></p>

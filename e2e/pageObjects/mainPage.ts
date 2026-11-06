@@ -8,6 +8,7 @@ export class MainPage {
   readonly page: Page
   readonly homeLink: Locator
   readonly loginLink: Locator
+  readonly signUpLink: Locator
   readonly logoutButton: Locator
   readonly greeting: Locator
   readonly cartLink: Locator
@@ -46,8 +47,10 @@ export class MainPage {
     this.usersLink = navLink('Users') // admins only
     this.subscribersLink = navLink('Subscribers') // admins only
 
-    // Right end of the nav: "Login" when signed out; "Hi, Alice!" and Log out when signed in.
+    // Right end of the nav: Sign up and Login when signed out; "Hi, Alice!" (a link
+    // to My account) and Log out when signed in.
     this.loginLink = navLink('Login')
+    this.signUpLink = navLink('Sign up')
     this.greeting = page.locator('.layouts-application__greeting')
     // Named "Cart, 2 items"; the badge shows the count when there are items.
     this.cartLink = nav.getByRole('link', { name: /^Cart, / })
