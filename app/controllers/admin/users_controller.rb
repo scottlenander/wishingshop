@@ -19,6 +19,7 @@ class Admin::UsersController < Admin::BaseController
     if @user.save
       redirect_to admin_users_path, notice: "User created."
     else
+      point_to_restore
       render :new, status: :unprocessable_entity
     end
   end
@@ -30,6 +31,7 @@ class Admin::UsersController < Admin::BaseController
     if @user.update(user_params)
       redirect_to admin_users_path, notice: "User updated."
     else
+      point_to_restore
       render :edit, status: :unprocessable_entity
     end
   end
@@ -45,6 +47,14 @@ class Admin::UsersController < Admin::BaseController
   end
 
   private
+    # A deactivated user's email: the admin can restore that user instead.
+    def point_to_restore
+      return unless @user.errors.of_kind?(:email_address, :deactivated)
+
+      @user.errors.delete(:email_address, :deactivated)
+      @user.errors.add(:email_address, :deactivated, message: "belongs to a deactivated user. Restore them from the Users page instead")
+    end
+
     def set_user
       @user = User.standard.find(params[:id])
     end

@@ -1,0 +1,89 @@
+/*
+ * Sign-up, reactivation and My account: registrations/new, reactivations/show,
+ * accounts/* and account_passwords/edit.
+ */
+
+/* Sign-up and reactivation: a narrow, centered column like the login page. */
+.auth__form {
+  max-width: 480px;
+  margin-inline: auto;
+}
+
+.auth__title,
+.auth__links {
+  text-align: center;
+}
+
+.form-card input.auth__submit {
+  align-self: stretch;
+}
+
+/* My account: cards side by side on wide screens, stacked on phones. */
+.account__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.account__card {
+  margin: 0;
+  gap: var(--space-3);
+}
+
+.account__card--danger {
+  border-color: var(--color-danger);
+}
+
+.account__card-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.account__details {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-2) var(--space-4);
+  margin: 0;
+}
+
+.account__details dt {
+  color: var(--color-text-muted);
+}
+
+.account__details dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.account__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+}
+
+.account__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding-left: var(--space-4);
+}
+
+/* Links inside the sentences, so underlined like other in-text links. */
+.account__links a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.account__close {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.account__form {
+  max-width: 560px;
+}

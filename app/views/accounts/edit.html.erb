@@ -1,0 +1,34 @@
+<% content_for :title, "Edit details" %>
+
+<h1>Edit details</h1>
+
+<%= form_with model: @user, url: account_path, method: :patch, class: "form-card account__form" do |form| %>
+  <% if @user.errors.any? %>
+    <p class="error"><%= @user.errors.full_messages.first %></p>
+  <% end %>
+
+  <div class="admin-form__row">
+    <div>
+      <%= form.label :first_name %>
+      <%= form.text_field :first_name, required: true, maxlength: 50, autocomplete: "given-name" %>
+    </div>
+    <div>
+      <%= form.label :last_name %>
+      <%= form.text_field :last_name, required: true, maxlength: 50, autocomplete: "family-name" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :email_address, "Email" %>
+    <%= form.email_field :email_address, required: true, autocomplete: "email" %>
+  </div>
+
+  <div>
+    <%= label_tag :current_password, "Current password" %>
+    <%= password_field_tag :current_password, nil, autocomplete: "current-password", aria: { describedby: "current-password-hint" } %>
+    <p id="current-password-hint" class="admin-form__hint">Only needed to change your email.</p>
+  </div>
+
+  <%= form.submit "Save details" %>
+<% end %>
+<%= link_to "Cancel", account_path, class: "admin-page__cancel" %>

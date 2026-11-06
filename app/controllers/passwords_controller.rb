@@ -23,7 +23,8 @@ class PasswordsController < ApplicationController
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: reactivating ? "Password has been reset and your account is active again." : "Password has been reset."
     else
-      redirect_to edit_password_path(params[:token]), alert: "Passwords did not match."
+      alert = @user.errors.of_kind?(:password_confirmation, :confirmation) ? "Passwords did not match." : @user.errors.full_messages.to_sentence
+      redirect_to edit_password_path(params[:token]), alert: alert
     end
   end
 

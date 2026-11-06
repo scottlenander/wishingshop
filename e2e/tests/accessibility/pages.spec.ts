@@ -51,6 +51,10 @@ test.describe('visitor pages', () => {
       await page.goto('/passwords/new')
       await expectNoViolations(page)
     })
+    await test.step('Sign up', async () => {
+      await page.goto('/sign_up')
+      await expectNoViolations(page)
+    })
   })
 })
 
@@ -73,7 +77,14 @@ test.describe('signed-in pages', () => {
       await page.goto('/checkout')
       await expectNoViolations(page)
     })
-    for (const path of ['/orders', '/addresses', '/subscriptions']) {
+    for (const path of [
+      '/orders',
+      '/addresses',
+      '/subscriptions',
+      '/account',
+      '/account/edit',
+      '/account/password/edit',
+    ]) {
       await test.step(path, async () => {
         await page.goto(path)
         await expectNoViolations(page)

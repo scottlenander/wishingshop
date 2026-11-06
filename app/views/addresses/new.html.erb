@@ -1,7 +1,16 @@
-<% title = "Add #{@address.billing? ? "billing" : "shipping"} address" %>
+<%# ?welcome=1 is the optional step straight after signing up. %>
+<% welcome = params[:welcome].present? %>
+<% title = welcome ? "Add your billing address (optional)" : "Add #{@address.billing? ? "billing" : "shipping"} address" %>
 <% content_for :title, title %>
 
 <h1><%= title %></h1>
+<% if welcome %>
+  <p class="admin-page__note">Checkout fills it in for you. You can add or change addresses any time on My addresses.</p>
+<% end %>
 
 <%= render "form", address: @address %>
-<%= link_to "Cancel", addresses_path, class: "admin-page__cancel" %>
+<% if welcome %>
+  <%= link_to "Skip for now", root_path, class: "admin-page__cancel" %>
+<% else %>
+  <%= link_to "Cancel", addresses_path, class: "admin-page__cancel" %>
+<% end %>

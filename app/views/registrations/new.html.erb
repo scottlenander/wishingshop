@@ -1,0 +1,41 @@
+<% content_for :title, "Create an account" %>
+
+<h1 class="auth__title">Create an account</h1>
+
+<%= form_with model: @user, url: registration_path, class: "form-card auth__form" do |form| %>
+  <% if @user.errors.any? %>
+    <p class="error"><%= @user.errors.full_messages.first %></p>
+  <% end %>
+
+  <div class="admin-form__row">
+    <div>
+      <%= form.label :first_name %>
+      <%= form.text_field :first_name, required: true, maxlength: 50, autocomplete: "given-name", autofocus: true %>
+    </div>
+    <div>
+      <%= form.label :last_name %>
+      <%= form.text_field :last_name, required: true, maxlength: 50, autocomplete: "family-name" %>
+    </div>
+  </div>
+
+  <div>
+    <%= form.label :email_address, "Email" %>
+    <%= form.email_field :email_address, required: true, autocomplete: "email" %>
+  </div>
+
+  <div>
+    <%= form.label :password %>
+    <%= form.password_field :password, required: true, minlength: User::PASSWORD_MINIMUM, maxlength: 72,
+                            autocomplete: "new-password", aria: { describedby: "password-hint" } %>
+    <p id="password-hint" class="admin-form__hint">At least <%= User::PASSWORD_MINIMUM %> characters.</p>
+  </div>
+
+  <div>
+    <%= form.label :password_confirmation, "Confirm password" %>
+    <%= form.password_field :password_confirmation, required: true, maxlength: 72, autocomplete: "new-password" %>
+  </div>
+
+  <%= form.submit "Create account", class: "auth__submit" %>
+<% end %>
+
+<p class="auth__links">Already have an account? <%= link_to "Log in", new_session_path %></p>

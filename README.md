@@ -10,7 +10,7 @@ A practice online clothing store, built to try out development and testing. It s
 - **Back-in-stock emails:** anyone can ask to be emailed when an out-of-stock product returns. Restocking sends the emails automatically.
 - **Homepage:** a carousel of announcements (sales, new products, news) and a featured product, either picked by an admin or chosen at random each day.
 - **Admin tools:** manage products and stock, bulk import from CSV, announcements, featured picks, orders, users and subscribers.
-- **Accounts:** sign in, password reset by email, and soft-deleted users: admins deactivate users instead of deleting them, so their orders and reviews are kept.
+- **Accounts:** sign up with an email and password, a My account page to change your details and password or close the account, and password reset by email. Closed and deactivated accounts are kept, not deleted, and can be reactivated, with the same email or a new one.
 - **Accessibility:** proper labels, alt text and keyboard support, checked automatically against WCAG 2.2 AA.
 - **Tests:** fast Rails tests, plus Playwright browser tests that run on every pull request.
 
@@ -30,7 +30,7 @@ bin/setup
 
 This installs the gems, creates the database, fills it with [test data](#test-data), and starts the app at [localhost:3000](http://localhost:3000). Next time, start the app with `bin/rails server` (or `bin/dev`).
 
-Log in as `admin@example.com` or `alice@example.com`, both with the password `password`.
+Log in as `admin@example.com` or `alice@example.com`, both with the password `password`, or click **Sign up** to create your own account.
 
 ## Test data
 
@@ -89,6 +89,17 @@ Use any future expiry (e.g. `12/30`) and any 3-digit code.
 ### Emails in development
 
 Emails aren't sent in development. They're saved, and you can read them at [localhost:3000/letter_opener](http://localhost:3000/letter_opener).
+
+## Your account
+
+- **Sign up** (`/sign_up`): first and last name, email and a password of at least 8 characters. You're logged in straight away, and anything already in your cart is kept.
+  - **Next step:** you're offered an optional **Add your billing address** step, which you can skip.
+  - **From checkout:** signing up from checkout brings you back to checkout.
+- **My account** (`/account`): click the **Hi, Ann!** greeting in the header.
+  - **Edit details:** change your name, or your email, which asks for your current password.
+  - **Change password:** asks for your current password. Other devices are logged out; this one stays logged in.
+  - **Links** to **My addresses** (your billing address and saved shipping addresses), **My orders** and **My subscriptions**.
+  - **Close my account:** asks for your current password. Your orders and reviews are kept, and you can come back later: see [Deactivated users](#deactivated-users).
 
 ## Shopping
 
@@ -163,11 +174,19 @@ Admins can create, edit and delete products, including their category, price and
 
 ### Deactivated users
 
-Users are never deleted. **Deactivate** on the Users page:
+Users are never deleted. An admin's **Deactivate** on the Users page, or a user's own **Close my account**:
 - **Stops them:** logs them out, stops them logging in, and stops their back-in-stock emails.
-- **Keeps their data:** their orders (marked "Deactivated" on the Orders page), reviews and email address. The email can't be used for a new user.
+- **Keeps their data:** their orders (marked "Deactivated" on the Orders page), reviews and email address. The email can't be used for a new account; sign-up tells them to log in instead.
 
-**To undo it:** an admin clicks **Restore** in the Deactivated list, or the user resets their password. If they log in with the right password, they're told to use **Forgot password?**, and the reset email says it will reactivate the account.
+**Coming back:**
+- **Log in again:** with the right password, they see **Reactivate your account**, where they keep their email or type a new one. Then they're logged in, with their orders, reviews and addresses as before.
+  - **A new email** frees up the old one.
+  - **The offer** lasts 10 minutes after logging in.
+  - **A wrong password** gets the usual error, so the login page never reveals which accounts exist.
+- **Reset their password:** the reset email says it will reactivate the account.
+- **Admin restores them:** an admin clicks **Restore** in the Deactivated list.
+
+Admins can't close their own account from My account.
 
 ### Bulk import
 
@@ -256,7 +275,7 @@ When a test fails, its trace, screenshot and video are kept in the HTML report (
   - **Stock emails:** subscribing to an out-of-stock item (signed in, or as a visitor by email), receiving the email, and unsubscribing from My subscriptions or from the email's link.
   - **Browsing:** products grouped by category, and a product page linking back to its category.
   - **Admin:** creating, editing and deleting products; adding and editing users; the Orders page; bulk import; featuring a product; announcements.
-  - **Accounts:** deactivating and restoring a user, and reactivating by password reset; standard users and visitors kept out of admin and account pages.
+  - **Accounts:** signing up, editing details, changing the password, closing the account and reactivating it with a new email; an admin deactivating and restoring a user, and reactivating by password reset; standard users and visitors kept out of admin and account pages.
 - `tests/accessibility/`: automated WCAG 2.2 AA scans (axe-core) of the visitor, signed-in and admin pages. A failure lists each problem and the element it's on.
   - **What they catch:** common problems such as labels, alt text, contrast and ARIA.
   - **What they don't:** keyboard and screen reader checks still need a person.

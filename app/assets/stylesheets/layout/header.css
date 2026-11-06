@@ -93,11 +93,18 @@
   margin: 0;
 }
 
-/* "Hi, Alice!" beside the Log out button. */
-.layouts-application__greeting {
+/* "Hi, Alice!" beside the Log out button, linking to My account; "Sign up"
+   beside Login for visitors. */
+.layouts-application__greeting,
+.layouts-application__signup {
   color: var(--color-on-brand);
   font-size: var(--font-size-sm);
   font-weight: 600;
+}
+
+.layouts-application__greeting:hover,
+.layouts-application__signup:hover {
+  color: var(--color-on-brand);
 }
 
 /* "Login" link: same outlined look as the Log out button. */

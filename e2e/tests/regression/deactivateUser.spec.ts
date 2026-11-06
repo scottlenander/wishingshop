@@ -4,6 +4,7 @@ import { LoginPage } from '../../pageObjects/loginPage'
 import { LetterOpener } from '../../pageObjects/letterOpener'
 import { PasswordReset } from '../../pageObjects/passwordReset'
 import { AdminUsers } from '../../pageObjects/admin/users'
+import { ReactivationPage } from '../../pageObjects/reactivationPage'
 import { USERS } from '../../libs/constants'
 import { AUTH_FILES } from '../../libs/auth'
 import { TestData } from '../../libs/testData'
@@ -11,9 +12,6 @@ import { TestData } from '../../libs/testData'
 // Only these tests deactivate this account, and both change it, so they run in order.
 const USER = USERS.deactivate
 test.describe.configure({ mode: 'serial' })
-
-const DEACTIVATED_ALERT =
-  'This account is deactivated. Use “Forgot password?” to reset your password and reactivate it.'
 
 // Signs in through the form in a fresh browser (the account has no saved session,
 // since deactivating ends its sessions). Returns the page, still on the result.
@@ -70,9 +68,10 @@ test.describe('admin', () => {
       )
     })
 
-    await test.step('The user is told how to reactivate when logging in', async () => {
+    await test.step('Logging in offers to reactivate, without logging them in', async () => {
+      // Reactivating from that page is tested in account.spec.ts.
       const userPage = await logInAsUser(browser)
-      await expect(new MainPage(userPage).alert).toHaveText(DEACTIVATED_ALERT)
+      await expect(new ReactivationPage(userPage).header).toBeVisible()
       await expect(new MainPage(userPage).greeting).toBeHidden()
       await userPage.context().close()
     })
@@ -105,15 +104,9 @@ test('a deactivated user reactivates by resetting their password', async ({ page
     lettersBefore = await letterOpener.letter(USER.email).count()
   })
 
-  await test.step('Logging in says to reset the password', async () => {
-    await loginPage.goto()
-    await loginPage.emailInput.fill(USER.email)
-    await loginPage.passwordInput.fill(USER.password)
-    await loginPage.signInButton.click()
-    await expect(mainPage.alert).toHaveText(DEACTIVATED_ALERT)
-  })
-
   await test.step('Ask for a reset email', async () => {
+    // As someone who forgot their password would: no login first.
+    await loginPage.goto()
     await loginPage.forgotPasswordLink.click()
     await expect(passwordReset.requestHeader).toBeVisible()
     await passwordReset.emailInput.fill(USER.email)

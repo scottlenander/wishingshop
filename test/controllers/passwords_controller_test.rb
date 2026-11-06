@@ -41,7 +41,7 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
 
   test "update" do
     assert_changes -> { @user.reload.password_digest } do
-      put password_path(@user.password_reset_token), params: { password: "new", password_confirmation: "new" }
+      put password_path(@user.password_reset_token), params: { password: "newpass123", password_confirmation: "newpass123" }
       assert_redirected_to new_session_path
     end
 
@@ -71,6 +71,13 @@ class PasswordsControllerTest < ActionDispatch::IntegrationTest
     @user.deactivate!
     post passwords_path, params: { email_address: @user.email_address }
     assert_enqueued_email_with PasswordsMailer, :reset, args: [ @user ]
+  end
+
+  test "a too-short new password says why" do
+    token = @user.password_reset_token
+    put password_path(token), params: { password: "short", password_confirmation: "short" }
+    assert_redirected_to edit_password_path(token)
+    assert_equal "Password is too short (minimum is 8 characters)", flash[:alert]
   end
 
   test "update with non matching passwords" do

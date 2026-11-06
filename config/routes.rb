@@ -1,6 +1,14 @@
 Rails.application.routes.draw do
   resource :session
   resources :passwords, param: :token
+  # Sign-up at /sign_up.
+  get "sign_up", to: "registrations#new", as: :new_registration
+  post "sign_up", to: "registrations#create", as: :registration
+  # After logging in to a closed account: keep or change the email, then reactivate.
+  resource :reactivation, only: %i[ show create ]
+  # My account: details, password, close.
+  resource :account, only: %i[ show edit update destroy ]
+  resource :account_password, only: %i[ edit update ], path: "account/password"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

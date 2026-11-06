@@ -1,0 +1,49 @@
+<% content_for :title, "My account" %>
+
+<div class="admin-page__header">
+  <h1>My account</h1>
+</div>
+
+<div class="account__grid">
+  <section class="form-card account__card" aria-labelledby="account-details-title">
+    <h2 id="account-details-title" class="account__card-title">Your details</h2>
+    <dl class="account__details">
+      <dt>Name</dt>
+      <dd><%= @user.full_name %></dd>
+      <dt>Email</dt>
+      <dd><%= @user.email_address %></dd>
+      <dt>Member since</dt>
+      <dd><%= @user.created_at.to_date.to_fs(:long) %></dd>
+    </dl>
+    <p class="account__actions">
+      <%= link_to "Edit details", edit_account_path, class: "btn btn--secondary" %>
+      <%= link_to "Change password", edit_account_password_path, class: "btn btn--secondary" %>
+    </p>
+  </section>
+
+  <section class="form-card account__card" aria-labelledby="account-shopping-title">
+    <h2 id="account-shopping-title" class="account__card-title">Shopping</h2>
+    <ul class="account__links">
+      <li><%= link_to "My addresses", addresses_path %>: your billing address and saved shipping addresses</li>
+      <li><%= link_to "My orders", orders_path %>: everything you've bought</li>
+      <li><%= link_to "My subscriptions", subscriptions_path %>: back-in-stock emails</li>
+    </ul>
+  </section>
+
+  <section class="form-card account__card account__card--danger" aria-labelledby="account-close-title">
+    <h2 id="account-close-title" class="account__card-title">Close my account</h2>
+    <% if @user.admin? %>
+      <p class="admin-page__note">Admin accounts can't be closed here.</p>
+    <% else %>
+      <p class="admin-page__note">You'll be logged out and won't get any more emails. Your orders and reviews are kept, and you can reactivate the account any time by logging in.</p>
+      <%= form_with url: account_path, method: :delete, class: "account__close",
+                    data: { turbo_confirm: "Close your account? You can reactivate it later by logging in." } do |form| %>
+        <div>
+          <%= form.label :current_password, "Current password", for: "close_current_password" %>
+          <%= form.password_field :current_password, id: "close_current_password", required: true, autocomplete: "current-password" %>
+        </div>
+        <%= form.button "Close my account", class: "btn btn--danger" %>
+      <% end %>
+    <% end %>
+  </section>
+</div>
