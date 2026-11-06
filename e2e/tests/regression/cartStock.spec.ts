@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { Cart } from '../../pageObjects/cart'
+import { CartPage } from '../../pageObjects/cartPage'
 import { PRODUCTS } from '../../libs/constants'
 import { TestData } from '../../libs/testData'
 
@@ -15,7 +15,7 @@ test.describe.configure({ mode: 'serial' })
 // A visitor: their cart lives in this browser only, so no account is shared.
 test('cart quantities are kept within stock', async ({ page, request }) => {
   const mainPage = new MainPage(page)
-  const cart = new Cart(page)
+  const cart = new CartPage(page)
   const testData = new TestData(request)
   const { products } = mainPage
   const { item } = products

@@ -35,7 +35,7 @@ export class AccountPage {
     this.page = page
 
     this.header = page.getByRole('heading', { name: 'My account', level: 1 })
-    this.details = page.locator('.account__details')
+    this.details = page.getByTestId('account-details')
     this.editDetailsLink = page.getByRole('link', { name: 'Edit details' })
     this.changePasswordLink = page.getByRole('link', { name: 'Change password' })
     this.addressesLink = page.getByRole('main').getByRole('link', { name: 'My addresses' })
@@ -54,11 +54,9 @@ export class AccountPage {
     this.confirmNewPasswordInput = page.getByLabel('Confirm new password')
     this.changePasswordButton = page.getByRole('button', { name: 'Change password' })
 
-    this.currentPasswordInput = page
-      .getByRole('main')
-      .locator('form')
-      .getByLabel('Current password')
-    this.error = page.locator('.form-card .error')
+    // On the Edit details and Change password pages (each has one).
+    this.currentPasswordInput = page.getByRole('main').getByLabel('Current password')
+    this.error = page.getByTestId('form-error')
   }
 
   async goto() {

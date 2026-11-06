@@ -18,7 +18,7 @@
            role="group" aria-roledescription="slide" aria-label="<%= index + 1 %> of <%= count %>"
            data-carousel-target="slide" <%= "hidden" unless index.zero? %>>
         <div class="carousel__content">
-          <p class="carousel__badge"><%= announcement.kind_label %></p>
+          <p class="carousel__badge" data-testid="slide-badge"><%= announcement.kind_label %></p>
           <h2 class="carousel__title">
             <%= products.one? ? link_to(announcement.title, products.first) : announcement.title %>
           </h2>

@@ -11,7 +11,7 @@ export class LoginPage {
 
   constructor(page: Page) {
     this.page = page
-    this.form = page.locator('.sessions-new__form')
+    this.form = page.getByTestId('login-form')
     this.emailInput = page.getByRole('textbox', { name: 'Enter your email address' })
     this.passwordInput = page.getByRole('textbox', { name: 'Enter your password' })
     this.signInButton = page.getByRole('button', { name: 'Sign in' })

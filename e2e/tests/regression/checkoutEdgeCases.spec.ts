@@ -1,9 +1,9 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { LoginPage } from '../../pageObjects/loginPage'
-import { Cart } from '../../pageObjects/cart'
-import { Checkout } from '../../pageObjects/checkout'
-import { MyAddresses } from '../../pageObjects/myAddresses'
+import { CartPage } from '../../pageObjects/cartPage'
+import { CheckoutPage } from '../../pageObjects/checkoutPage'
+import { MyAddressesPage } from '../../pageObjects/myAddressesPage'
 import { OrderPage } from '../../pageObjects/orderPage'
 import {
   PRODUCTS,
@@ -27,9 +27,9 @@ test.describe('as a signed-in customer', () => {
   test('a declined card places no order and saves nothing', async ({ page, request }) => {
     const PRODUCT = PRODUCTS.CHINOS.name
     const mainPage = new MainPage(page)
-    const cart = new Cart(page)
-    const checkout = new Checkout(page)
-    const myAddresses = new MyAddresses(page)
+    const cart = new CartPage(page)
+    const checkout = new CheckoutPage(page)
+    const myAddresses = new MyAddressesPage(page)
     const { products } = mainPage
     const { item } = products
     let stockBefore = ''
@@ -112,10 +112,10 @@ test.describe('as a signed-in customer', () => {
     const PRODUCT = PRODUCTS.LINEN_PANTS.name
     const NICKNAME = 'Work'
     const mainPage = new MainPage(page)
-    const cart = new Cart(page)
-    const checkout = new Checkout(page)
+    const cart = new CartPage(page)
+    const checkout = new CheckoutPage(page)
     const orderPage = new OrderPage(page)
-    const myAddresses = new MyAddresses(page)
+    const myAddresses = new MyAddressesPage(page)
     const { products } = mainPage
     const { item } = products
 
@@ -195,8 +195,8 @@ test('a visitor cart is kept through logging in at checkout', async ({ browser, 
   const PRODUCT = PRODUCTS.SWEATPANTS.name
   const mainPage = new MainPage(page)
   const loginPage = new LoginPage(page)
-  const cart = new Cart(page)
-  const checkout = new Checkout(page)
+  const cart = new CartPage(page)
+  const checkout = new CheckoutPage(page)
   const testData = new TestData(request)
   const { products } = mainPage
   const { item } = products

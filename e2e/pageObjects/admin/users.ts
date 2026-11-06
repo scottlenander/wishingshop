@@ -26,9 +26,9 @@ export class AdminUsers {
 
     this.header = page.getByRole('heading', { name: 'Users', exact: true })
     this.newLink = page.getByRole('link', { name: 'New user' })
-    this.activeRows = page.locator('.admin-table:not(.admin-users__deactivated) tbody tr')
+    this.activeRows = page.getByTestId('user-row')
     this.deactivatedHeader = page.getByRole('heading', { name: 'Deactivated' })
-    this.deactivatedRows = page.locator('.admin-users__deactivated tbody tr')
+    this.deactivatedRows = page.getByTestId('deactivated-user-row')
 
     this.firstNameInput = page.getByLabel('First name')
     this.lastNameInput = page.getByLabel('Last name')
@@ -37,7 +37,7 @@ export class AdminUsers {
     this.passwordConfirmationInput = page.getByLabel('Password confirmation')
     // "Create User" on new, "Update User" on edit.
     this.saveButton = page.getByRole('button', { name: /^(Create|Update) User$/ })
-    this.error = page.locator('.form-card .error')
+    this.error = page.getByTestId('form-error')
   }
 
   async goto() {

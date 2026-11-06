@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test'
 
 // "My subscriptions" page (/subscriptions): back-in-stock sign-ups.
-export class MySubscriptions {
+export class MySubscriptionsPage {
   readonly page: Page
   readonly header: Locator
   readonly rows: Locator
@@ -9,7 +9,7 @@ export class MySubscriptions {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'My subscriptions' })
-    this.rows = page.locator('.admin-table tbody tr')
+    this.rows = page.getByTestId('subscription-row')
   }
 
   async goto() {

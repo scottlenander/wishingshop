@@ -8,14 +8,14 @@
   <p class="admin-page__empty">Your cart is empty. <%= link_to "Browse products", root_path %></p>
 <% else %>
   <% @problems.each do |problem| %>
-    <p class="error cart__problem"><%= problem %></p>
+    <p class="error cart__problem" data-testid="cart-problem"><%= problem %></p>
   <% end %>
 
   <div class="cart">
     <ul class="cart__items">
       <% @items.each do |item| %>
         <% product = item.product %>
-        <li class="cart__item" id="cart_item_<%= item.id %>">
+        <li class="cart__item" id="cart_item_<%= item.id %>" data-testid="cart-item">
           <% if product.featured_image.attached? %>
             <%= image_tag product.featured_image.variant(:thumb), alt: "", class: "cart__image" %>
           <% else %>
@@ -37,7 +37,7 @@
             </div>
           </div>
 
-          <p class="cart__line-total"><%= format_price(item.line_total_cents) %></p>
+          <p class="cart__line-total" data-testid="line-total"><%= format_price(item.line_total_cents) %></p>
         </li>
       <% end %>
     </ul>
@@ -46,10 +46,10 @@
       <h2 id="cart-summary-title">Summary</h2>
       <dl class="cart__totals">
         <dt>Subtotal (<%= pluralize(@cart.item_count, "item") %>)</dt>
-        <dd class="cart__subtotal"><%= format_price(@cart.subtotal_cents) %></dd>
+        <dd class="cart__subtotal" data-testid="cart-subtotal"><%= format_price(@cart.subtotal_cents) %></dd>
       </dl>
       <% remaining = ShippingMethod::FREE_STANDARD_THRESHOLD_CENTS - @cart.subtotal_cents %>
-      <p class="cart__shipping-note">
+      <p class="cart__shipping-note" data-testid="shipping-note">
         <% if remaining.positive? %>
           Add <%= format_price(remaining) %> more for free standard shipping.
         <% else %>
@@ -58,10 +58,10 @@
       </p>
 
       <% if @problems.any? %>
-        <button type="button" class="btn cart__checkout" disabled>Checkout</button>
+        <button type="button" class="btn cart__checkout" data-testid="cart-checkout" disabled>Checkout</button>
         <p class="admin-form__hint">Fix the items above to check out.</p>
       <% else %>
-        <%= link_to "Checkout", checkout_path, class: "btn cart__checkout" %>
+        <%= link_to "Checkout", checkout_path, class: "btn cart__checkout", data: { testid: "cart-checkout" } %>
         <% unless authenticated? %>
           <p class="admin-form__hint">You'll log in before paying. Your cart is kept.</p>
         <% end %>

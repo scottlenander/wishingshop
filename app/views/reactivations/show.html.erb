@@ -6,7 +6,7 @@
   <p>Welcome back, <%= @user.first_name %>. This account was closed. Your orders and reviews are still here.</p>
 
   <% if @user.errors.any? %>
-    <p class="error"><%= @user.errors.full_messages.first %></p>
+    <p class="error" data-testid="form-error"><%= @user.errors.full_messages.first %></p>
   <% end %>
 
   <div>

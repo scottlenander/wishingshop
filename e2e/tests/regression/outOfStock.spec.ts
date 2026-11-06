@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { MySubscriptions } from '../../pageObjects/mySubscriptions'
+import { MySubscriptionsPage } from '../../pageObjects/mySubscriptionsPage'
 import { AUTH_FILES } from '../../libs/auth'
-import { LetterOpener } from '../../pageObjects/letterOpener'
+import { LetterOpenerPage } from '../../pageObjects/letterOpenerPage'
 import { PRODUCTS, USERS } from '../../libs/constants'
 import { TestData } from '../../libs/testData'
 
@@ -23,8 +23,8 @@ test('subscriber is emailed when an out-of-stock item is restocked', async ({
 }) => {
   // Standard user
   const mainPage = new MainPage(page)
-  const letterOpener = new LetterOpener(page)
-  const mySubscriptions = new MySubscriptions(page)
+  const letterOpener = new LetterOpenerPage(page)
+  const mySubscriptions = new MySubscriptionsPage(page)
   const testData = new TestData(request)
   const { products } = mainPage
   const { item } = products

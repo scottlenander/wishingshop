@@ -1,9 +1,9 @@
 <%# One product in the grid on the products page. %>
-<div class="products-index__card">
+<div class="products-index__card" data-testid="product-card">
   <% if product.featured_image.attached? %>
-    <%= image_tag product.featured_image.variant(:thumb), alt: "", loading: "lazy", class: "products-index__card-image" %>
+    <%= image_tag product.featured_image.variant(:thumb), alt: "", loading: "lazy", class: "products-index__card-image", data: { testid: "product-card-image" } %>
   <% else %>
-    <div class="products-index__card-placeholder"></div>
+    <div class="products-index__card-placeholder" data-testid="product-card-image"></div>
   <% end %>
   <%= link_to product.name, product_path(product.id), class: "products-index__card-link" %>
   <%= render "card_rating", rating: @ratings[product.id] %>

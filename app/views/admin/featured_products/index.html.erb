@@ -5,7 +5,7 @@
   <%= link_to "Feature a product", new_admin_featured_product_path, class: "btn" %>
 </div>
 
-<section class="admin-featured__current">
+<section class="admin-featured__current" data-testid="featured-current">
   <h2>Showing now</h2>
   <% if @current %>
     <p>
@@ -35,7 +35,7 @@
         </thead>
         <tbody>
           <% picks.each do |pick| %>
-            <tr id="<%= dom_id(pick) %>">
+            <tr id="<%= dom_id(pick) %>" data-testid="featured-pick-row">
               <td><%= pick.product.name %></td>
               <td><%= pick.starts_at.to_fs(:short) %></td>
               <td><%= pick.ends_at.to_fs(:short) %></td>

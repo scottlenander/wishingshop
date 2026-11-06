@@ -33,7 +33,7 @@ export class AddressFields {
 
 // Checkout page (/checkout): billing and shipping addresses, shipping method,
 // payment, summary.
-export class Checkout {
+export class CheckoutPage {
   readonly page: Page
   readonly header: Locator
   readonly errors: Locator
@@ -66,7 +66,7 @@ export class Checkout {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'Checkout' })
-    this.errors = page.locator('.checkout__errors')
+    this.errors = page.getByTestId('checkout-errors')
 
     this.billing = new AddressFields(page.getByRole('group', { name: 'Billing address' }))
     this.saveBillingCheckbox = page.getByRole('checkbox', {
@@ -86,11 +86,11 @@ export class Checkout {
     this.cardExpiryInput = page.getByLabel('Expiry (MM/YY)')
     this.cardCvcInput = page.getByLabel('Security code (CVC)')
     // After an error: the card number and CVC are cleared and must be typed again.
-    this.cardAgainNote = page.locator('.checkout__card-again')
+    this.cardAgainNote = page.getByTestId('card-again-note')
 
-    this.summaryItems = page.locator('.checkout__items li')
-    this.shippingCost = page.locator('[data-checkout-target="shipping"]')
-    this.total = page.locator('[data-checkout-target="total"]')
+    this.summaryItems = page.getByTestId('summary-item')
+    this.shippingCost = page.getByTestId('checkout-shipping-cost')
+    this.total = page.getByTestId('checkout-total')
     this.placeOrderButton = page.getByRole('button', { name: 'Place order' })
   }
 
@@ -105,7 +105,7 @@ export class Checkout {
 
   // An input Rails marked invalid (wrapped in .field_with_errors), or nothing.
   fieldError(input: Locator): Locator {
-    return this.page.locator('.field_with_errors').filter({ has: input })
+    return this.page.getByTestId('field-error').filter({ has: input })
   }
 
   // Radio for a saved shipping address, by nickname.

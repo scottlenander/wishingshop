@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test'
 
 // "My orders" page (/orders): the signed-in user's purchases, newest first.
-export class MyOrders {
+export class MyOrdersPage {
   readonly page: Page
   readonly header: Locator
   readonly rows: Locator
@@ -10,7 +10,7 @@ export class MyOrders {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'My orders' })
-    this.rows = page.locator('.admin-table tbody tr')
+    this.rows = page.getByTestId('order-row')
     this.emptyMessage = page.getByText('No orders yet.')
   }
 

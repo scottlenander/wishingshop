@@ -18,8 +18,8 @@
     </thead>
     <tbody>
       <% @orders.each do |order| %>
-        <tr id="<%= dom_id(order) %>">
-          <td><%= order.number %></td>
+        <tr id="<%= dom_id(order) %>" data-testid="admin-order-row">
+          <td data-testid="order-number"><%= order.number %></td>
           <td><%= order.user.full_name %><%= tag.span("Deactivated", class: "admin-page__tag") if order.user.deactivated? %><br><%= order.user.email_address %></td>
           <td><%= safe_join(order.order_items.map { |i| "#{i.quantity} × #{i.product_name}" }, tag.br) %></td>
           <td><%= order.shipping_option&.label || "—" %></td>

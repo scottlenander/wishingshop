@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { MyOrders } from '../../pageObjects/myOrders'
-import { Cart } from '../../pageObjects/cart'
-import { Checkout } from '../../pageObjects/checkout'
+import { MyOrdersPage } from '../../pageObjects/myOrdersPage'
+import { CartPage } from '../../pageObjects/cartPage'
+import { CheckoutPage } from '../../pageObjects/checkoutPage'
 import { OrderPage } from '../../pageObjects/orderPage'
 import { PURCHASE_BILLING, PRODUCTS, TEST_CARDS, USERS, futureExpiry } from '../../libs/constants'
 import { AUTH_FILES } from '../../libs/auth'
@@ -19,10 +19,10 @@ test.use({ storageState: AUTH_FILES.purchase })
 
 test('standard user checks out a cart and sees the order', async ({ page, request }) => {
   const mainPage = new MainPage(page)
-  const cart = new Cart(page)
-  const checkout = new Checkout(page)
+  const cart = new CartPage(page)
+  const checkout = new CheckoutPage(page)
   const orderPage = new OrderPage(page)
-  const myOrders = new MyOrders(page)
+  const myOrders = new MyOrdersPage(page)
   const testData = new TestData(request)
   const { products } = mainPage
   const { item } = products

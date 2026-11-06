@@ -25,7 +25,7 @@ export class Announcements {
 
     this.header = page.getByRole('heading', { name: 'Announcements', exact: true })
     this.newLink = page.getByRole('link', { name: 'New announcement' })
-    this.rows = page.locator('.admin-table tbody tr')
+    this.rows = page.getByTestId('announcement-row')
 
     this.kindSelect = page.getByLabel('Type')
     this.titleInput = page.getByLabel('Title')
@@ -36,7 +36,7 @@ export class Announcements {
     this.positionInput = page.getByLabel('Position')
     // "Create Announcement" on new, "Update Announcement" on edit.
     this.saveButton = page.getByRole('button', { name: /^(Create|Update) Announcement$/ })
-    this.error = page.locator('.form-card .error')
+    this.error = page.getByTestId('form-error')
   }
 
   async goto() {

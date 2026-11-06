@@ -1,6 +1,6 @@
 <%= form_with model: [ product, review ], class: "reviews-form" do |form| %>
   <% if review.errors.any? %>
-    <div class="error" role="alert">
+    <div class="error" role="alert" data-testid="form-error">
       <% review.errors.full_messages.each do |message| %>
         <p><%= message %></p>
       <% end %>

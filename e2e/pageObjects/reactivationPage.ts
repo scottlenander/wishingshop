@@ -14,6 +14,6 @@ export class ReactivationPage {
     this.header = page.getByRole('heading', { name: 'Reactivate your account' })
     this.emailInput = page.getByLabel('Email')
     this.reactivateButton = page.getByRole('button', { name: 'Reactivate my account' })
-    this.error = page.locator('.form-card .error')
+    this.error = page.getByTestId('form-error')
   }
 }

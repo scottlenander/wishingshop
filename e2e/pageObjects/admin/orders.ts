@@ -9,7 +9,7 @@ export class AdminOrders {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'Orders', exact: true })
-    this.rows = page.locator('.admin-table tbody tr')
+    this.rows = page.getByTestId('admin-order-row')
   }
 
   async goto() {
@@ -23,6 +23,6 @@ export class AdminOrders {
 
   // The order number (e.g. "WS-1A2B3C") in the first column of a row.
   async numberOf(row: Locator): Promise<string> {
-    return ((await row.locator('td').first().textContent()) ?? '').trim()
+    return ((await row.getByTestId('order-number').textContent()) ?? '').trim()
   }
 }

@@ -53,11 +53,11 @@
       <div class="layouts-application__account">
         <% count = current_cart_count %>
         <%= link_to cart_path, class: "layouts-application__cart", aria: { label: "Cart, #{pluralize(count, "item")}" } do %>
-          Cart<% if count.positive? %> <span class="layouts-application__cart-count"><%= count %></span><% end %>
+          Cart<% if count.positive? %> <span class="layouts-application__cart-count" data-testid="cart-count"><%= count %></span><% end %>
         <% end %>
         <% if authenticated? %>
           <%# The greeting is the way to My account. %>
-          <%= link_to "Hi, #{Current.user.first_name}!", account_path, class: "layouts-application__greeting",
+          <%= link_to "Hi, #{Current.user.first_name}!", account_path, class: "layouts-application__greeting", data: { testid: "nav-greeting" },
                       aria: { label: "Hi, #{Current.user.first_name}! My account" } %>
           <%= button_to "Log out", session_path, method: :delete, class: "layouts-application__logout" %>
         <% else %>
@@ -70,8 +70,8 @@
     <main class="layouts-application__main">
       <%# In the page flow, above the content, so they never cover a button.
           The roles make screen readers announce them. %>
-      <%= tag.div(flash[:notice], class: "notice", role: "status") if flash[:notice] %>
-      <%= tag.div(flash[:alert], class: "alert", role: "alert") if flash[:alert] %>
+      <%= tag.div(flash[:notice], class: "notice", role: "status", data: { testid: "flash-notice" }) if flash[:notice] %>
+      <%= tag.div(flash[:alert], class: "alert", role: "alert", data: { testid: "flash-alert" }) if flash[:alert] %>
       <%= yield %>
     </main>
   </body>

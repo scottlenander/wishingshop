@@ -4,8 +4,8 @@ import { LoginPage } from '../../pageObjects/loginPage'
 import { SignUpPage } from '../../pageObjects/signUpPage'
 import { AccountPage } from '../../pageObjects/accountPage'
 import { ReactivationPage } from '../../pageObjects/reactivationPage'
-import { MyAddresses } from '../../pageObjects/myAddresses'
-import { AddressFields } from '../../pageObjects/checkout'
+import { MyAddressesPage } from '../../pageObjects/myAddressesPage'
+import { AddressFields } from '../../pageObjects/checkoutPage'
 import { TEST_ADDRESS } from '../../libs/constants'
 
 // A brand-new account every run (no seeded account), followed from sign-up to
@@ -27,7 +27,7 @@ test('a new customer signs up, manages their account, closes it and comes back',
   const signUp = new SignUpPage(page)
   const account = new AccountPage(page)
   const reactivation = new ReactivationPage(page)
-  const myAddresses = new MyAddresses(page)
+  const myAddresses = new MyAddressesPage(page)
 
   const runId = Date.now()
   const firstEmail = `e2e-signup-${runId}@example.com`
@@ -57,7 +57,7 @@ test('a new customer signs up, manages their account, closes it and comes back',
     ).toBeVisible()
     await expect(page.getByRole('link', { name: 'Skip for now' })).toBeVisible()
 
-    await new AddressFields(page.locator('.form-card')).fill(TEST_ADDRESS)
+    await new AddressFields(page.getByTestId('address-form')).fill(TEST_ADDRESS)
     await page.getByRole('button', { name: 'Save address' }).click()
     await expect(myAddresses.billing).toContainText(TEST_ADDRESS.line1)
   })

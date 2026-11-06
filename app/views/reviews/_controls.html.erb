@@ -11,7 +11,7 @@
   </nav>
 
   <% if @review_stars %>
-    <p class="reviews__filter">
+    <p class="reviews__filter" data-testid="review-filter-note">
       Showing <%= pluralize(@review_total, "#{@review_stars}-star review") %>.
       <%= link_to "Show all reviews", product_path(product, **review_list_params(sort: @review_sort, stars: nil), anchor: "reviews") %>
     </p>

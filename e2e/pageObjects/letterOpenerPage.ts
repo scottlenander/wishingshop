@@ -3,7 +3,7 @@ import { expect, type FrameLocator, type Locator, type Page } from '@playwright/
 // Development inbox from the letter_opener_web gem (/letter_opener).
 // Sent emails are listed on the left. The selected one shows in an iframe (#mail)
 // with its headers, and the HTML body sits in a second iframe nested inside it.
-export class LetterOpener {
+export class LetterOpenerPage {
   readonly page: Page
   readonly letters: Locator
   readonly refreshButton: Locator
@@ -12,6 +12,8 @@ export class LetterOpener {
 
   constructor(page: Page) {
     this.page = page
+    // letter_opener_web's own markup (a gem), so it can't have test ids.
+    // eslint-disable-next-line no-restricted-syntax
     this.letters = page.locator('.letter-opener li')
     this.refreshButton = page.getByRole('link', { name: 'Refresh' })
     this.mail = page.frameLocator('#mail')

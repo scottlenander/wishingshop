@@ -15,12 +15,12 @@ export class Featured {
   readonly link: Locator
 
   constructor(page: Page) {
-    this.root = page.locator('.products-featured')
+    this.root = page.getByTestId('featured-product')
     this.label = this.root.getByText('Featured', { exact: true })
-    this.image = this.root.locator('.products-featured__image')
+    this.image = this.root.getByTestId('featured-image')
     this.title = this.root.getByRole('heading', { level: 2 })
-    this.description = this.root.locator('.products-featured__description')
-    this.stockStatus = this.root.locator('.products-inventory__status')
+    this.description = this.root.getByTestId('featured-description')
+    this.stockStatus = this.root.getByTestId('in-stock').or(this.root.getByTestId('out-of-stock'))
     // Only shown for admin picks, not the daily random pick.
     this.pickedNote = this.root.getByText('Picked by our team')
     this.link = this.root.getByRole('link', { name: /^View / })

@@ -21,10 +21,10 @@
           <% remaining = @review_total - @reviews.size %>
           <%= render "reviews/more", product: product, offset: @reviews.size, remaining: remaining if remaining.positive? %>
         <% else %>
-          <p class="reviews__empty">No <%= @review_stars %>-star reviews yet.</p>
+          <p class="reviews__empty" data-testid="reviews-empty">No <%= @review_stars %>-star reviews yet.</p>
         <% end %>
       <% else %>
-        <p class="reviews__empty">No reviews yet.<%= " Be the first to review it." if @can_review && !@my_review %></p>
+        <p class="reviews__empty" data-testid="reviews-empty">No reviews yet.<%= " Be the first to review it." if @can_review && !@my_review %></p>
       <% end %>
     </div>
   </div>

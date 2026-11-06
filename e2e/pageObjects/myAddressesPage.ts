@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 
 // "My addresses" page (/addresses): billing address and saved shipping addresses.
-export class MyAddresses {
+export class MyAddressesPage {
   readonly page: Page
   readonly header: Locator
   readonly billing: Locator
@@ -12,11 +12,11 @@ export class MyAddresses {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'My addresses' })
-    this.billing = page.getByRole('region', { name: 'Billing address' }).locator('.addresses__card')
+    this.billing = page.getByRole('region', { name: 'Billing address' }).getByTestId('address-card')
     this.noBillingMessage = page.getByText('No billing address saved.')
     this.shippingCards = page
       .getByRole('region', { name: 'Shipping addresses' })
-      .locator('.addresses__card')
+      .getByTestId('address-card')
     this.addShippingLink = page.getByRole('link', { name: 'Add shipping address' })
   }
 

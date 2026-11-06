@@ -29,9 +29,9 @@ export class ProductImport {
     this.exportLink = page.getByRole('link', { name: 'export current products' })
 
     this.previewHeader = page.getByRole('heading', { name: 'Import preview' })
-    this.summary = page.locator('.admin-import__summary')
-    this.fileErrors = page.locator('main .error')
-    this.rows = page.locator('.admin-import__table tbody tr')
+    this.summary = page.getByTestId('import-summary')
+    this.fileErrors = page.getByTestId('import-file-error')
+    this.rows = page.getByTestId('import-row')
     this.applyButton = page.getByRole('button', { name: 'Apply import' })
     this.uploadAgainLink = page.getByRole('link', { name: 'Upload again' })
   }
@@ -47,7 +47,7 @@ export class ProductImport {
 
   // Preview row for a CSV line (the header is line 1).
   row(line: number): Locator {
-    return this.page.locator(`.admin-import__table tr[data-line="${line}"]`)
+    return this.rows.and(this.page.locator(`[data-line="${line}"]`))
   }
 
   // Uploads CSV text as a file, without writing it to disk.

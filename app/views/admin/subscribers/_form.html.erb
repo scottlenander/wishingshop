@@ -1,6 +1,6 @@
 <%= form_with model: [ :admin, subscriber ], class: "form-card" do |form| %>
   <% if form.object.errors.any? %>
-    <p class="error"><%= form.object.errors.full_messages.first %></p>
+    <p class="error" data-testid="form-error"><%= form.object.errors.full_messages.first %></p>
   <% end %>
 
   <div>

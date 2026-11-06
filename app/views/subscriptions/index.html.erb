@@ -17,7 +17,7 @@
     </thead>
     <tbody>
       <% @subscriptions.each do |subscription| %>
-        <tr id="<%= dom_id(subscription) %>">
+        <tr id="<%= dom_id(subscription) %>" data-testid="subscription-row">
           <td><%= link_to subscription.product.name, subscription.product %></td>
           <td><%= subscription.product.inventory_count.positive? ? "#{subscription.product.inventory_count} in stock" : "Out of stock" %></td>
           <td class="admin-table__actions">
