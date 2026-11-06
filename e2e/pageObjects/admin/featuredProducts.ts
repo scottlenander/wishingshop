@@ -23,15 +23,15 @@ export class FeaturedProducts {
 
     this.header = page.getByRole('heading', { name: 'Featured product' })
     this.newLink = page.getByRole('link', { name: 'Feature a product' })
-    this.showingNow = page.locator('.admin-featured__current')
-    this.rows = page.locator('.admin-table tbody tr')
+    this.showingNow = page.getByTestId('featured-current')
+    this.rows = page.getByTestId('featured-pick-row')
 
     this.productSelect = page.getByLabel('Product')
     this.selectedProduct = this.productSelect.locator('option:checked')
     this.fromInput = page.getByLabel('From')
     this.untilInput = page.getByLabel('Until')
     this.saveButton = page.getByRole('button', { name: 'Save' })
-    this.error = page.locator('.form-card .error')
+    this.error = page.getByTestId('form-error')
   }
 
   async goto() {

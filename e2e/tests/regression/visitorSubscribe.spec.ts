@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
-import { LetterOpener } from '../../pageObjects/letterOpener'
+import { LetterOpenerPage } from '../../pageObjects/letterOpenerPage'
 import { AdminSubscribers } from '../../pageObjects/admin/subscribers'
 import { PRODUCTS } from '../../libs/constants'
 import { AUTH_FILES } from '../../libs/auth'
@@ -18,7 +18,7 @@ test('a visitor subscribes by email and unsubscribes from the email link', async
   request,
 }) => {
   const mainPage = new MainPage(page)
-  const letterOpener = new LetterOpener(page)
+  const letterOpener = new LetterOpenerPage(page)
   const testData = new TestData(request)
   const { item } = mainPage.products
   // New every run, so the inbox has exactly one email for it.

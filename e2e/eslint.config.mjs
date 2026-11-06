@@ -5,6 +5,9 @@ import prettier from 'eslint-config-prettier'
 import globals from 'globals'
 import tseslint from 'typescript-eslint'
 
+const CLASS_SELECTOR_MESSAGE =
+  'Avoid CSS class selectors: use getByRole/getByLabel/getByText, or add a data-testid to the view and use getByTestId.'
+
 export default tseslint.config(
   {
     ignores: [
@@ -28,6 +31,22 @@ export default tseslint.config(
     rules: {
       // Forgotten awaits on Playwright calls are the most common e2e bug.
       '@typescript-eslint/no-floating-promises': 'error',
+      // CSS class selectors break when styling changes. Use getByRole, getByLabel
+      // or getByText; when none fits, add a data-testid to the view and use
+      // getByTestId. Matches a ".class" anywhere in a locator() selector.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.property.name='locator'] > Literal[value=/(^|[\\s>+~,(])\\.[A-Za-z_-]/]",
+          message: CLASS_SELECTOR_MESSAGE,
+        },
+        {
+          selector:
+            "CallExpression[callee.property.name='locator'] > TemplateLiteral > TemplateElement[value.raw=/(^|[\\s>+~,(])\\.[A-Za-z_-]/]",
+          message: CLASS_SELECTOR_MESSAGE,
+        },
+      ],
     },
   },
   {

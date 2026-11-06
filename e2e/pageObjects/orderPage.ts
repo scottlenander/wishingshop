@@ -14,11 +14,11 @@ export class OrderPage {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: /^Order WS-/ })
-    this.itemRows = page.locator('.order__items tbody tr')
-    this.total = page.locator('.order__total')
-    this.address = page.locator('.order__address')
-    this.payment = page.locator('.order__payment')
-    this.billing = page.locator('.order__billing')
+    this.itemRows = page.getByTestId('order-item')
+    this.total = page.getByTestId('order-total')
+    this.address = page.getByTestId('order-address')
+    this.payment = page.getByTestId('order-payment')
+    this.billing = page.getByTestId('order-billing')
   }
 
   // "WS-7F3K2Q" from the page heading.

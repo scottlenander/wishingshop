@@ -21,7 +21,7 @@
     </thead>
     <tbody>
       <% @announcements.each do |announcement| %>
-        <tr id="<%= dom_id(announcement) %>">
+        <tr id="<%= dom_id(announcement) %>" data-testid="announcement-row">
           <td><%= announcement.title %></td>
           <td><%= announcement.kind_label %></td>
           <td><%= announcement.status %></td>

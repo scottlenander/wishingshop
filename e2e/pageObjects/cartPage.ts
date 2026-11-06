@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test'
 
 // Cart page (/cart). Visitors have a cart too; Checkout asks them to log in.
-export class Cart {
+export class CartPage {
   readonly page: Page
   readonly header: Locator
   readonly items: Locator
@@ -15,12 +15,12 @@ export class Cart {
   constructor(page: Page) {
     this.page = page
     this.header = page.getByRole('heading', { name: 'Your cart' })
-    this.items = page.locator('.cart__item')
+    this.items = page.getByTestId('cart-item')
     this.emptyMessage = page.getByText('Your cart is empty.')
-    this.problems = page.locator('.cart__problem')
-    this.subtotal = page.locator('.cart__subtotal')
-    this.shippingNote = page.locator('.cart__shipping-note')
-    this.checkoutButton = page.locator('.cart__checkout')
+    this.problems = page.getByTestId('cart-problem')
+    this.subtotal = page.getByTestId('cart-subtotal')
+    this.shippingNote = page.getByTestId('shipping-note')
+    this.checkoutButton = page.getByTestId('cart-checkout')
   }
 
   async goto() {
@@ -46,7 +46,7 @@ export class Cart {
   }
 
   lineTotal(productName: string): Locator {
-    return this.item(productName).locator('.cart__line-total')
+    return this.item(productName).getByTestId('line-total')
   }
 
   async setQuantity(productName: string, quantity: number) {

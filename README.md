@@ -282,6 +282,10 @@ When a test fails, its trace, screenshot and video are kept in the HTML report (
 
 **How the suite is organized:**
 - **Page objects** (`pageObjects/`): shared locators for each page, used by every test.
+- **Finding elements:**
+  - **First choice:** the way a person would, with `getByRole`, `getByLabel` and `getByText`.
+  - **When none of those fits:** add a `data-testid` to the view, e.g. `data-testid="cart-item"`, named after what the element is, and use `getByTestId`.
+  - **CSS class selectors aren't used:** they break when styling changes. `npm run lint` rejects them in `.locator(...)`. The only exception is the letter_opener inbox, whose markup comes from a gem.
 - **Saved logins** (`tests/auth.setup.ts`): signs in once per run as admin and as each test account, and saves the sessions in `playwright/.auth/` (git-ignored).
   - Regression tests start already signed in, with `test.use({ storageState: AUTH_FILES.admin })`.
   - The smoke tests still sign in through the form, as admin and Alice.

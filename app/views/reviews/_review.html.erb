@@ -1,4 +1,4 @@
-<article class="reviews-item" id="<%= dom_id(review) %>">
+<article class="reviews-item" data-testid="review" id="<%= dom_id(review) %>">
   <header class="reviews-item__header">
     <%= star_rating(review.rating) %>
     <strong class="reviews-item__author"><%= review.author_name %></strong>

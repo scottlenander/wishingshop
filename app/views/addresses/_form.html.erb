@@ -1,6 +1,6 @@
-<%= form_with model: address, class: "form-card" do |form| %>
+<%= form_with model: address, class: "form-card", data: { testid: "address-form" } do |form| %>
   <% if address.errors.any? %>
-    <p class="error"><%= address.errors.full_messages.first %></p>
+    <p class="error" data-testid="form-error"><%= address.errors.full_messages.first %></p>
   <% end %>
   <%= hidden_field_tag "address[kind]", address.kind if address.new_record? %>
 

@@ -13,8 +13,8 @@
 <div id="products" class="products-index__categories">
   <% @product_groups.each do |key, label, products| %>
     <section class="products-index__category" id="category-<%= key %>" aria-labelledby="category-<%= key %>-title">
-      <h2 id="category-<%= key %>-title" class="products-index__category-title"><%= label %></h2>
-      <div class="products-index__grid">
+      <h2 id="category-<%= key %>-title" class="products-index__category-title" data-testid="category-title"><%= label %></h2>
+      <div class="products-index__grid" data-testid="product-grid">
         <%= render partial: "card", collection: products, as: :product %>
       </div>
     </section>

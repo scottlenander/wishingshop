@@ -2,7 +2,7 @@ import type { Locator, Page } from '@playwright/test'
 
 // "Forgot password?" pages: ask for a reset email (passwords/new), then choose a
 // new password from the emailed link (passwords/edit).
-export class PasswordReset {
+export class PasswordResetPage {
   readonly page: Page
 
   // Request

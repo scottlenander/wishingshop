@@ -1,8 +1,8 @@
 import { test, expect, type Browser, type Page } from '@playwright/test'
 import { MainPage } from '../../pageObjects/mainPage'
 import { LoginPage } from '../../pageObjects/loginPage'
-import { LetterOpener } from '../../pageObjects/letterOpener'
-import { PasswordReset } from '../../pageObjects/passwordReset'
+import { LetterOpenerPage } from '../../pageObjects/letterOpenerPage'
+import { PasswordResetPage } from '../../pageObjects/passwordResetPage'
 import { AdminUsers } from '../../pageObjects/admin/users'
 import { ReactivationPage } from '../../pageObjects/reactivationPage'
 import { USERS } from '../../libs/constants'
@@ -92,8 +92,8 @@ test.describe('admin', () => {
 test('a deactivated user reactivates by resetting their password', async ({ page, request }) => {
   const mainPage = new MainPage(page)
   const loginPage = new LoginPage(page)
-  const passwordReset = new PasswordReset(page)
-  const letterOpener = new LetterOpener(page)
+  const passwordReset = new PasswordResetPage(page)
+  const letterOpener = new LetterOpenerPage(page)
   let lettersBefore = 0
 
   await test.step('Start deactivated', async () => {

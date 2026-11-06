@@ -1,6 +1,6 @@
-<%= form_with model: product, class: "form-card products-form" do |form| %>
+<%= form_with model: product, class: "form-card products-form", data: { testid: "product-form" } do |form| %>
   <% if form.object.errors.any? %>
-    <p class="error"><%= form.object.errors.full_messages.first %></p>
+    <p class="error" data-testid="form-error"><%= form.object.errors.full_messages.first %></p>
   <% end %>
 
   <div class="products-form__field">

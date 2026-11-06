@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import { test as setup, expect, type Browser } from '@playwright/test'
 import { LoginPage } from '../pageObjects/loginPage'
 import { MainPage } from '../pageObjects/mainPage'
-import { MySubscriptions } from '../pageObjects/mySubscriptions'
+import { MySubscriptionsPage } from '../pageObjects/mySubscriptionsPage'
 import { AUTH_FILES } from '../libs/auth'
 import { USERS } from '../libs/constants'
 
@@ -30,7 +30,7 @@ async function savedSessionWorks(browser: Browser, file: string, email: string) 
 
   const context = await browser.newContext({ storageState: file })
   const page = await context.newPage()
-  const mySubscriptions = new MySubscriptions(page)
+  const mySubscriptions = new MySubscriptionsPage(page)
   await mySubscriptions.goto()
   const works = await mySubscriptions.page.getByText(`We'll email ${email} when`).isVisible()
   await context.close()

@@ -10,7 +10,7 @@
               data: { controller: "checkout", checkout_subtotal_value: subtotal } do |form| %>
   <div class="checkout__form">
     <% if @checkout.errors.any? %>
-      <div class="error checkout__errors" role="alert">
+      <div class="error checkout__errors" role="alert" data-testid="checkout-errors">
         <p><strong>Please check the details below.</strong></p>
         <ul>
           <% @checkout.errors.full_messages.each do |message| %>
@@ -104,7 +104,7 @@
         <%= form.text_field :card_name, required: true, autocomplete: "cc-name" %>
       </div>
       <% if @checkout.errors.any? %>
-        <p class="admin-form__hint checkout__card-again">For your security, enter your card number and security code again.</p>
+        <p class="admin-form__hint checkout__card-again" data-testid="card-again-note">For your security, enter your card number and security code again.</p>
       <% end %>
       <div>
         <%= form.label :card_number %>
@@ -129,7 +129,7 @@
     <h2 id="checkout-summary-title">Order summary</h2>
     <ul class="checkout__items">
       <% @cart.cart_items.includes(:product).each do |item| %>
-        <li>
+        <li data-testid="summary-item">
           <span><%= item.quantity %> × <%= item.product.name %></span>
           <span><%= format_price(item.line_total_cents) %></span>
         </li>
@@ -139,9 +139,9 @@
       <dt>Subtotal</dt>
       <dd><%= format_price(subtotal) %></dd>
       <dt>Shipping</dt>
-      <dd data-checkout-target="shipping"><%= @checkout.shipping_cents.zero? ? "Free" : format_price(@checkout.shipping_cents) %></dd>
+      <dd data-checkout-target="shipping" data-testid="checkout-shipping-cost"><%= @checkout.shipping_cents.zero? ? "Free" : format_price(@checkout.shipping_cents) %></dd>
       <dt class="checkout__total-label">Total</dt>
-      <dd class="checkout__total" data-checkout-target="total"><%= format_price(@checkout.total_cents) %></dd>
+      <dd class="checkout__total" data-checkout-target="total" data-testid="checkout-total"><%= format_price(@checkout.total_cents) %></dd>
     </dl>
     <%= form.submit "Place order", class: "checkout__submit" %>
   </aside>

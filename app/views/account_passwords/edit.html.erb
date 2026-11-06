@@ -4,7 +4,7 @@
 
 <%= form_with model: @user, url: account_password_path, method: :patch, class: "form-card account__form" do |form| %>
   <% if @user.errors.any? %>
-    <p class="error"><%= @user.errors.full_messages.first %></p>
+    <p class="error" data-testid="form-error"><%= @user.errors.full_messages.first %></p>
   <% end %>
 
   <div>

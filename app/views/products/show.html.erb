@@ -1,6 +1,6 @@
 <p><%= link_to "Back", products_path, class: "products-show__back" %></p>
 
-<%= tag.section class: ["products-show__product", { "products-show__product--no-image": !@product.featured_image.attached? }] do %>
+<%= tag.section class: ["products-show__product", { "products-show__product--no-image": !@product.featured_image.attached? }], data: { testid: "product-details" } do %>
   <%= image_tag @product.featured_image, alt: @product.name, class: "products-show__image" if @product.featured_image.attached? %>
 
   <section class="products-show__info">
@@ -14,7 +14,7 @@
     <h1 class="products-show__title"><%= @product.name %></h1>
 
     <%# Not cached: reviews change without touching the product. %>
-    <p class="products-show__rating">
+    <p class="products-show__rating" data-testid="product-rating">
       <% if @rating_summary.any? %>
         <%= link_to "#reviews", class: "products-show__rating-link" do %>
           <span aria-hidden="true"><%= star_rating(@rating_summary.average) %></span>
@@ -26,7 +26,7 @@
     </p>
 
     <% cache @product do %>
-      <div class="products-show__description"><%= @product.description %></div>
+      <div class="products-show__description" data-testid="product-description"><%= @product.description %></div>
     <% end %>
 
     <%= render "products/inventory", product: @product %>

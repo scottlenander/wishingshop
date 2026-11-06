@@ -17,7 +17,7 @@
     </thead>
     <tbody>
       <% @users.each do |user| %>
-        <tr id="<%= dom_id(user) %>">
+        <tr id="<%= dom_id(user) %>" data-testid="user-row">
           <td><%= user.full_name %></td>
           <td><%= user.email_address %></td>
           <td><%= user.created_at.to_date.to_fs(:long) %></td>
@@ -48,7 +48,7 @@
     </thead>
     <tbody>
       <% @deactivated_users.each do |user| %>
-        <tr id="<%= dom_id(user) %>">
+        <tr id="<%= dom_id(user) %>" data-testid="deactivated-user-row">
           <td><%= user.full_name %></td>
           <td><%= user.email_address %></td>
           <td><%= user.deactivated_at.to_date.to_fs(:long) %></td>

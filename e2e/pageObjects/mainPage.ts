@@ -51,14 +51,14 @@ export class MainPage {
     // to My account) and Log out when signed in.
     this.loginLink = navLink('Login')
     this.signUpLink = navLink('Sign up')
-    this.greeting = page.locator('.layouts-application__greeting')
+    this.greeting = page.getByTestId('nav-greeting')
     // Named "Cart, 2 items"; the badge shows the count when there are items.
     this.cartLink = nav.getByRole('link', { name: /^Cart, / })
-    this.cartCount = page.locator('.layouts-application__cart-count')
+    this.cartCount = page.getByTestId('cart-count')
 
     // Flash messages
-    this.notice = page.locator('.notice')
-    this.alert = page.locator('.alert')
+    this.notice = page.getByTestId('flash-notice')
+    this.alert = page.getByTestId('flash-alert')
 
     // Top of the products page
     this.carousel = new Carousel(page)

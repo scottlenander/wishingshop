@@ -22,7 +22,7 @@ export class SignUpPage {
     this.passwordInput = page.getByLabel('Password', { exact: true })
     this.confirmPasswordInput = page.getByLabel('Confirm password')
     this.createButton = page.getByRole('button', { name: 'Create account' })
-    this.error = page.locator('.form-card .error')
+    this.error = page.getByTestId('form-error')
     this.logInLink = page.getByRole('main').getByRole('link', { name: 'Log in' })
   }
 

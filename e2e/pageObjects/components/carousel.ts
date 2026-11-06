@@ -35,7 +35,7 @@ export class Carousel {
   }
 
   badge(slide: Locator): Locator {
-    return slide.locator('.carousel__badge')
+    return slide.getByTestId('slide-badge')
   }
 
   // Clicks through the dots until the slide with this title is showing.

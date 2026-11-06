@@ -34,15 +34,15 @@ export class Reviews {
     this.page = page
     this.root = page.getByRole('region', { name: 'Reviews' })
 
-    this.average = this.root.locator('.reviews-summary__average strong')
-    this.count = this.root.locator('.reviews-summary__count')
+    this.average = this.root.getByTestId('rating-average')
+    this.count = this.root.getByTestId('review-count')
 
-    this.items = this.root.locator('.reviews-item')
+    this.items = this.root.getByTestId('review')
     this.showMoreButton = this.root.getByRole('link', { name: /^Show more reviews/ })
-    this.emptyMessage = this.root.locator('.reviews__empty')
+    this.emptyMessage = this.root.getByTestId('reviews-empty')
 
     this.sortNav = this.root.getByRole('navigation', { name: 'Sort reviews' })
-    this.filterNote = this.root.locator('.reviews__filter')
+    this.filterNote = this.root.getByTestId('review-filter-note')
     this.showAllLink = this.root.getByRole('link', { name: 'Show all reviews' })
 
     this.compose = this.root.locator('#write-review')
@@ -52,7 +52,7 @@ export class Reviews {
     )
     this.bodyInput = page.getByLabel('Your review')
     this.submitButton = page.getByRole('button', { name: /^(Post|Update) review$/ })
-    this.formErrors = page.locator('.reviews-form .error')
+    this.formErrors = page.getByTestId('form-error')
     this.yourReview = this.compose.getByRole('heading', { name: 'Your review' })
     this.editLink = this.compose.getByRole('link', { name: 'Edit your review' })
     this.deleteButton = this.compose.getByRole('button', { name: 'Delete your review' })
@@ -114,7 +114,7 @@ export class Reviews {
     if (await this.deleteButton.isVisible()) {
       this.page.once('dialog', (dialog) => void dialog.accept())
       await this.deleteButton.click()
-      await this.page.locator('.notice').getByText('Review deleted.').waitFor()
+      await this.page.getByTestId('flash-notice').getByText('Review deleted.').waitFor()
     }
   }
 }

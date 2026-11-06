@@ -2,9 +2,9 @@
   <% if summary.any? %>
     <p class="reviews-summary__average">
       <%= star_rating(summary.average) %>
-      <strong><%= summary.average %> out of 5</strong>
+      <strong data-testid="rating-average"><%= summary.average %> out of 5</strong>
     </p>
-    <p class="reviews-summary__count"><%= pluralize(summary.count, "review") %></p>
+    <p class="reviews-summary__count" data-testid="review-count"><%= pluralize(summary.count, "review") %></p>
 
     <ul class="reviews-summary__breakdown">
       <% summary.breakdown.each do |stars, count| %>
@@ -28,6 +28,6 @@
       <% end %>
     </ul>
   <% else %>
-    <p class="reviews-summary__count">No reviews yet</p>
+    <p class="reviews-summary__count" data-testid="review-count">No reviews yet</p>
   <% end %>
 </div>

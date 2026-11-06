@@ -16,7 +16,7 @@
       </thead>
       <tbody>
         <% @order.order_items.each do |item| %>
-          <tr>
+          <tr data-testid="order-item">
             <td><%= item.product ? link_to(item.product_name, item.product) : item.product_name %></td>
             <td><%= @order.legacy? ? "—" : format_price(item.unit_price_cents) %></td>
             <td><%= item.quantity %></td>
@@ -35,7 +35,7 @@
         <dt>Shipping (<%= @order.shipping_option&.label %>)</dt>
         <dd><%= @order.shipping_cents.zero? ? "Free" : format_price(@order.shipping_cents) %></dd>
         <dt class="checkout__total-label">Total</dt>
-        <dd class="checkout__total order__total"><%= format_price(@order.total_cents) %></dd>
+        <dd class="checkout__total order__total" data-testid="order-total"><%= format_price(@order.total_cents) %></dd>
       </dl>
     <% end %>
   </section>
@@ -43,20 +43,20 @@
   <% unless @order.legacy? %>
     <section class="form-card order__shipping" aria-labelledby="order-shipping-title">
       <h2 id="order-shipping-title">Shipping to</h2>
-      <address class="order__address"><%= safe_join(@order.address_lines, tag.br) %></address>
+      <address class="order__address" data-testid="order-address"><%= safe_join(@order.address_lines, tag.br) %></address>
 
       <% if @order.billing_lines.any? %>
         <h2>Billing address</h2>
         <% if @order.ships_to_billing? %>
-          <p class="order__billing">Same as shipping</p>
+          <p class="order__billing" data-testid="order-billing">Same as shipping</p>
         <% else %>
-          <address class="order__billing"><%= safe_join(@order.billing_lines, tag.br) %></address>
+          <address class="order__billing" data-testid="order-billing"><%= safe_join(@order.billing_lines, tag.br) %></address>
         <% end %>
       <% end %>
       <p><strong><%= @order.shipping_option&.label %></strong>: <%= @order.shipping_option&.estimate %></p>
 
       <h2>Payment</h2>
-      <p class="order__payment"><%= @order.payment_summary %></p>
+      <p class="order__payment" data-testid="order-payment"><%= @order.payment_summary %></p>
     </section>
   <% end %>
 </div>
